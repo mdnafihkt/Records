@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="45dp"
+        android:elevation="4dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Folders"
+            android:textColor="@color/white"
+            android:textSize="35dp"
+            android:textStyle="bold"/>
+        <Button
+            android:id="@+id/addFolderBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="4dp"
+            android:backgroundTint="@color/lavender"
+            android:background="@drawable/baseline_create_new_folder_24"/>
+    </RelativeLayout>
+    <!-- All Notes button styled like folder items -->
+    <LinearLayout
+        android:id="@+id/AllNotesLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="10dp"
+        android:padding="5dp"
+        android:clickable="true"
+        android:background="@drawable/border"
+        android:backgroundTint="@color/transparent"
+        >
+
+        <ImageView
+            android:id="@+id/folderIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_folder"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="16dp">
+
+            <TextView
+                android:id="@+id/allNotesTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="All Notes"
+                android:textColor="@color/white"
+                />
+
+            <TextView
+                android:id="@+id/noteCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="number of Notes"
+                android:textColor="#999"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/FolderRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"
+        android:background="@drawable/border"
+        android:backgroundTint="@color/transparent"
+        android:layout_margin="10dp" />
+</LinearLayout>
