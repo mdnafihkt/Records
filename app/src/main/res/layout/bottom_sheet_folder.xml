@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/black">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="80dp"
+        android:orientation="vertical"
+        android:background="@drawable/border"
+        android:backgroundTint="#BA05152B">
+    <TextView
+        android:id="@+id/renameOption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Rename"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:padding="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#575757" />
+
+    <TextView
+        android:id="@+id/deleteOption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete"
+        android:textColor="@color/dark_red"
+        android:textSize="16sp"
+        android:padding="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground" />
+    </LinearLayout>
+</LinearLayout>

@@ -3,11 +3,18 @@ package com.example.records
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.ContextThemeWrapper
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
+import android.widget.PopupMenu
+import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.example.records.R
+import com.example.records.database.FolderNoteJoin
 import com.example.records.database.Note
 import com.example.records.database.NoteDatabase
 import kotlinx.coroutines.launch
@@ -38,19 +45,38 @@ class ViewNoteActivity : AppCompatActivity() {
 
 
         findViewById<Button>(R.id.backToNotesBtn).setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+//            val intent = Intent(this, MainActivity::class.java)
+//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+//            startActivity(intent)
             finish()
         }
 
-        findViewById<Button>(R.id.editNoteBtn).setOnClickListener {
-            editNote()
+        val optionsButton: Button = findViewById(R.id.view_notes_options)
+        optionsButton.setOnClickListener { view ->
+            showPopupMenu(view)
+        }
+    }
+
+    private fun showPopupMenu(view: View) {
+        val popupMenuView = layoutInflater.inflate(R.layout.popup_menu_layout,null)
+
+        val editButton = popupMenuView.findViewById<Button>(R.id.edit)
+        val deleteButton = popupMenuView.findViewById<Button>(R.id.delete)
+
+
+        val popupWindow = PopupWindow(popupMenuView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true)
+
+        // Set button actions
+        editButton.setOnClickListener {
+            popupWindow.dismiss() // Close popup
+            editNote() // Your edit action
         }
 
-        findViewById<Button>(R.id.deleteNoteBtn).setOnClickListener {
+        deleteButton.setOnClickListener {
+            popupWindow.dismiss() // Close popup
             AlertDialog.Builder(this)
                 .setTitle("Delete Note")
-                .setMessage("Are you sure to Delete this Note ?")
+                .setMessage("Are you sure to delete this note?")
                 .setPositiveButton("Delete") { _, _ ->
                     deleteNote()
                 }
@@ -59,7 +85,13 @@ class ViewNoteActivity : AppCompatActivity() {
                 }
                 .show()
         }
+
+        // Show the PopupWindow anchored to the view
+        popupWindow.showAsDropDown(view, -50,10)
     }
+
+
+
 
     // Method to load note details from the database
     private fun loadNoteDetails() {
@@ -72,6 +104,7 @@ class ViewNoteActivity : AppCompatActivity() {
         }
     }
 
+
     private fun deleteNote() {
         lifecycleScope.launch{
             val note = db.noteDao().getNoteById(noteId)
@@ -79,7 +112,9 @@ class ViewNoteActivity : AppCompatActivity() {
                 db.noteDao().delete(note)
                 finish()
             }
+            db.folderNoteJoinDao().deleteByNoteId(noteId)
         }
+
 
     }
 

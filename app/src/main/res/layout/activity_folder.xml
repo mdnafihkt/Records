@@ -42,7 +42,11 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="20dp"
         android:layout_marginRight="10dp"
-        android:padding="5dp"
+        android:layout_marginBottom="5dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
         android:clickable="true"
         android:background="@drawable/border"
         android:backgroundTint="@color/transparent"
@@ -50,9 +54,9 @@
 
         <ImageView
             android:id="@+id/folderIcon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_folder"/>
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/folder"/>
 
         <LinearLayout
             android:layout_width="0dp"
@@ -70,7 +74,7 @@
                 />
 
             <TextView
-                android:id="@+id/noteCount"
+                android:id="@+id/allNotesCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="number of Notes"
@@ -80,7 +84,6 @@
 
     </LinearLayout>
 
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/FolderRecyclerView"
         android:layout_width="match_parent"
@@ -88,6 +91,6 @@
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"
         android:background="@drawable/border"
-        android:backgroundTint="@color/transparent"
+        android:backgroundTint="#121212"
         android:layout_margin="10dp" />
 </LinearLayout>

@@ -17,7 +17,7 @@ class NoteAdapter(private val onClick: (Note) -> Unit) : RecyclerView.Adapter<No
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_1, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_note, parent, false)
         return NoteViewHolder(view)
     }
 
@@ -29,7 +29,7 @@ class NoteAdapter(private val onClick: (Note) -> Unit) : RecyclerView.Adapter<No
     override fun getItemCount() = notes.size
 
     class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val titleView: TextView = itemView.findViewById(android.R.id.text1)
+        private val titleView: TextView = itemView.findViewById(R.id.title1)
 
         fun bind(note: Note, onClick: (Note) -> Unit) {
             titleView.text = note.title

@@ -3,20 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/black"
+    android:background="@color/light_black"
     android:padding="20dp">
 
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/menubar_view_notes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <Button
-            android:layout_weight="1"
             android:id="@+id/backToNotesBtn"
-            android:layout_width="25dp"
+            android:layout_width="wrap_content"
             android:layout_height="18dp"
             android:background="@drawable/back_icon"
             android:text="Notes"
@@ -24,25 +23,26 @@
             android:textColor="@color/lavender"
             android:textSize="15dp" />
 
+
         <Button
-            android:layout_weight="1"
             android:id="@+id/editNoteBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="edit"
-            android:backgroundTint="@color/black"
-            android:textColor="@color/orange"/>
+            android:layout_toLeftOf="@+id/view_notes_options"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginRight="15dp"
+            android:background="@drawable/search_icon8"
+            android:backgroundTint="@color/white"/>
+
+
 
         <Button
-            android:layout_weight="1"
-            android:id="@+id/deleteNoteBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="delete"
-            android:backgroundTint="@color/black"
-            android:textColor="@color/dark_red"/>
+            android:id="@+id/view_notes_options"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/option_icon" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 
     <TextView
@@ -61,7 +61,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/textViewTitle"
-        android:paddingBottom="20dp">
+        android:paddingBottom="20dp"
+        android:scrollbars="none">
 
         <TextView
             android:id="@+id/textViewContent"
@@ -69,11 +70,15 @@
             android:layout_height="match_parent"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="20dp"
+
             android:hint="Content"
             android:paddingTop="10dp"
             android:textColorHint="@color/grey"
             android:textColor="@color/white"
-            android:textSize="20sp" />
+            android:textSize="18sp"
+            android:fontFamily="sans-serif-light"
+            android:letterSpacing="0.03"
+            android:lineSpacingExtra="10sp"/>
     </ScrollView>
 
 </RelativeLayout>
