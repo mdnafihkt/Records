@@ -4,17 +4,17 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [Note::class, Folder::class, FolderNoteJoin::class], version = 1)
+@Database(entities = [Note::class, Folder::class, FolderNoteJoin::class], version = 2)
 abstract class NoteDatabase : RoomDatabase() {
     abstract fun noteDao(): NoteDao
     abstract fun folderDao(): FolderDao
     abstract fun folderNoteJoinDao(): FolderNoteJoinDao
-
 
     companion object {
         @Volatile
@@ -26,9 +26,17 @@ abstract class NoteDatabase : RoomDatabase() {
                     context.applicationContext,
                     NoteDatabase::class.java,
                     "note_database"
-                ).build()
+                )
+                    .addMigrations(MIGRATION_1_2) // Add migration here
+                    .build()
                 INSTANCE = instance
                 instance
+            }
+        }
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Add the lastUpdated column with a default value
+                database.execSQL("ALTER TABLE Note ADD COLUMN lastUpdated INTEGER DEFAULT 0 NOT NULL")
             }
         }
     }

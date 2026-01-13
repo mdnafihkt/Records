@@ -18,13 +18,18 @@ interface FolderNoteJoinDao {
     @Query("DELETE FROM FolderNoteJoin WHERE folderId = :folderId")
     suspend fun deleteByFolderId(folderId: Int)
 
-
-
     @Query("SELECT COUNT(*) FROM FolderNoteJoin WHERE folderId = :folderId")
     suspend fun getNoteCountForFolder(folderId: Int): Int
 
+    @Query("""
+             SELECT *
+             FROM Note
+             INNER JOIN FolderNoteJoin
+             ON Note.id = FolderNoteJoin.noteId
+             WHERE FolderNoteJoin.folderId = :folderId
+             ORDER BY Note.lastUpdated DESC
+    """)
 
-    @Query("SELECT * FROM Note INNER JOIN FolderNoteJoin ON Note.id = FolderNoteJoin.noteId WHERE FolderNoteJoin.folderId = :folderId")
     fun getNotesForFolder(folderId: Int): LiveData<List<Note>>
 
 

@@ -30,10 +30,13 @@ class NoteAdapter(private val onClick: (Note) -> Unit) : RecyclerView.Adapter<No
 
     class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val titleView: TextView = itemView.findViewById(R.id.title1)
+        private val contentView: TextView = itemView.findViewById(R.id.item_note_content)
 
         fun bind(note: Note, onClick: (Note) -> Unit) {
             titleView.text = note.title
             titleView.setTextColor(itemView.context.getColor(R.color.white))
+            contentView.text = note.content
+            contentView.setTextColor(itemView.context.getColor(R.color.white))
             itemView.setOnClickListener { onClick(note) }
         }
     }

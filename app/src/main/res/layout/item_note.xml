@@ -2,26 +2,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@drawable/border"
+    android:backgroundTint="#0A0E1B"
+    android:layout_marginBottom="20dp">
 
-<TextView
-    android:id="@+id/title1"
-    android:hint="title"
-    android:textColorHint="@color/grey"
-    android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:textSize="16sp"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="5dp"
-    android:layout_margin="0dp"
-    android:textColor="#FFFFFF"
-    android:background="@color/black" />
-    <!-- Divider -->
-<View
-android:layout_width="match_parent"
-android:layout_height="1dp"
-android:background="#575757" />
+    <TextView
+        android:id="@+id/title1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="title"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="@color/grey"
+        android:textSize="18sp"
+        android:letterSpacing="0.08"
+        android:fontWeight="600"/>
+
+    <TextView
+        android:id="@+id/item_note_content"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:hint="content"
+        android:singleLine="true"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="5dp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="@color/grey"
+        android:textFontWeight="300"
+        android:textSize="15sp" />
+
 
     </LinearLayout>

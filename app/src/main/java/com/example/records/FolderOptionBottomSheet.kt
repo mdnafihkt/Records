@@ -1,7 +1,9 @@
 package com.example.records
 
 
+import android.app.Dialog
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -34,5 +36,14 @@ class FolderOptionsBottomSheet(
             dismiss() // Close the bottom sheet
             onDeleteClick() // Trigger the delete action
         }
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.setOnShowListener {
+            val bottomSheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            bottomSheet?.setBackgroundColor(Color.BLACK) // Set background to black
+        }
+        return dialog
     }
 }

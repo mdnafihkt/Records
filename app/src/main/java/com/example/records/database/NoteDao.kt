@@ -5,6 +5,11 @@ import androidx.room.*
 
 @Dao
 interface NoteDao {
+    @Query("SELECT * FROM Note WHERE title LIKE :query COLLATE NOCASE")
+    suspend fun searchNotesByTitle(query: String): List<Note>
+
+    @Query("SELECT * FROM Note")
+    fun getAllNotes(): LiveData<List<Note>>
 
     @Query("SELECT * FROM Note WHERE id = :id LIMIT 1")
     suspend fun getNoteById(id: Int): Note?
@@ -17,6 +22,5 @@ interface NoteDao {
 
     @Update
     suspend fun update(note: Note)
-
 
 }

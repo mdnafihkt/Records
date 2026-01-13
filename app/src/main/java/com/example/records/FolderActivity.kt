@@ -1,18 +1,17 @@
 package com.example.records
 
+import com.example.records.R
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.transition.TransitionInflater
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +22,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+
 class FolderActivity : AppCompatActivity() {
     private lateinit var folderAdapter: FolderAdapter
     private lateinit var db:NoteDatabase
@@ -31,10 +31,16 @@ class FolderActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.sharedElementReenterTransition = TransitionInflater.from(this)
+            .inflateTransition(android.R.transition.move)
+        window.sharedElementExitTransition = TransitionInflater.from(this)
+            .inflateTransition(android.R.transition.move)
+        window.requestFeature(android.view.Window.FEATURE_CONTENT_TRANSITIONS)
         setContentView(R.layout.activity_folder)
 
         // Initialize the database
         db = NoteDatabase.getDatabase(this)
+
 
         val allNotesTextView = findViewById<LinearLayout>(R.id.AllNotesLayout)
         val allnotesCount = findViewById<TextView>(R.id.allNotesCount)
@@ -45,19 +51,29 @@ class FolderActivity : AppCompatActivity() {
         }
 
         allNotesTextView.setOnClickListener{
+            val folderTitle = findViewById<TextView>(R.id.FolderTitle)
             val intent = Intent(this, MainActivity::class.java)
             intent.putExtra("FOLDER_ID",0)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
+            Intent.FLAG_ACTIVITY_CLEAR_TOP
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                this,
+                folderTitle,"sharedFolderTitle"
+            )
+            startActivity(intent,options.toBundle())
         }
 
 
 
         folderAdapter = FolderAdapter(
             onClick = {  folder ->
+                val folderTitle = findViewById<TextView>(R.id.FolderTitle)
                 val intent = Intent(this, MainActivity::class.java)
+                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                    this,
+                    folderTitle,"sharedFolderTitle"
+                )
                 intent.putExtra("FOLDER_ID",folder.id)
-                startActivity(intent)},
+                startActivity(intent,options.toBundle())},
             onLongClick = {folder ->
                 showBottomSheet(folder)
             },
@@ -85,7 +101,6 @@ class FolderActivity : AppCompatActivity() {
             onRenameClick = {
                 val builder = AlertDialog.Builder(this)
                 builder.setTitle("Rename Folder")
-
                 val input = EditText(this)
                 input.setText(folder.name)
                 builder.setView(input)
@@ -102,6 +117,7 @@ class FolderActivity : AppCompatActivity() {
                 }
 
                 builder.setNegativeButton("Cancel", null)
+
                 builder.show() // Implement rename logic here
             },
             onDeleteClick = {
@@ -152,6 +168,10 @@ class FolderActivity : AppCompatActivity() {
         }
         builder.setNegativeButton("cancel",null)
         builder.show()
+    }
+    override fun startActivity(intent: Intent?) {
+        super.startActivity(intent)
+        overridePendingTransition(R.transition.slide_left, R.transition.slide_right)
     }
 
 }

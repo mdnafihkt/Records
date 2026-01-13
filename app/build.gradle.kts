@@ -1,8 +1,8 @@
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
-    id("kotlin-kapt")
 }
 
 android {
@@ -13,8 +13,8 @@ android {
         applicationId = "com.example.records"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "2.0.0" // major ui change
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -32,17 +32,17 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
     packaging {
         resources {
@@ -52,27 +52,43 @@ android {
 }
 
 dependencies {
+    // Core Android & Kotlin Extensions
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+
+    // Jetpack Compose BOM
+    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
+
+    // Jetpack Compose UI Toolkit (Material 3)
     implementation("androidx.activity:activity-compose:1.9.2")
-    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
-    //ROOM
-    implementation("androidx.room:room-runtime:2.5.2")
-    implementation("com.google.android.material:material:1.12.0")
-    ksp("androidx.room:room-compiler:2.5.2")
-    implementation("androidx.room:room-ktx:2.5.2")
+    implementation("androidx.compose.animation:animation")
 
-    implementation("androidx.appcompat:appcompat:1.7.0")
+    // RecyclerView (Legacy / Interop)
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+
+    // Room Database (Persistence Layer)
+    implementation("androidx.room:room-runtime:2.5.2")
+    implementation("androidx.room:room-ktx:2.5.2")
+    ksp("androidx.room:room-compiler:2.5.2")
+
+    // Material Components for Views (legacy XML views)
+    implementation("com.google.android.material:material:1.12.0")
+
+    // Unit Testing
     testImplementation("junit:junit:4.13.2")
+
+    // Android Instrumentation & Compose UI Testing
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.06.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
+    // Debugging & Preview Tooling (Compose-only)
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

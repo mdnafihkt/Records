@@ -13,25 +13,46 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/backToNotesBtn"
+        <LinearLayout
+            android:id="@+id/backToNoteslayout"
             android:layout_width="wrap_content"
-            android:layout_height="18dp"
-            android:background="@drawable/back_icon"
-            android:text="Notes"
-            android:layout_centerVertical="true"
-            android:textColor="@color/lavender"
-            android:textSize="15dp" />
-
-
-        <Button
-            android:id="@+id/editNoteBtn"
-            android:layout_toLeftOf="@+id/view_notes_options"
-            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal"
+            android:clickable="true">
+            <Button
+                android:id="@+id/backToNotesBtn"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:background="@drawable/back_icon"
+                />
+            <TextView
+                android:id="@+id/backToNotesBtnText"
+                android:layout_width="50dp"
+                android:layout_height="18dp"
+                android:text="Notes"
+                android:textColor="@color/lavender"
+                android:textSize="15dp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="200dp"
             android:layout_height="30dp"
-            android:layout_marginRight="15dp"
-            android:background="@drawable/search_icon8"
-            android:backgroundTint="@color/white"/>
+            android:layout_toLeftOf="@+id/view_notes_options"
+            android:gravity="end"
+            >
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchView_view_note"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginRight="10dp"
+            android:iconifiedByDefault="true"
+            android:textAppearance="@color/white"
+            android:background="@drawable/border"
+            android:backgroundTint="#2CFFBF00"
+            />
+        </LinearLayout>
 
 
 
@@ -70,7 +91,6 @@
             android:layout_height="match_parent"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="20dp"
-
             android:hint="Content"
             android:paddingTop="10dp"
             android:textColorHint="@color/grey"
