@@ -1,8 +1,6 @@
 package com.example.records.ui.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,31 +11,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.records.R
 import com.example.records.database.Note
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.*
 
 @Composable
 fun NotesContent(
     notes: List<Note>,
     modifier: Modifier = Modifier
 ) {
+    var searchQuery by remember { mutableStateOf("") }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -51,9 +47,37 @@ fun NotesContent(
             modifier = Modifier.padding(top = 10.dp),
         )
 
-    Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-    notes.forEach { note ->
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            singleLine = true,
+            placeholder = {
+                Text(
+                    text = "search",
+                    color = Color.White.copy(alpha = 0.45f)
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .clip(RoundedCornerShape(10.dp)),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                cursorColor = Color(0xFFB39DDB),
+                focusedIndicatorColor = Color.White.copy(alpha = 0.6f),
+                unfocusedIndicatorColor = Color.White.copy(alpha = 0.3f),
+                focusedContainerColor = Color(0xFF2C2C2C),
+                unfocusedContainerColor = Color(0xFF2C2C2C)
+            )
+        )
+
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        notes.forEach { note ->
         Row(
             modifier = Modifier
                 .padding(vertical = 12.dp)

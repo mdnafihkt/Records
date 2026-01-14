@@ -38,8 +38,10 @@ fun NotesScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        horizontal = 16.dp, // ← horizontal margin
-                        vertical = 6.dp
+                        start = 16.dp, // ← horizontal margin
+                        end =16.dp,
+                        top = 0.dp,
+                        bottom = 20.dp
                     )
                     .clip(RoundedCornerShape(14.dp)),
             containerColor = colorResource(R.color.proton_dark_secondary),
