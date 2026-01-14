@@ -22,6 +22,7 @@ import androidx.compose.runtime.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.TextField
 import androidx.compose.ui.platform.LocalContext
 import com.example.records.ViewNoteActivity
 import androidx.compose.ui.res.colorResource
@@ -55,7 +56,7 @@ fun NotesContent(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        OutlinedTextField(
+        TextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
             singleLine = true,
@@ -73,13 +74,15 @@ fun NotesContent(
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White,
                 cursorColor = Color(0xFFB39DDB),
-                focusedIndicatorColor = Color.White.copy(alpha = 0.6f),
-                unfocusedIndicatorColor = Color.White.copy(alpha = 0.3f),
-                focusedContainerColor = colorResource(id = R.color.proton_dark_secondary),
-                unfocusedContainerColor = colorResource(id = R.color.proton_dark_secondary)
+                focusedContainerColor = colorResource(R.color.proton_dark_secondary),
+                unfocusedContainerColor = colorResource(R.color.proton_dark_secondary),
 
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
             )
         )
+
 
 
         Spacer(modifier = Modifier.height(20.dp))

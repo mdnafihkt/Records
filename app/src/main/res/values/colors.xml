@@ -14,6 +14,7 @@
     <color name="grey">#4E4C4C</color>
     <color name="dark_red">#C70000</color>
     <!--- primary dark -->
-    <color name="proton_dark_primary">#252138</color>
-    <color name="proton_dark_secondary">#2E2E42</color>
+    <color name="proton_dark_primary">#100E18</color>
+    <color name="proton_dark_secondary">#252138</color>
+    <color name="proton_dark_accent">#6D4AFF</color>
 </resources>
