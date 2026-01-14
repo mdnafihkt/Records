@@ -30,7 +30,8 @@ class MainActivity : ComponentActivity() {
             NotesScreen(
                 notes = notes,
                 onBackClick = { backToFolders() },
-                onAddClick = { addNote(folderId) }
+                onAddClick = { addNote(folderId) },
+                onSettingsClick = {}
             )
         }
     }

@@ -16,6 +16,7 @@ fun NotesScreenPreview() {
             Note(3, "Old laptop survives", "this is new note 3", 124)
         ),
         onBackClick = {},
-        onAddClick = {}
+        onAddClick = {},
+        onSettingsClick = {}
     )
 }
