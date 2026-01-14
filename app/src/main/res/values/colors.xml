@@ -13,4 +13,6 @@
     <color name="transparent">#25FFFFFF</color>
     <color name="grey">#4E4C4C</color>
     <color name="dark_red">#C70000</color>
+    <!--- primary dark -->
+    <color name="proton_dark_primary">#121016</color>
 </resources>

@@ -5,8 +5,10 @@ import androidx.room.*
 
 @Dao
 interface NoteDao {
-    @Query("SELECT * FROM Note WHERE title LIKE :query COLLATE NOCASE")
-    suspend fun searchNotesByTitle(query: String): List<Note>
+
+    @Query("SELECT * FROM Note WHERE title LIKE :query COLLATE NOCASE ORDER BY lastUpdated DESC")
+    fun searchNotesByTitle(query: String): LiveData<List<Note>>
+
 
     @Query("SELECT * FROM Note")
     fun getAllNotes(): LiveData<List<Note>>
