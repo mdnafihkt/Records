@@ -15,4 +15,5 @@
     <color name="dark_red">#C70000</color>
     <!--- primary dark -->
     <color name="proton_dark_primary">#121016</color>
+    <color name="proton_dark_secondary">#17151d</color>
 </resources>
