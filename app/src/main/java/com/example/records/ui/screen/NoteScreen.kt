@@ -38,8 +38,8 @@ fun NotesScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        start = 16.dp, // ← horizontal margin
-                        end =16.dp,
+                        start = 17.dp, // ← horizontal margin
+                        end =17.dp,
                         top = 0.dp,
                         bottom = 20.dp
                     )
@@ -49,6 +49,7 @@ fun NotesScreen(
 
             )
             {
+                Spacer(modifier = Modifier.weight(0.5f))
                 IconButton(onClick = onBackClick) {
                     Icon(
                         painter = painterResource(R.drawable.icon_folder),
@@ -75,6 +76,7 @@ fun NotesScreen(
                         modifier = Modifier.size(32.dp)
                     )
                 }
+                Spacer(modifier = Modifier.weight(0.5f))
             }
         }
     ){ innerPadding ->
