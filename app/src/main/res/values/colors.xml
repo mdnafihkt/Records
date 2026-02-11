@@ -14,6 +14,12 @@
     <color name="grey">#4E4C4C</color>
     <color name="dark_red">#C70000</color>
     <!--- primary dark -->
+<<<<<<< HEAD
     <color name="proton_dark_primary">#121016</color>
     <color name="proton_dark_secondary">#17151d</color>
+=======
+    <color name="proton_dark_primary">#100E18</color>
+    <color name="proton_dark_secondary">#252138</color>
+    <color name="proton_dark_accent">#6D4AFF</color>
+>>>>>>> 07d9e23
 </resources>

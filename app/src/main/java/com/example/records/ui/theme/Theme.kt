@@ -14,51 +14,55 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+val ProtonDarkColorScheme = darkColorScheme(
+    primary = ProtonDarkPrimary,
+    secondary = ProtonDarkSecondary,
+    background = ProtonDarkPrimary,
+    surface = ProtonDarkSecondary,
     onPrimary = Color.White,
     onSecondary = Color.White,
-    onTertiary = Color.White,
+    onBackground = Color.White,
+    onSurface = Color.White
+)
+
+val ProtonLightColorScheme = darkColorScheme(
+    primary = Purple40,
+    secondary = PurpleGrey40,
+    tertiary = Pink40,
+    background = Color.White,
+    surface = Color.White,
+    onPrimary = Color.Black,
+    onSecondary = Color.Black,
+    onTertiary = Color.Black,
     onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
-    */
 )
+
 
 @Composable
 fun RecordsTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    appTheme: AppTheme = AppTheme.PROTON_DARK,
+
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    val colorScheme = when (appTheme) {
+        AppTheme.PROTON_DARK -> ProtonDarkColorScheme
+        AppTheme.PROTON_AMOLED -> ProtonLightColorScheme
     }
+
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            window.statusBarColor = colorScheme.background.toArgb()
+            window.navigationBarColor = colorScheme.background.toArgb()
+
+            WindowCompat.getInsetsController(window, view)
+                .isAppearanceLightStatusBars = false
+            WindowCompat.getInsetsController(window, view)
+                .isAppearanceLightNavigationBars = false
         }
     }
 
@@ -67,4 +71,9 @@ fun RecordsTheme(
         typography = Typography,
         content = content
     )
+}
+
+enum class AppTheme {
+    PROTON_DARK,
+    PROTON_AMOLED
 }

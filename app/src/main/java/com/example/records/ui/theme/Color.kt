@@ -2,6 +2,10 @@ package com.example.records.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+val ProtonDarkPrimary = Color(0xFF100E18)
+val ProtonDarkSecondary = Color(0xFF252138)
+val ProtonDarkAccent = Color(0xFF6D4AFF)
+
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)

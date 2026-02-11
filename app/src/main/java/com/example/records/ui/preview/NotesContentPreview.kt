@@ -1,27 +1,24 @@
 package com.example.records.ui.preview
 
+import androidx.compose.foundation.background
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.example.records.database.Note
-import com.example.records.ui.screen.NotesScreen
+import com.example.records.ui.screen.NotesContent
 
 @Preview(showBackground = true)
 @Composable
-fun NotesScreenPreview() {
-    NotesScreen(
+fun NotesContentPreview() {
+    NotesContent(
         notes = listOf(
             Note(1, "Preview works", "this is new note 1", 122),
             Note(2, "No rebuilding", "this is new note 2", 123),
             Note(3, "Old laptop survives", "this is new note 3", 124)
         ),
-        onBackClick = {},
-        onAddClick = {},
-<<<<<<< HEAD
-        onSettingsClick = {}
-=======
-        onSettingsClick = {},
+        modifier = Modifier.background(Color(0xFF121212)),
         onNoteClick = {}
->>>>>>> 07d9e23
     )
+
 }
