@@ -27,6 +27,8 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.records.ViewNoteActivity
 import androidx.compose.ui.res.colorResource
 import com.example.records.R
+import com.example.records.ui.theme.GlassmorphicCard
+import androidx.compose.foundation.lazy.items
 
 @Composable
 fun NotesContent(
@@ -56,88 +58,92 @@ fun NotesContent(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        TextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            singleLine = true,
-            placeholder = {
-                Text(
-                    text = "search",
-                    color = Color.White.copy(alpha = 0.45f)
+        // Search Bar - Glassmorphic style
+        // We can wrap TextField in a GlassmorphicCard or just style it transparently with border
+        GlassmorphicCard(
+             modifier = Modifier.fillMaxWidth(),
+             cornerRadius = 10.dp
+        ) {
+            Box(contentAlignment = Alignment.CenterStart) {
+                if (searchQuery.isEmpty()) {
+                    Text(
+                        text = "search",
+                        color = Color.White.copy(alpha = 0.45f),
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+                androidx.compose.foundation.text.BasicTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    singleLine = true,
+                    textStyle = androidx.compose.ui.text.TextStyle(
+                        color = Color.White,
+                        fontSize = 16.sp
+                    ),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp)
                 )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .clip(RoundedCornerShape(10.dp)),
-            colors = TextFieldDefaults.colors(
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                cursorColor = Color(0xFFB39DDB),
-                focusedContainerColor = colorResource(R.color.proton_dark_secondary),
-                unfocusedContainerColor = colorResource(R.color.proton_dark_secondary),
-
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent
-            )
-        )
-
-
+            }
+        }
 
         Spacer(modifier = Modifier.height(20.dp))
 
         LazyColumn(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(bottom = 80.dp)
         ) {
 
             items(filteredNotes) { note ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp)
-                        .clickable {
-                            val intent = Intent(context, ViewNoteActivity::class.java).apply {
-                                putExtra("noteId", note.id)
-                            }
-                            context.startActivity(intent)
-                },
-                    verticalAlignment = Alignment.CenterVertically
+                GlassmorphicCard(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    // find  folder color
-                    val folderColor = when (note.title) {
-                        "Work" -> Color.Blue
-                        "Personal" -> Color.Green
-                        else -> Color.White.copy(alpha = 0.5f)
-                    }
-
-                    Box(
+                    Row(
                         modifier = Modifier
-                            .size(30.dp)
-                            .clip(RoundedCornerShape(5.dp))
-                            .background(folderColor)
-                    )
+                            .fillMaxWidth()
+                            .clickable {
+                                val intent = Intent(context, ViewNoteActivity::class.java).apply {
+                                    putExtra("noteId", note.id)
+                                }
+                                context.startActivity(intent)
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // find  folder color
+                        val folderColor = when (note.title) {
+                            "Work" -> Color.Blue
+                            "Personal" -> Color.Green
+                            else -> Color.White.copy(alpha = 0.5f)
+                        }
 
-
-                    Spacer(modifier = Modifier.width(12.dp))
-
-                    Column {
-
-                        Text(
-                            text = note.title,
-                            color = Color.White,
-                            fontSize = 16.sp
+                        Box(
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clip(RoundedCornerShape(5.dp))
+                                .background(folderColor)
                         )
 
-                        Spacer(modifier = Modifier.height(2.dp))
 
-                        Text(
-                            text = note.content,
-                            color = Color.White.copy(alpha = 0.7f),
-                            fontSize = 14.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Column {
+
+                            Text(
+                                text = note.title,
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            Spacer(modifier = Modifier.height(2.dp))
+
+                            Text(
+                                text = note.content,
+                                color = Color.White.copy(alpha = 0.7f),
+                                fontSize = 14.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 }
             }

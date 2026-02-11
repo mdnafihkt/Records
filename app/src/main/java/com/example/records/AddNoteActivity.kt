@@ -2,17 +2,17 @@ package com.example.records
 
 
 import android.content.Intent
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
-import androidx.core.app.ActivityOptionsCompat
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.lifecycleScope
-import com.example.records.R
 import com.example.records.database.FolderNoteJoin
 import com.example.records.database.Note
 import com.example.records.database.NoteDatabase
+import com.example.records.ui.screen.AddNoteScreen
+import com.example.records.ui.theme.RecordsTheme
 import kotlinx.coroutines.launch
 
 class AddNoteActivity : AppCompatActivity() {
@@ -23,39 +23,37 @@ class AddNoteActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_note)
-
+        
         db = NoteDatabase.getDatabase(this)
         folderId = intent.getIntExtra("FOLDER_ID", 0)
-
-        //INITIALISATIONS
-        val titleEditText = findViewById<EditText>(R.id.editTextTitle)
-        val contentEditText = findViewById<EditText>(R.id.editTextContent)
-
         isEdit = intent.getBooleanExtra("isEdit", false)
-        if (isEdit) {
-            val noteTitle = intent.getStringExtra("title")
-            val noteContent = intent.getStringExtra("content")
-            noteId = intent.getIntExtra("noteId", 0)
-            folderId = intent.getIntExtra("FOLDER_ID",0)
-            titleEditText.setText(noteTitle)
-            contentEditText.setText(noteContent)
-        }
+        
+        val initialTitle = if (isEdit) intent.getStringExtra("title") ?: "" else ""
+        val initialContent = if (isEdit) intent.getStringExtra("content") ?: "" else ""
+        noteId = intent.getIntExtra("noteId", 0)
 
-
-
-        findViewById<Button>(R.id.saveBtn).setOnClickListener {
-            val noteTitle = titleEditText.text.toString()
-            val noteContent = contentEditText.text.toString()
-            if (noteTitle.isNotEmpty() && noteContent.isNotEmpty()) {
-                saveNote(noteTitle, noteContent, folderId)
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
+        setContent {
+            RecordsTheme {
+                AddNoteScreen(
+                    initialTitle = initialTitle,
+                    initialContent = initialContent,
+                    onSaveClick = { title, content ->
+                        if (title.isNotEmpty() && content.isNotEmpty()) {
+                            saveNote(title, content, folderId)
+                            val intent = Intent(this@AddNoteActivity, MainActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
+                    },
+                    onBackClick = {
+                        finish()
+                    }
+                )
             }
         }
     }
 
-    private fun saveNote(noteTitle: String, noteContent: String,folderId : Int) {
+    private fun saveNote(noteTitle: String, noteContent: String, folderId : Int) {
         val currentTime = System.currentTimeMillis()
         lifecycleScope.launch {
             if (isEdit) {
@@ -86,6 +84,7 @@ class AddNoteActivity : AppCompatActivity() {
         }
 
     }
+    
     override fun startActivity(intent: Intent?) {
         super.startActivity(intent)
         overridePendingTransition(R.transition.slide_right, R.transition.slide_left)

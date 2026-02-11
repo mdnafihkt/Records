@@ -14,7 +14,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 2
-        versionName = "2.0.2" // fixed themes
+        versionName = "2.0.2" // glassmorphic theme
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

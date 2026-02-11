@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                         notes = notes,
                         onBackClick = { backToFolders() },
                         onAddClick = { addNote(folderId) },
-                        onSettingsClick = {}
+                        onSettingsClick = { openSettings() }
                     )
                 }
             }
@@ -62,5 +62,9 @@ class MainActivity : ComponentActivity() {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
         )
+    }
+
+    private fun openSettings() {
+        startActivity(Intent(this, SettingsActivity::class.java))
     }
 }
