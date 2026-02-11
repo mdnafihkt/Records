@@ -29,6 +29,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,11 +55,15 @@ import com.example.records.ui.theme.GlassmorphicBackground
 fun AddNoteScreen(
     initialTitle: String,
     initialContent: String,
-    onSaveClick: (String, String) -> Unit,
+    initialFolderId: Int,
+    folders: List<com.example.records.database.Folder>, // Pass folders for selection
+    onSaveClick: (String, String, Int) -> Unit, // Return selected folder ID
     onBackClick: () -> Unit
 ) {
     var title by remember { mutableStateOf(initialTitle) }
     var content by remember { mutableStateOf(initialContent) }
+    var selectedFolderId by remember { mutableIntStateOf(initialFolderId) }
+    var expanded by remember { mutableStateOf(false) }
 
     GlassmorphicBackground {
         Column(
@@ -68,8 +77,18 @@ fun AddNoteScreen(
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                IconButton(onClick = onBackClick) {
+                     Icon(
+                        painter = painterResource(id = R.drawable.icon_folder), // Reusing folder icon as back/close
+                        contentDescription = "Back",
+                        tint = Color.White
+                    )
+                }
+                
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Text(
-                    text = "New Note",
+                    text = if (initialTitle.isEmpty()) "New Note" else "Edit Note",
                     color = Color(0xFFE6E6FA), // Lavender
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
@@ -88,7 +107,7 @@ fun AddNoteScreen(
                             )
                         )
                         .border(1.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-                        .clickable { onSaveClick(title, content) }
+                        .clickable { onSaveClick(title, content, selectedFolderId) }
                         .padding(horizontal = 20.dp, vertical = 8.dp)
                 ) {
                     Text(
@@ -99,6 +118,42 @@ fun AddNoteScreen(
                 }
             }
             
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            // Folder Selector
+            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                val selectedFolderName = folders.find { it.id == selectedFolderId }?.name ?: "Select Folder"
+                
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.White.copy(alpha = 0.1f))
+                        .clickable { expanded = true }
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = selectedFolderName, color = Color.White, fontSize = 14.sp)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Select Folder", tint = Color.White)
+                }
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.background(Color(0xFF2D2D2D))
+                ) {
+                    folders.forEach { folder ->
+                        DropdownMenuItem(
+                            text = { Text(folder.name, color = Color.White) },
+                            onClick = {
+                                selectedFolderId = folder.id
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             // Content Area

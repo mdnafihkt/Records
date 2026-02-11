@@ -24,16 +24,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.TextField
 import androidx.compose.ui.platform.LocalContext
-import com.example.records.ViewNoteActivity
-import androidx.compose.ui.res.colorResource
-import com.example.records.R
 import com.example.records.ui.theme.GlassmorphicCard
-import androidx.compose.foundation.lazy.items
 
 @Composable
 fun NotesContent(
     notes: List<Note>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNoteClick: (Int) -> Unit
 ) {
     val context = LocalContext.current
     var searchQuery by remember { mutableStateOf("") }
@@ -101,10 +98,7 @@ fun NotesContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                val intent = Intent(context, ViewNoteActivity::class.java).apply {
-                                    putExtra("noteId", note.id)
-                                }
-                                context.startActivity(intent)
+                                onNoteClick(note.id)
                             },
                         verticalAlignment = Alignment.CenterVertically
                     ) {

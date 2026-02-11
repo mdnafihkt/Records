@@ -1,70 +1,68 @@
 package com.example.records
 
-import android.content.Intent
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.records.ui.screen.NotesScreen
-import com.example.records.viewmodel.NoteViewModel
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.example.records.ui.navigation.AppNavHost
+import com.example.records.ui.screen.LockScreen
 import com.example.records.ui.theme.AppTheme
 import com.example.records.ui.theme.RecordsTheme
+import com.example.records.util.BiometricAuthManager
 
-
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val sharedPrefs = getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val isAppLockEnabled = sharedPrefs.getBoolean("app_lock", false)
 
         setContent {
+            var isLocked by remember { mutableStateOf(isAppLockEnabled) }
+
+            // Effect to trigger authentication if locked
+            LaunchedEffect(isLocked) {
+                if (isLocked) {
+                    BiometricAuthManager.authenticate(
+                        activity = this@MainActivity,
+                        onSuccess = { isLocked = false },
+                        onError = { /* Handle error or stay locked */ },
+                        onFailed = { /* Handle failure or stay locked */ }
+                    )
+                }
+            }
+
             RecordsTheme(appTheme = AppTheme.PROTON_DARK) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val folderId = intent.getIntExtra("FOLDER_ID", 0)
-                    val noteViewModel: NoteViewModel = viewModel()
-
-                    LaunchedEffect(folderId) {
-                        noteViewModel.loadNotes(folderId)
+                    if (isLocked) {
+                        LockScreen(
+                            onUnlockClick = {
+                                BiometricAuthManager.authenticate(
+                                    activity = this@MainActivity,
+                                    onSuccess = { isLocked = false },
+                                    onError = {},
+                                    onFailed = {}
+                                )
+                            }
+                        )
+                    } else {
+                        AppNavHost()
                     }
-
-                    val notes by noteViewModel.notes.observeAsState(emptyList())
-
-                    NotesScreen(
-                        notes = notes,
-                        onBackClick = { backToFolders() },
-                        onAddClick = { addNote(folderId) },
-                        onSettingsClick = { openSettings() }
-                    )
                 }
             }
         }
-    }
-
-    private fun addNote(folderId: Int) {
-        startActivity(
-            Intent(this, AddNoteActivity::class.java)
-                .putExtra("FOLDER_ID", folderId)
-        )
-    }
-
-    private fun backToFolders() {
-        startActivity(
-            Intent(this, FolderActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
-        )
-    }
-
-    private fun openSettings() {
-        startActivity(Intent(this, SettingsActivity::class.java))
     }
 }

@@ -72,6 +72,9 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.animation:animation")
     implementation("androidx.compose.runtime:runtime-livedata")
+    implementation("androidx.navigation:navigation-compose:2.8.0")
+    implementation("androidx.biometric:biometric:1.2.0-alpha05")
+
 
 
     // RecyclerView (Legacy / Interop)

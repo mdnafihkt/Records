@@ -17,7 +17,8 @@ fun NotesContentPreview() {
             Note(2, "No rebuilding", "this is new note 2", 123),
             Note(3, "Old laptop survives", "this is new note 3", 124)
         ),
-        modifier = Modifier.background(Color(0xFF121212))
+        modifier = Modifier.background(Color(0xFF121212)),
+        onNoteClick = {}
     )
 
 }

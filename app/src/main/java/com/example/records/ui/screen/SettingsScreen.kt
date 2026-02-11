@@ -1,5 +1,8 @@
 package com.example.records.ui.screen
 
+import android.annotation.SuppressLint
+import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,17 +14,27 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.records.R
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+
 import com.example.records.ui.theme.GlassmorphicBackground
 import com.example.records.ui.theme.GlassmorphicCard
+import com.example.records.util.AppIcon
+import com.example.records.util.AppIconManager
+import com.example.records.R
 
+@SuppressLint("UseKtx")
 @Composable
 fun SettingsScreen(
     onBackClick: () -> Unit,
-    onClearDataClick: () -> Unit = {} // Example functional setting
+    onClearDataClick: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    var showIconChangeDialog by remember { mutableStateOf<AppIcon?>(null) }
+
     GlassmorphicBackground {
         Column(
             modifier = Modifier
@@ -69,28 +82,83 @@ fun SettingsScreen(
                     SettingItem(title = "App Theme", subtitle = "System Default") {
                         // TODO: Implement Theme Toggle Logic
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "App Icon",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        AppIconOption(color = Color.Gray, name = "Default", isSelected = false) { // TODO: Check actual state
+                             showIconChangeDialog = AppIcon.DEFAULT
+                        }
+                        AppIconOption(color = Color.Blue, name = "Blue", isSelected = false) {
+                            showIconChangeDialog = AppIcon.BLUE
+                        }
+                        AppIconOption(color = Color.Green, name = "Green", isSelected = false) {
+                            showIconChangeDialog = AppIcon.GREEN
+                        }
+                        AppIconOption(color = Color.Magenta, name = "Purple", isSelected = false) {
+                            showIconChangeDialog = AppIcon.PURPLE
+                        }
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Security Settings
             GlassmorphicCard(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Data Management",
+                        text = "Security",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color(0xFF8692F7),
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
-                    SettingItem(
-                        title = "Clear All Notes",
-                        subtitle = "Delete all stored notes permanently",
-                        onClick = onClearDataClick
-                    )
+                    var isAppLockEnabled by remember {
+                         mutableStateOf(context.getSharedPreferences("settings", Context.MODE_PRIVATE).getBoolean("app_lock", false))
+                    }
+
+                    Row(
+                         modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(text = "App Lock", fontSize = 16.sp, color = Color.White)
+                            Text(text = "Require authentication on launch", fontSize = 12.sp, color = Color.Gray)
+                        }
+                        Switch(
+                            checked = isAppLockEnabled,
+                            onCheckedChange = { isEnabled ->
+                                isAppLockEnabled = isEnabled
+                                context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+                                    .edit()
+                                    .putBoolean("app_lock", isEnabled)
+                                    .apply()
+                            },
+                             colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color(0xFF8692F7),
+                                checkedTrackColor = Color(0xFF8692F7).copy(alpha = 0.5f)
+                            )
+                        )
+                    }
                 }
             }
+
              Spacer(modifier = Modifier.height(16.dp))
 
             GlassmorphicCard(modifier = Modifier.fillMaxWidth()) {
@@ -106,6 +174,32 @@ fun SettingsScreen(
                     SettingItem(title = "Version", subtitle = "2.0.2") {}
                 }
             }
+        }
+        
+        if (showIconChangeDialog != null) {
+            AlertDialog(
+                onDismissRequest = { showIconChangeDialog = null },
+                title = { Text("Change Icon") },
+                text = { Text("Changing the app icon will close the app. You will need to reopen it. Continue?") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            val icon = showIconChangeDialog
+                            if (icon != null) {
+                                AppIconManager.setAppIcon(context, icon)
+                            }
+                            showIconChangeDialog = null
+                        }
+                    ) {
+                        Text("Yes, Restart")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showIconChangeDialog = null }) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
     }
 }
@@ -138,5 +232,19 @@ fun SettingItem(title: String, subtitle: String, onClick: () -> Unit) {
             tint = Color.Gray,
             modifier = Modifier.size(16.dp)
         )
+    }
+}
+
+@Composable
+fun AppIconOption(color: Color, name: String, isSelected: Boolean, onClick: () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onClick() }) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(color)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = name, color = Color.White, fontSize = 12.sp)
     }
 }

@@ -154,16 +154,6 @@ fun FolderScreen(
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
                     items(folders) { folderWithCount ->
-                        // Using Box with combinedClickable for long press
-                        // Since combinedClickable is experimental foundation API, 
-                        // we can simulate it or pass it. But let's act simply: 
-                        // Just use clickable and a separate 'more' icon if needed, 
-                        // OR stick to the design where long press opens menu.
-                        // For simplicity and stability without ExperimentalFoundationApi which requires opt-in everywhere:
-                        // I will add a "more" icon, or just use the standard onClick.
-                        // Wait, user used onLongClick in XML.
-                        // I'll try to use `combinedClickable` if I can add the opt-in.
-                        
                         FolderItem(
                             folderWithCount = folderWithCount,
                             onClick = { onFolderClick(folderWithCount.folder.id) },

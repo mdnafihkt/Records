@@ -17,6 +17,7 @@ fun NotesScreenPreview() {
         ),
         onBackClick = {},
         onAddClick = {},
-        onSettingsClick = {}
+        onSettingsClick = {},
+        onNoteClick = {}
     )
 }

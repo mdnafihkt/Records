@@ -32,6 +32,18 @@ interface FolderNoteJoinDao {
 
     fun getNotesForFolder(folderId: Int): LiveData<List<Note>>
 
+    @Query("""
+             SELECT *
+             FROM Note
+             INNER JOIN FolderNoteJoin
+             ON Note.id = FolderNoteJoin.noteId
+             WHERE FolderNoteJoin.folderId = :folderId
+             ORDER BY Note.lastUpdated DESC
+    """)
+    suspend fun getNotesForFolderList(folderId: Int): List<Note>
+
+    @Query("SELECT * FROM FolderNoteJoin WHERE noteId = :noteId")
+    suspend fun getFolderNoteJoinByNoteId(noteId: Int): List<FolderNoteJoin>
 
     //NOT USED FOR NOW
     @Query("SELECT * FROM FolderNoteJoin WHERE noteId = :noteId")
