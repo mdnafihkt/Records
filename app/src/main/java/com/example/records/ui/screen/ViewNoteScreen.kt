@@ -27,6 +27,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -139,6 +140,9 @@ fun ViewNoteScreen(
                             )
                             DropdownMenuItem(
                                 text = { Text("Delete") },
+                                colors = MenuDefaults.itemColors(
+                                    textColor = Color.Red
+                                ),
                                 onClick = {
                                     showMenu = false
                                     showDeleteDialog = true
@@ -154,8 +158,8 @@ fun ViewNoteScreen(
                 Text(
                     text = note.title,
                     color = Color.White,
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
