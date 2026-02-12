@@ -20,11 +20,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+
 import com.example.records.database.FolderNoteJoin
 import com.example.records.database.Note
 import com.example.records.database.NoteDatabase
 import com.example.records.ui.screen.*
 import com.example.records.viewmodel.FolderViewModel
+
 import kotlinx.coroutines.launch
 
 @Composable
@@ -63,14 +65,12 @@ fun AppNavHost() {
                                 }
                             },
                             onNotesClick = {
-                                // Default to folder ID 1 if available, or 0 if "All Notes" implies
-                                var targetFolderId = 1
+                                var targetFolderId = 0
                                 val args = navBackStackEntry?.arguments
                                 if (currentRoute == Screen.NoteList.route && args != null) {
                                     targetFolderId = args.getInt("folderId", 1)
                                     if (targetFolderId == 0)
-                                            targetFolderId =
-                                                    1
+                                            targetFolderId = 1
                                 }
                                 navController.navigate(Screen.NoteList.createRoute(targetFolderId))
                             },
@@ -125,7 +125,7 @@ fun AppNavHost() {
                         onNoteClick = { noteId ->
                             navController.navigate(Screen.ViewNote.createRoute(noteId))
                         },
-                        onAddNoteClick = { navController.navigate(Screen.AddEditNote) }
+                        onAddNoteClick = { navController.navigate(Screen.AddEditNote.createRoute(folderId = 0 , isEdit = false)) }
                 )
             }
 
