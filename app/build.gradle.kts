@@ -7,14 +7,14 @@ plugins {
 
 android {
     namespace = "com.example.records"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.records"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 2
-        versionName = "2.0.2" // glassmorphic theme
+        targetSdk = 35
+        versionCode = 4
+        versionName = "2.1.2" // glassmorphic theme
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -74,6 +74,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata")
     implementation("androidx.navigation:navigation-compose:2.8.0")
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
+    implementation("androidx.compose.material:material-icons-extended")
 
 
 
@@ -83,6 +84,7 @@ dependencies {
     // Room Database (Persistence Layer)
     implementation("androidx.room:room-runtime:2.5.2")
     implementation("androidx.room:room-ktx:2.5.2")
+    implementation("androidx.compose.material3:material3:1.4.0")
     ksp("androidx.room:room-compiler:2.5.2")
 
     // Material Components for Views (legacy XML views)

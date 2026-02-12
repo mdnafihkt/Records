@@ -37,11 +37,8 @@ fun AppNavHost() {
     // Determine if Bottom Bar should be visible
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    // Check if the current route matches any of the main screens
-    // NoteList route is "note_list/{folderId}", so we check if it matches that pattern or starts
-    // with "note_list"
     val showBottomBar =
-            currentRoute == Screen.FolderList.route ||
+                    currentRoute == Screen.FolderList.route ||
                     currentRoute == Screen.Settings.route ||
                     currentRoute == Screen.NoteList.route
 
@@ -65,24 +62,17 @@ fun AppNavHost() {
                                     }
                                 }
                             },
-                            onAddClick = {
-                                // Global Add Logic
+                            onNotesClick = {
                                 // Default to folder ID 1 if available, or 0 if "All Notes" implies
-                                // no folder.
-                                // Ideally we should know the current folder if we are on NoteList.
                                 var targetFolderId = 1
                                 val args = navBackStackEntry?.arguments
                                 if (currentRoute == Screen.NoteList.route && args != null) {
                                     targetFolderId = args.getInt("folderId", 1)
                                     if (targetFolderId == 0)
                                             targetFolderId =
-                                                    1 // Default to 1 if 0 is "All Notes" and not a
-                                    // valid target
+                                                    1
                                 }
-
-                                navController.navigate(
-                                        Screen.AddEditNote.createRoute(targetFolderId)
-                                )
+                                navController.navigate(Screen.NoteList.createRoute(targetFolderId))
                             },
                             onSettingsClick = {
                                 if (currentRoute != Screen.Settings.route) {
@@ -134,20 +124,12 @@ fun AppNavHost() {
                             value = folderNotes
                         }
 
-                NotesScreen(
-                        notes = notes,
-                        onBackClick = {
-                            // If we are at root (All Notes), maybe exit app or go to Folders?
-                            // If we came from Folders, go back.
-                            // Standard behavior: Pop back stack.
-                            // If start destination is NoteList(0), pop might exit app.
-                            navController.popBackStack()
-                        },
+                NoteScreen(
+                        notes =  notes,
                         onNoteClick = { noteId ->
                             navController.navigate(Screen.ViewNote.createRoute(noteId))
                         },
-                    onAddClick = {navController.navigate(Screen.AddEditNote)},
-                    onSettingsClick = {navController.navigate(Screen.Settings)}
+                        onAddNoteClick = { navController.navigate(Screen.AddEditNote) }
                 )
             }
 

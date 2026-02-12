@@ -24,34 +24,15 @@ class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val sharedPrefs = getSharedPreferences("settings", Context.MODE_PRIVATE)
         val isAppLockEnabled = sharedPrefs.getBoolean("app_lock", false)
 
         setContent {
+            // 1. Manage the lock state
             var isLocked by remember { mutableStateOf(isAppLockEnabled) }
 
-            // Effect to trigger authentication if locked
-            LaunchedEffect(isLocked) {
-                if (isLocked) {
-                    BiometricAuthManager.authenticate(
-                        activity = this@MainActivity,
-                        onSuccess = { isLocked = false },
-                        onError = { /* Handle error or stay locked */ },
-                        onFailed = { /* Handle failure or stay locked */ }
-                    )
-                }
-            }
-
-<<<<<<< HEAD
-            val notes by noteViewModel.notes.observeAsState(emptyList())
-
-            NotesScreen(
-                notes = notes,
-                onBackClick = { backToFolders() },
-                onAddClick = { addNote(folderId) },
-                onSettingsClick = {}
-            )
-=======
+            // 2. Wrap everything in your custom theme
             RecordsTheme(appTheme = AppTheme.PROTON_DARK) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -63,17 +44,29 @@ class MainActivity : FragmentActivity() {
                                 BiometricAuthManager.authenticate(
                                     activity = this@MainActivity,
                                     onSuccess = { isLocked = false },
-                                    onError = {},
-                                    onFailed = {}
+                                    onError = { /* Log error */ },
+                                    onFailed = { /* Feedback to user */ }
                                 )
                             }
                         )
                     } else {
+                        // 3. AppNavHost should manage the NotesScreen, not MainActivity
                         AppNavHost()
                     }
                 }
             }
->>>>>>> 07d9e23
+
+            // 4. Trigger auth automatically when the app opens
+            LaunchedEffect(Unit) {
+                if (isLocked) {
+                    BiometricAuthManager.authenticate(
+                        activity = this@MainActivity,
+                        onSuccess = { isLocked = false },
+                        onError = {},
+                        onFailed = {}
+                    )
+                }
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ package com.example.records.ui.screen
 
 import android.annotation.SuppressLint
 import android.content.Context
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,6 +20,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 
 import com.example.records.ui.theme.GlassmorphicBackground
 import com.example.records.ui.theme.GlassmorphicCard
@@ -50,14 +54,6 @@ fun SettingsScreen(
                     .padding(vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.icon_folder), // Reusing existing icon or back arrow if available
-                        contentDescription = "Back",
-                        tint = Color.White
-                    )
-                }
-                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Settings",
                     fontSize = 28.sp,
@@ -97,16 +93,30 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
-                        AppIconOption(color = Color.Gray, name = "Default", isSelected = false) { // TODO: Check actual state
+                        AppIconOption(
+                            painter = painterResource(id = R.drawable.glassmorphic),
+                            name = "Default",
+                            isSelected = true
+                        ) {
                              showIconChangeDialog = AppIcon.DEFAULT
                         }
-                        AppIconOption(color = Color.Blue, name = "Blue", isSelected = false) {
+                        AppIconOption(
+                            painter = painterResource(id = R.drawable.overlay),
+                            name = "Overlay",
+                            isSelected = false
+                        ) {
                             showIconChangeDialog = AppIcon.BLUE
                         }
-                        AppIconOption(color = Color.Green, name = "Green", isSelected = false) {
+                        AppIconOption(
+                            painter = painterResource(id = R.drawable.dark_plain),
+                            name = "Dark plain",
+                            isSelected = false) {
                             showIconChangeDialog = AppIcon.GREEN
                         }
-                        AppIconOption(color = Color.Magenta, name = "Purple", isSelected = false) {
+                        AppIconOption(
+                            painter = painterResource(id = R.drawable.dark_stack),
+                            name = "Dark stack",
+                            isSelected = false) {
                             showIconChangeDialog = AppIcon.PURPLE
                         }
                     }
@@ -160,20 +170,6 @@ fun SettingsScreen(
             }
 
              Spacer(modifier = Modifier.height(16.dp))
-
-            GlassmorphicCard(modifier = Modifier.fillMaxWidth()) {
-                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "About",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF8692F7),
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-
-                    SettingItem(title = "Version", subtitle = "2.0.2") {}
-                }
-            }
         }
         
         if (showIconChangeDialog != null) {
@@ -236,15 +232,35 @@ fun SettingItem(title: String, subtitle: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun AppIconOption(color: Color, name: String, isSelected: Boolean, onClick: () -> Unit) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onClick() }) {
+fun AppIconOption(
+    painter: Painter,
+    name: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable { onClick() }) {
         Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(48.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .background(color)
-        )
+                .background(if (isSelected) Color.Gray.copy(alpha = 0.4f) else Color.Transparent)
+        ){
+            Image(
+                painter = painter,
+                contentDescription = name,
+                modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Fit
+            )
+
+        }
         Spacer(modifier = Modifier.height(4.dp))
-        Text(text = name, color = Color.White, fontSize = 12.sp)
+        Text(
+            text = name,
+            color = Color.White,
+            fontSize = 12.sp
+        )
     }
 }

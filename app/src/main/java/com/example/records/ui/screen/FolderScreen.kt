@@ -113,7 +113,6 @@ fun FolderScreen(
                     }
                 }
 
-                // All Notes Item
                 GlassmorphicCard(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -126,7 +125,7 @@ fun FolderScreen(
                         Icon(
                             painter = painterResource(id = R.drawable.folder),
                             contentDescription = null,
-                            tint = Color.Unspecified, // Assuming original icon has colors
+                            tint = Color.Unspecified,
                             modifier = Modifier.size(40.dp)
                         )
                         Spacer(modifier = Modifier.width(16.dp))

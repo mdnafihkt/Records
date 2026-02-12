@@ -28,7 +28,7 @@ import com.example.records.R
 fun BottomNavigationBar(
     navController: NavController,
     onFolderClick: () -> Unit,
-    onAddClick: () -> Unit,
+    onNotesClick: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -37,13 +37,13 @@ fun BottomNavigationBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 17.dp, end = 17.dp, bottom = 20.dp)
             .height(80.dp) // Adjust height as needed
-            .clip(RoundedCornerShape(24.dp))
             .background(Color(0xFF252138).copy(alpha = 0.9f))
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -52,30 +52,35 @@ fun BottomNavigationBar(
                 modifier = Modifier
                     .size(60.dp)
                     .clip(CircleShape)
+                    .background(if (currentRoute == Screen.FolderList.route) Color.White else Color.Transparent)
                     .clickable { onFolderClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.icon_folder),
                     contentDescription = "Folders",
-                    tint = if (currentRoute == Screen.FolderList.route || currentRoute?.startsWith("note_list") == true) Color.White else Color(0xFF8692F7),
-                    modifier = Modifier.size(28.dp)
+                    tint = if (currentRoute == Screen.FolderList.route) Color.White else Color(0xFF8692F7),
+                    modifier = if (currentRoute == Screen.FolderList.route) Modifier.size(28.dp) else Modifier.size(42.dp),
                 )
             }
 
-            // Global Add
+            // Notes
              Box(
                 modifier = Modifier
                     .size(60.dp)
                     .clip(CircleShape)
-                    .clickable { onAddClick() },
+                    .background(
+                        if (currentRoute == Screen.NoteList.route) Color.White
+                        else Color.Transparent
+                    )
+                    .clickable { onNotesClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.add_note_icon),
+                    painter = painterResource(id = R.drawable.note_icon),
                     contentDescription = "Add Note",
                     tint = Color(0xFF8692F7),
-                    modifier = Modifier.size(48.dp)
+                    modifier = if (currentRoute == Screen.NoteList.route) Modifier.size(28.dp) else Modifier.size(42.dp),
                 )
             }
 
@@ -84,6 +89,10 @@ fun BottomNavigationBar(
                 modifier = Modifier
                     .size(60.dp)
                     .clip(CircleShape)
+                    .background(
+                        if (currentRoute == Screen.Settings.route) Color.White
+                        else Color.Transparent
+                    )
                     .clickable { onSettingsClick() },
                 contentAlignment = Alignment.Center
             ) {
@@ -91,7 +100,7 @@ fun BottomNavigationBar(
                     painter = painterResource(id = R.drawable.icon_settings),
                     contentDescription = "Settings",
                     tint = if (currentRoute == Screen.Settings.route) Color.White else Color(0xFF8692F7),
-                    modifier = Modifier.size(28.dp)
+                    modifier = if (currentRoute == Screen.Settings.route) Modifier.size(28.dp) else Modifier.size(42.dp),
                 )
             }
         }

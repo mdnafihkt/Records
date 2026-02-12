@@ -33,12 +33,7 @@ fun GlassmorphicCard(
             )
             .border(
                 width = 1.dp,
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color.White.copy(alpha = 0.4f),
-                        Color.Transparent
-                    )
-                ),
+                color = Color.Transparent,
                 shape = RoundedCornerShape(cornerRadius)
             )
             .padding(16.dp),
