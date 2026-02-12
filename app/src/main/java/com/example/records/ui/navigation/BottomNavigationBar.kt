@@ -52,7 +52,7 @@ fun BottomNavigationBar(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(if (currentRoute == Screen.FolderList.route) Color.White.copy(alpha = 0.2f) else Color.Transparent)
+                    .background(if (currentRoute == Screen.FolderList.route) Color.White.copy(alpha = 0.1f) else Color.Transparent)
                     .clickable { onFolderClick() },
                 contentAlignment = Alignment.Center
             ) {
@@ -69,7 +69,7 @@ fun BottomNavigationBar(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(if (currentRoute == Screen.NoteList.route) Color.White.copy(alpha = 0.2f) else Color.Transparent)
+                    .background(if (currentRoute == Screen.NoteList.route) Color.White.copy(alpha = 0.1f) else Color.Transparent)
                     .clickable { onNotesClick() },
                 contentAlignment = Alignment.Center
             ) {
@@ -86,7 +86,7 @@ fun BottomNavigationBar(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(if (currentRoute == Screen.Settings.route) Color.White.copy(alpha = 0.2f) else Color.Transparent)
+                    .background(if (currentRoute == Screen.Settings.route) Color.White.copy(alpha = 0.1f) else Color.Transparent)
                     .clickable { onSettingsClick() },
                 contentAlignment = Alignment.Center
             ) {

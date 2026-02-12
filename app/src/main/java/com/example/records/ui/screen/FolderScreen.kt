@@ -314,7 +314,7 @@ fun FolderItem(
                         text = folderWithCount.folder.name,
                         color = Color.White,
                         fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.SemiBold
                     )
                     Text(
                         text = "${folderWithCount.count} notes",

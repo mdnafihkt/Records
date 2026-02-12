@@ -129,7 +129,10 @@ fun ViewNoteScreen(
                         }
                         DropdownMenu(
                             expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
+                            onDismissRequest = { showMenu = false },
+                            modifier = Modifier
+                                .width(200.dp)
+                                .background(Color.Black.copy(alpha = 0.1f))
                         ) {
                             DropdownMenuItem(
                                 text = { Text("Edit") },
@@ -197,7 +200,7 @@ fun ViewNoteScreen(
                     Text(
                         text = annotatedContent,
                         color = Color.White.copy(alpha = 0.9f),
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                         lineHeight = 28.sp
                     )
                 }

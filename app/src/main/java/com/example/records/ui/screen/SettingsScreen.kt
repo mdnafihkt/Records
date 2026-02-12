@@ -69,13 +69,15 @@ fun SettingsScreen(
 
             // Glassmorphic Settings Container
             GlassmorphicCard(modifier = Modifier.fillMaxWidth()) {
-                Column() {
+                Column(
+                    modifier = Modifier.padding(vertical = 16.dp)
+                ) {
                     Text(
                         text = "Appearance",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color(0xFF8692F7),
-                        modifier = Modifier.padding(start = 16.dp,bottom = 8.dp)
+                        modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
                     )
                     
                     SettingItem(title = "App Theme", subtitle = "System Default") {

@@ -13,8 +13,8 @@ android {
         applicationId = "com.example.records"
         minSdk = 24
         targetSdk = 35
-        versionCode = 5
-        versionName = "2.1.3" // glassmorphic theme
+        versionCode = 6
+        versionName = "2.1.4" // single-activity-architecture.glassmorphic-theme.bottom-nav-bar
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
