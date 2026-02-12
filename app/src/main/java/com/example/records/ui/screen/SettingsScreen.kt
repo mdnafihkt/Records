@@ -38,6 +38,9 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     var showIconChangeDialog by remember { mutableStateOf<AppIcon?>(null) }
+    val currentIcon by remember {
+        mutableStateOf(AppIconManager.getCurrentIcon(context))
+    }
 
     GlassmorphicBackground {
         Column(
@@ -66,13 +69,13 @@ fun SettingsScreen(
 
             // Glassmorphic Settings Container
             GlassmorphicCard(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column() {
                     Text(
                         text = "Appearance",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color(0xFF8692F7),
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(start = 16.dp,bottom = 8.dp)
                     )
                     
                     SettingItem(title = "App Theme", subtitle = "System Default") {
@@ -86,37 +89,40 @@ fun SettingsScreen(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color.White,
-                        modifier = Modifier.padding(bottom = 12.dp)
+                        modifier = Modifier.padding(start = 16.dp, bottom = 12.dp)
                     )
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         AppIconOption(
                             painter = painterResource(id = R.drawable.glassmorphic),
                             name = "Default",
-                            isSelected = true
+                            isSelected = currentIcon == AppIcon.DEFAULT
                         ) {
                              showIconChangeDialog = AppIcon.DEFAULT
                         }
                         AppIconOption(
                             painter = painterResource(id = R.drawable.overlay),
                             name = "Overlay",
-                            isSelected = false
+                            isSelected = currentIcon == AppIcon.BLUE
                         ) {
                             showIconChangeDialog = AppIcon.BLUE
                         }
                         AppIconOption(
                             painter = painterResource(id = R.drawable.dark_plain),
                             name = "Dark plain",
-                            isSelected = false) {
+                            isSelected = currentIcon == AppIcon.GREEN
+                        ) {
                             showIconChangeDialog = AppIcon.GREEN
                         }
                         AppIconOption(
                             painter = painterResource(id = R.drawable.dark_stack),
                             name = "Dark stack",
-                            isSelected = false) {
+                            isSelected = currentIcon == AppIcon.PURPLE
+                        ) {
                             showIconChangeDialog = AppIcon.PURPLE
                         }
                     }
@@ -206,7 +212,7 @@ fun SettingItem(title: String, subtitle: String, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
+            .padding(horizontal = 16.dp,vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -240,7 +246,10 @@ fun AppIconOption(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable { onClick() }) {
+        modifier = Modifier
+            .clickable { onClick() }
+            .clip(RoundedCornerShape(12.dp))
+    ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier

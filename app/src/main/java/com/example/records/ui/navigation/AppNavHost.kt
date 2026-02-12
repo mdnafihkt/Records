@@ -92,12 +92,8 @@ fun AppNavHost() {
     ) { innerPadding ->
         NavHost(
                 navController = navController,
-                startDestination = Screen.NoteList.createRoute(0), // Start at All Notes
+                startDestination = Screen.NoteList.createRoute(0),
                 modifier = Modifier.padding(innerPadding),
-                enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
-                exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) },
-                popEnterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) },
-                popExitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
         ) {
 
             // Folder List

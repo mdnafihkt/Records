@@ -43,7 +43,7 @@ fun BottomNavigationBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 20.dp),
+                .padding(start = 50.dp, end = 50.dp,bottom = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -52,15 +52,15 @@ fun BottomNavigationBar(
                 modifier = Modifier
                     .size(60.dp)
                     .clip(CircleShape)
-                    .background(if (currentRoute == Screen.FolderList.route) Color.White else Color.Transparent)
+                    .background(Color.Transparent)
                     .clickable { onFolderClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.icon_folder),
                     contentDescription = "Folders",
-                    tint = if (currentRoute == Screen.FolderList.route) Color.White else Color(0xFF8692F7),
-                    modifier = if (currentRoute == Screen.FolderList.route) Modifier.size(28.dp) else Modifier.size(42.dp),
+                    tint = if (currentRoute == Screen.FolderList.route) Color(red = 189, green = 44, blue = 222, alpha = 102) else Color.White,
+                    modifier = Modifier.size(28.dp)
                 )
             }
 
@@ -79,8 +79,8 @@ fun BottomNavigationBar(
                 Icon(
                     painter = painterResource(id = R.drawable.note_icon),
                     contentDescription = "Add Note",
-                    tint = Color(0xFF8692F7),
-                    modifier = if (currentRoute == Screen.NoteList.route) Modifier.size(28.dp) else Modifier.size(42.dp),
+                    tint = if (currentRoute == Screen.NoteList.route) Color(red = 189, green = 44, blue = 222, alpha = 102) else Color.White,
+                    modifier = Modifier.size(28.dp),
                 )
             }
 
@@ -99,8 +99,8 @@ fun BottomNavigationBar(
                 Icon(
                     painter = painterResource(id = R.drawable.icon_settings),
                     contentDescription = "Settings",
-                    tint = if (currentRoute == Screen.Settings.route) Color.White else Color(0xFF8692F7),
-                    modifier = if (currentRoute == Screen.Settings.route) Modifier.size(28.dp) else Modifier.size(42.dp),
+                    tint = if (currentRoute == Screen.NoteList.route) Color(red = 189, green = 44, blue = 222, alpha = 102) else Color.White,
+                    modifier = Modifier.size(28.dp)
                 )
             }
         }

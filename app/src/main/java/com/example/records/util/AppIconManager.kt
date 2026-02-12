@@ -35,4 +35,15 @@ object AppIconManager {
             PackageManager.DONT_KILL_APP
         )
     }
+    fun getCurrentIcon(context: Context): AppIcon {
+        val pm = context.packageManager
+        val packageName = context.packageName
+
+        return when {
+            pm.getComponentEnabledSetting(ComponentName(packageName, "com.example.records.MainActivityBlue")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> AppIcon.BLUE
+            pm.getComponentEnabledSetting(ComponentName(packageName, "com.example.records.MainActivityGreen")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> AppIcon.GREEN
+            pm.getComponentEnabledSetting(ComponentName(packageName, "com.example.records.MainActivityPurple")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> AppIcon.PURPLE
+            else -> AppIcon.DEFAULT
+        }
+    }
 }

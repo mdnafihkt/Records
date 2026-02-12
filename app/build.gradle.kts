@@ -13,8 +13,8 @@ android {
         applicationId = "com.example.records"
         minSdk = 24
         targetSdk = 35
-        versionCode = 4
-        versionName = "2.1.2" // glassmorphic theme
+        versionCode = 5
+        versionName = "2.1.3" // glassmorphic theme
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
