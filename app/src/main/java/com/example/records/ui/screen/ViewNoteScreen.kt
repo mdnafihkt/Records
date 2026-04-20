@@ -167,27 +167,7 @@ fun ViewNoteScreen(
 
                 // Content
                 val annotatedContent = remember(note.content, searchQuery) {
-                    if (searchQuery.isEmpty()) {
-                        AnnotatedString(note.content)
-                    } else {
-                        buildAnnotatedString {
-                            val content = note.content
-                            val lowerContent = content.lowercase()
-                            val lowerQuery = searchQuery.lowercase()
-                            var lastIndex = 0
-                            var index = lowerContent.indexOf(lowerQuery)
-                            
-                            while (index >= 0) {
-                                append(content.substring(lastIndex, index))
-                                withStyle(SpanStyle(background = Color(0xFFC48E1F), color = Color.White)) {
-                                    append(content.substring(index, index + lowerQuery.length))
-                                }
-                                lastIndex = index + lowerQuery.length
-                                index = lowerContent.indexOf(lowerQuery, lastIndex)
-                            }
-                            append(content.substring(lastIndex))
-                        }
-                    }
+                    com.example.records.util.RichTextParser.toAnnotatedString(note.content, searchQuery)
                 }
 
                 Box(

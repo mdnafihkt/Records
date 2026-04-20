@@ -45,11 +45,21 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.records.R
 import com.example.records.ui.theme.GlassmorphicBackground
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.SpanStyle
 
 @Composable
 fun AddNoteScreen(
@@ -61,9 +71,76 @@ fun AddNoteScreen(
     onBackClick: () -> Unit
 ) {
     var title by remember { mutableStateOf(initialTitle) }
-    var content by remember { mutableStateOf(initialContent) }
+    var contentValue by remember { mutableStateOf(TextFieldValue(initialContent)) }
     var selectedFolderId by remember { mutableIntStateOf(initialFolderId) }
     var expanded by remember { mutableStateOf(false) }
+
+    val onFormatClick: (String) -> Unit = { tag ->
+        val selection = contentValue.selection
+        val text = contentValue.text
+        val selectedText = text.substring(selection.start, selection.end)
+        val newText = text.substring(0, selection.start) + 
+                     "<$tag>$selectedText</$tag>" + 
+                     text.substring(selection.end)
+        
+        // Update text and move cursor after the inserted tag
+        contentValue = contentValue.copy(
+            text = newText,
+            selection = TextRange(selection.start + tag.length + 2 + selectedText.length + tag.length + 3)
+        )
+    }
+
+    val richTextVisualTransformation = remember {
+        VisualTransformation { text ->
+            val annotatedString = buildAnnotatedString {
+                val input = text.text
+                var currentIndex = 0
+                val tagRegex = Regex("(<[biu]>)|(</[biu]>)")
+                val matches = tagRegex.findAll(input)
+                
+                val activeStyles = mutableSetOf<String>()
+                
+                for (match in matches) {
+                    val segment = input.substring(currentIndex, match.range.first)
+                    if (segment.isNotEmpty()) {
+                        withStyle(style = SpanStyle(
+                            fontWeight = if (activeStyles.contains("b")) FontWeight.Bold else FontWeight.Normal,
+                            fontStyle = if (activeStyles.contains("i")) FontStyle.Italic else FontStyle.Normal,
+                            textDecoration = if (activeStyles.contains("u")) TextDecoration.Underline else TextDecoration.None
+                        )) {
+                            append(segment)
+                        }
+                    }
+                    
+                    // Style the tag itself to make it subtle
+                    withStyle(style = SpanStyle(color = Color.Gray.copy(alpha = 0.5f))) {
+                        append(match.value)
+                    }
+                    
+                    val tag = match.value
+                    if (tag.startsWith("</")) {
+                        activeStyles.remove(tag.substring(2, 3))
+                    } else {
+                        activeStyles.add(tag.substring(1, 2))
+                    }
+                    
+                    currentIndex = match.range.last + 1
+                }
+                
+                if (currentIndex < input.length) {
+                    val remaining = input.substring(currentIndex)
+                    withStyle(style = SpanStyle(
+                        fontWeight = if (activeStyles.contains("b")) FontWeight.Bold else FontWeight.Normal,
+                        fontStyle = if (activeStyles.contains("i")) FontStyle.Italic else FontStyle.Normal,
+                        textDecoration = if (activeStyles.contains("u")) TextDecoration.Underline else TextDecoration.None
+                    )) {
+                        append(remaining)
+                    }
+                }
+            }
+            TransformedText(annotatedString, OffsetMapping.Identity)
+        }
+    }
 
     GlassmorphicBackground {
         Column(
@@ -107,7 +184,7 @@ fun AddNoteScreen(
                             )
                         )
                         .border(1.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-                        .clickable { onSaveClick(title, content, selectedFolderId) }
+                        .clickable { onSaveClick(title, contentValue.text, selectedFolderId) }
                         .padding(horizontal = 20.dp, vertical = 8.dp)
                 ) {
                     Text(
@@ -154,7 +231,27 @@ fun AddNoteScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Formatting Toolbar
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { onFormatClick("b") }) {
+                    Text("B", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                }
+                IconButton(onClick = { onFormatClick("i") }) {
+                    Text("I", color = Color.White, fontStyle = FontStyle.Italic, fontSize = 18.sp)
+                }
+                IconButton(onClick = { onFormatClick("u") }) {
+                    Text("U", color = Color.White, textDecoration = TextDecoration.Underline, fontSize = 18.sp)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Content Area
             Column(
@@ -190,16 +287,17 @@ fun AddNoteScreen(
 
                 // Content Input
                 BasicTextField(
-                    value = content,
-                    onValueChange = { content = it },
+                    value = contentValue,
+                    onValueChange = { contentValue = it },
                     textStyle = TextStyle(
                         color = Color.White.copy(alpha = 0.9f),
                         fontSize = 14.sp,
                         lineHeight = 20.sp
                     ),
+                    visualTransformation = richTextVisualTransformation,
                     cursorBrush = Brush.verticalGradient(listOf(Color.White, Color.White)),
                     decorationBox = { innerTextField ->
-                        if (content.isEmpty()) {
+                        if (contentValue.text.isEmpty()) {
                             Text(
                                 text = "Start typing...",
                                 color = Color.Gray,

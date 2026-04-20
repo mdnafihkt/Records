@@ -112,7 +112,7 @@ fun NoteItem(
             )
 
             Text(
-                text = note.content,
+                text = com.example.records.util.RichTextParser.toAnnotatedString(note.content),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = Color.White.copy(alpha = 0.7f),
                     lineHeight = 20.sp

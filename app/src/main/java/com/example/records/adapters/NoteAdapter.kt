@@ -35,7 +35,8 @@ class NoteAdapter(private val onClick: (Note) -> Unit) : RecyclerView.Adapter<No
         fun bind(note: Note, onClick: (Note) -> Unit) {
             titleView.text = note.title
             titleView.setTextColor(itemView.context.getColor(R.color.white))
-            contentView.text = note.content
+            val htmlContent = note.content.replace("\n", "<br>")
+            contentView.text = androidx.core.text.HtmlCompat.fromHtml(htmlContent, androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY)
             contentView.setTextColor(itemView.context.getColor(R.color.white))
             itemView.setOnClickListener { onClick(note) }
         }
