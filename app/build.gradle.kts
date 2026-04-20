@@ -85,6 +85,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.5.2")
     implementation("androidx.room:room-ktx:2.5.2")
     implementation("androidx.compose.material3:material3:1.4.0")
+    implementation("androidx.compose.ui:ui-graphics:1.10.6")
     ksp("androidx.room:room-compiler:2.5.2")
 
     // Material Components for Views (legacy XML views)

@@ -113,8 +113,7 @@ fun ViewNoteScreen(
                                 unfocusedContainerColor = Color.Transparent,
                                 focusedTextColor = Color.White,
                                 unfocusedTextColor = Color.White,
-                                focusedIndicatorColor = Color(0xFFE6E6FA),
-                                unfocusedIndicatorColor = Color.Gray
+                                cursorColor = Color.White,
                             )
                         )
                     } else {

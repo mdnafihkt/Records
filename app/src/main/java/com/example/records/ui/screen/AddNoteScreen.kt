@@ -194,15 +194,16 @@ fun AddNoteScreen(
                     onValueChange = { content = it },
                     textStyle = TextStyle(
                         color = Color.White.copy(alpha = 0.9f),
-                        fontSize = 18.sp,
-                        lineHeight = 28.sp
+                        fontSize = 14.sp,
+                        lineHeight = 20.sp
                     ),
+                    cursorBrush = Brush.verticalGradient(listOf(Color.White, Color.White)),
                     decorationBox = { innerTextField ->
                         if (content.isEmpty()) {
                             Text(
                                 text = "Start typing...",
                                 color = Color.Gray,
-                                fontSize = 18.sp
+                                fontSize = 14.sp
                             )
                         }
                         innerTextField()
