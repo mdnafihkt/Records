@@ -1,16 +1,28 @@
+# --- IDE & System ---
+.idea/
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+*.iws
 .DS_Store
-/build
-/captures
+captures/
+
+# --- Build Artifacts ---
+.gradle/
+build/
+app/build/
+*.pyc
+
+# --- Local Configuration ---
+local.properties
+
+# --- Android Specific ---
 .externalNativeBuild
 .cxx
-local.properties
-.idea/*
+output.json
+
+# --- Keystores & Secrets ---
+*.jks
+*.keystore
+google-services.json
+
+# --- Gradle Wrapper ---
+gradle/wrapper/gradle-wrapper.jar
