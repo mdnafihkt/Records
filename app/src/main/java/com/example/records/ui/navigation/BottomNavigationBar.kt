@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -37,8 +38,8 @@ fun BottomNavigationBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp) // Adjust height as needed
-            .background(Color(0xFF252138).copy(alpha = 0.9f))
+            .height(88.dp) // Adjust height as needed
+            .background(Color.Transparent)
     ) {
         Row(
             modifier = Modifier
@@ -59,7 +60,7 @@ fun BottomNavigationBar(
                 Icon(
                     painter = painterResource(id = R.drawable.icon_folder),
                     contentDescription = "Folders",
-                    tint = if (currentRoute == Screen.FolderList.route) Color(red = 189, green = 44, blue = 222) else Color.White,
+                    tint = if (currentRoute == Screen.FolderList.route) colorResource(id = R.color.lavender) else Color.White,
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -76,7 +77,7 @@ fun BottomNavigationBar(
                 Icon(
                     painter = painterResource(id = R.drawable.note_icon),
                     contentDescription = "Add Note",
-                    tint = if (currentRoute == Screen.NoteList.route) Color(red = 189, green = 44, blue = 222) else Color.White,
+                    tint = if (currentRoute == Screen.NoteList.route) colorResource(id = R.color.lavender)else Color.White,
                     modifier = Modifier.size(28.dp),
                 )
             }
@@ -93,7 +94,7 @@ fun BottomNavigationBar(
                 Icon(
                     painter = painterResource(id = R.drawable.icon_settings),
                     contentDescription = "Settings",
-                    tint = if (currentRoute == Screen.Settings.route) Color(red = 189, green = 44, blue = 222) else Color.White,
+                    tint = if (currentRoute == Screen.Settings.route) colorResource(id = R.color.lavender) else Color.White,
                     modifier = Modifier.size(28.dp)
                 )
             }
