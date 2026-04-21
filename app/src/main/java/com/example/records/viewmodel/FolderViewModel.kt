@@ -18,6 +18,7 @@ class FolderViewModel(application: Application) : AndroidViewModel(application) 
 
     private val db = NoteDatabase.getDatabase(application)
     private val folderDao = db.folderDao()
+    private val noteDao = db.noteDao()
     private val folderNoteJoinDao = db.folderNoteJoinDao()
 
     private val _folders = MutableStateFlow<List<FolderWithCount>>(emptyList())
@@ -40,7 +41,7 @@ class FolderViewModel(application: Application) : AndroidViewModel(application) 
             _folders.value = foldersWithCount
 
             // Update All Notes count (using folderId 0 for 'All Notes' convention from original code)
-            _allNotesCount.value = folderNoteJoinDao.getNoteCountForFolder(0)
+            _allNotesCount.value = noteDao.getAllNotesList().size
         }
     }
 

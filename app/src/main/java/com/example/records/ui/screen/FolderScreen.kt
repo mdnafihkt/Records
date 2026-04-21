@@ -58,6 +58,7 @@ import com.example.records.viewmodel.FolderWithCount
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,7 +109,7 @@ fun FolderScreen(
                             .padding(8.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Add,
+                            imageVector = Icons.Default.CreateNewFolder,
                             contentDescription = "Add Folder",
                             tint = Color.White
                         )
@@ -303,7 +304,7 @@ fun FolderItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.folder),
+                    painter = painterResource(id = R.drawable.folder_icon_2),
                     contentDescription = null,
                     tint = Color.Unspecified,
                     modifier = Modifier.size(40.dp)

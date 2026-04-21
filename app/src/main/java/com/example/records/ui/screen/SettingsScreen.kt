@@ -255,7 +255,7 @@ fun AppIconOption(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(64.dp)
+                .size(56.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(if (isSelected) colorResource(id = R.color.lavender).copy(alpha = 0.8f) else Color.Transparent)
         ){
