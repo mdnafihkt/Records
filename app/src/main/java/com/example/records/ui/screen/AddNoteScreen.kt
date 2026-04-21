@@ -199,7 +199,7 @@ fun AddNoteScreen(
 
                 Text(
                     text = if (initialTitle.isEmpty()) "New Note" else "Edit Note",
-                    color = Color(0xFFE6E6FA), // Lavender
+                    color = Color(0xFFE6E6FA),
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                     modifier = Modifier.weight(1f)
@@ -282,13 +282,13 @@ fun AddNoteScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Content Input
+                // Input Contents
                 BasicTextField(
                     value = contentValue,
                     onValueChange = { contentValue = it },
                     textStyle = TextStyle(
                         color = Color.White.copy(alpha = 0.9f),
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         lineHeight = 20.sp
                     ),
                     visualTransformation = richTextVisualTransformation,
