@@ -24,9 +24,9 @@
             android:name=".MainActivityDefault"
             android:enabled="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/ic_launcher_default"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
+            android:roundIcon="@mipmap/ic_launcher_default_round"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,29 +34,14 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- Overlay Icon -->
+        <!-- Light -->
         <activity-alias
-            android:name=".MainActivityBlue"
+            android:name=".MainActivityLight"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_overlay"
+            android:icon="@mipmap/ic_launcher_light"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_overlay"
-            android:targetActivity=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity-alias>
-
-        <!-- Dark Plain -->
-        <activity-alias
-            android:name=".MainActivityGreen"
-            android:enabled="false"
-            android:exported="true"
-            android:icon="@mipmap/ic_launcher_dark_plain"
-            android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_dark_plain"
+            android:roundIcon="@mipmap/ic_launcher_light_round"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -66,12 +51,12 @@
 
          <!-- Dark Stack -->
         <activity-alias
-            android:name=".MainActivityPurple"
+            android:name=".MainActivityDark"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_dark_stack"
+            android:icon="@mipmap/ic_launcher_dark"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_dark_stack"
+            android:roundIcon="@mipmap/ic_launcher_dark_round"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

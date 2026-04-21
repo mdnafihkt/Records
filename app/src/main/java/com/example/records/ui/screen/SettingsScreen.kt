@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 
 import com.example.records.ui.theme.GlassmorphicBackground
@@ -100,32 +99,25 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         AppIconOption(
-                            painter = painterResource(id = R.drawable.glassmorphic),
+                            painter = painterResource(id = R.drawable.logo_default),
                             name = "Default",
                             isSelected = currentIcon == AppIcon.DEFAULT
                         ) {
-                             showIconChangeDialog = AppIcon.DEFAULT
+                            showIconChangeDialog = AppIcon.DEFAULT
                         }
                         AppIconOption(
-                            painter = painterResource(id = R.drawable.overlay),
-                            name = "Overlay",
-                            isSelected = currentIcon == AppIcon.BLUE
+                            painter = painterResource(id = R.drawable.logo_light),
+                            name = "Light",
+                            isSelected = currentIcon == AppIcon.LIGHT
                         ) {
-                            showIconChangeDialog = AppIcon.BLUE
+                            showIconChangeDialog = AppIcon.LIGHT
                         }
                         AppIconOption(
-                            painter = painterResource(id = R.drawable.dark_plain),
-                            name = "Dark plain",
-                            isSelected = currentIcon == AppIcon.GREEN
+                            painter = painterResource(id = R.drawable.logo_dark),
+                            name = "Dark",
+                            isSelected = currentIcon == AppIcon.DARK
                         ) {
-                            showIconChangeDialog = AppIcon.GREEN
-                        }
-                        AppIconOption(
-                            painter = painterResource(id = R.drawable.dark_stack),
-                            name = "Dark stack",
-                            isSelected = currentIcon == AppIcon.PURPLE
-                        ) {
-                            showIconChangeDialog = AppIcon.PURPLE
+                            showIconChangeDialog = AppIcon.DARK
                         }
                     }
                 }

@@ -7,9 +7,8 @@ import android.content.pm.PackageManager
 
 enum class AppIcon(val aliasName: String, val iconResId: Int) {
     DEFAULT("com.example.records.MainActivityDefault", android.R.mipmap.sym_def_app_icon), // Placeholder ID, UI uses drawable
-    BLUE("com.example.records.MainActivityBlue", 0),
-    GREEN("com.example.records.MainActivityGreen", 0),
-    PURPLE("com.example.records.MainActivityPurple", 0)
+    LIGHT("com.example.records.MainActivityLight", 0),
+    DARK("com.example.records.MainActivityDark", 0)
 }
 
 object AppIconManager {
@@ -40,9 +39,8 @@ object AppIconManager {
         val packageName = context.packageName
 
         return when {
-            pm.getComponentEnabledSetting(ComponentName(packageName, "com.example.records.MainActivityBlue")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> AppIcon.BLUE
-            pm.getComponentEnabledSetting(ComponentName(packageName, "com.example.records.MainActivityGreen")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> AppIcon.GREEN
-            pm.getComponentEnabledSetting(ComponentName(packageName, "com.example.records.MainActivityPurple")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> AppIcon.PURPLE
+            pm.getComponentEnabledSetting(ComponentName(packageName, "com.example.records.MainActivityLight")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> AppIcon.LIGHT
+            pm.getComponentEnabledSetting(ComponentName(packageName, "com.example.records.MainActivityDark")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> AppIcon.DARK
             else -> AppIcon.DEFAULT
         }
     }
