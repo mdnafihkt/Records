@@ -60,6 +60,7 @@ fun ViewNoteScreen(
     note: Note?,
     onBackClick: () -> Unit,
     onEditClick: () -> Unit,
+    onMoveClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -121,7 +122,7 @@ fun ViewNoteScreen(
                             Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White)
                         }
                     }
-
+                    // Dropdown menu
                     Box {
                         IconButton(onClick = { showMenu = true }) {
                             Icon(Icons.Default.MoreVert, contentDescription = "Options", tint = Color.White)
@@ -138,6 +139,13 @@ fun ViewNoteScreen(
                                 onClick = {
                                     showMenu = false
                                     onEditClick()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Move folder") },
+                                onClick = {
+                                    showMenu = false
+                                    onMoveClick()
                                 }
                             )
                             DropdownMenuItem(

@@ -13,6 +13,7 @@ fun ViewNoteScreenPreview() {
         note = Note(1, "Preview works", "this is new note 1", 122),
         onBackClick = {  },
         onEditClick = {  },
+        onMoveClick = { },
         onDeleteClick= {  }
     )
 }

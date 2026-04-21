@@ -1,5 +1,6 @@
 package com.example.records.ui.navigation
 
+import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -157,6 +158,9 @@ fun AppNavHost() {
                                         Screen.AddEditNote.createRoute(folderId, noteId, true)
                                 )
                             }
+                        },
+                        onMoveClick = {
+                            Toast.makeText(context, "Not yet implemented", Toast.LENGTH_LONG).show()
                         },
                         onDeleteClick = {
                             scope.launch {

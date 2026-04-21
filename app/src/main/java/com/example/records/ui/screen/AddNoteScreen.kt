@@ -156,13 +156,16 @@ fun AddNoteScreen(
             ) {
                 IconButton(onClick = onBackClick) {
                      Icon(
-                        painter = painterResource(id = R.drawable.back_icon), // Reusing folder icon as back/close
+                        modifier = Modifier
+                            .size(16.dp)
+                            .background(Color.Red),
+                        painter = painterResource(id = R.drawable.back_icon),
                         contentDescription = "Back",
                         tint = Color.White
                     )
                 }
                 // Folder Selector
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                Box(modifier = Modifier.padding(horizontal = 4.dp)) {
                     val selectedFolderName = folders.find { it.id == selectedFolderId }?.name ?: "Select Folder"
 
                     Row(
