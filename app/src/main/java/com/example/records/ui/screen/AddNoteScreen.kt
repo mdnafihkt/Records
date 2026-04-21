@@ -156,12 +156,45 @@ fun AddNoteScreen(
             ) {
                 IconButton(onClick = onBackClick) {
                      Icon(
-                        painter = painterResource(id = R.drawable.icon_folder), // Reusing folder icon as back/close
+                        painter = painterResource(id = R.drawable.back_icon), // Reusing folder icon as back/close
                         contentDescription = "Back",
                         tint = Color.White
                     )
                 }
-                
+                // Folder Selector
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    val selectedFolderName = folders.find { it.id == selectedFolderId }?.name ?: "Select Folder"
+
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.White.copy(alpha = 0.1f))
+                            .clickable { expanded = true }
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = selectedFolderName, color = Color.White, fontSize = 14.sp)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Select Folder", tint = Color.White)
+                    }
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier.background(Color(0xFF2D2D2D))
+                    ) {
+                        folders.forEach { folder ->
+                            DropdownMenuItem(
+                                text = { Text(folder.name, color = Color.White) },
+                                onClick = {
+                                    selectedFolderId = folder.id
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
@@ -195,42 +228,6 @@ fun AddNoteScreen(
                 }
             }
             
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            // Folder Selector
-            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                val selectedFolderName = folders.find { it.id == selectedFolderId }?.name ?: "Select Folder"
-                
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.White.copy(alpha = 0.1f))
-                        .clickable { expanded = true }
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = selectedFolderName, color = Color.White, fontSize = 14.sp)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Select Folder", tint = Color.White)
-                }
-
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier.background(Color(0xFF2D2D2D))
-                ) {
-                    folders.forEach { folder ->
-                        DropdownMenuItem(
-                            text = { Text(folder.name, color = Color.White) },
-                            onClick = {
-                                selectedFolderId = folder.id
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
-
             Spacer(modifier = Modifier.height(8.dp))
 
             // Formatting Toolbar
