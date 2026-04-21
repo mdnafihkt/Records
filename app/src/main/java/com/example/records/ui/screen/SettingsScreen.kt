@@ -22,6 +22,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 
 import com.example.records.ui.theme.GlassmorphicBackground
 import com.example.records.ui.theme.GlassmorphicCard
@@ -92,7 +93,7 @@ fun SettingsScreen(
                         color = Color.White,
                         modifier = Modifier.padding(start = 16.dp, bottom = 12.dp)
                     )
-
+                    // App Icons Settings
                     Row(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -106,18 +107,25 @@ fun SettingsScreen(
                             showIconChangeDialog = AppIcon.DEFAULT
                         }
                         AppIconOption(
-                            painter = painterResource(id = R.drawable.logo_light),
-                            name = "Light",
-                            isSelected = currentIcon == AppIcon.LIGHT
+                            painter = painterResource(id = R.drawable.logo_diary),
+                            name = "Diary",
+                            isSelected = currentIcon == AppIcon.DIARY
                         ) {
-                            showIconChangeDialog = AppIcon.LIGHT
+                            showIconChangeDialog = AppIcon.DIARY
                         }
                         AppIconOption(
-                            painter = painterResource(id = R.drawable.logo_dark),
-                            name = "Dark",
-                            isSelected = currentIcon == AppIcon.DARK
+                            painter = painterResource(id = R.drawable.logo_glassmorphic),
+                            name = "Glassmorphic",
+                            isSelected = currentIcon == AppIcon.GLASSMORPHIC
                         ) {
-                            showIconChangeDialog = AppIcon.DARK
+                            showIconChangeDialog = AppIcon.GLASSMORPHIC
+                        }
+                        AppIconOption(
+                            painter = painterResource(id = R.drawable.logo_liquid_glass),
+                            name = "LiquidGlass",
+                            isSelected = currentIcon == AppIcon.LIQUID_GLASS
+                        ) {
+                            showIconChangeDialog = AppIcon.LIQUID_GLASS
                         }
                     }
                 }
@@ -247,14 +255,14 @@ fun AppIconOption(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(48.dp)
+                .size(64.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .background(if (isSelected) Color.Gray.copy(alpha = 0.4f) else Color.Transparent)
+                .background(if (isSelected) colorResource(id = R.color.lavender).copy(alpha = 0.8f) else Color.Transparent)
         ){
             Image(
                 painter = painter,
                 contentDescription = name,
-                modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp)),
+                modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Fit
             )
 

@@ -21,7 +21,7 @@
 
         <!-- Default Icon Alias -->
         <activity-alias
-            android:name=".MainActivityDefault"
+            android:name=".MainActivity"
             android:enabled="true"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_default"
@@ -34,14 +34,14 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- Light -->
+        <!-- Dairy Logo -->
         <activity-alias
-            android:name=".MainActivityLight"
+            android:name=".MainActivityDiary"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_light"
+            android:icon="@mipmap/ic_launcher_diary"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_light_round"
+            android:roundIcon="@mipmap/ic_launcher_diary_round"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,21 +49,36 @@
             </intent-filter>
         </activity-alias>
 
-         <!-- Dark Stack -->
+         <!-- Glassmorphic Logo -->
         <activity-alias
-            android:name=".MainActivityDark"
+            android:name=".MainActivityGlassmorphic"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_dark"
+            android:icon="@mipmap/ic_launcher_glassmorphic"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_dark_round"
+            android:roundIcon="@mipmap/ic_launcher_glassmorphic_round"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
-        
+
+        <!-- Liquid_glass Logo -->
+        <activity-alias
+            android:name=".MainActivityLiquidGlass"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_liquid_glass"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_liquid_glass_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
     </application>
 
 </manifest>

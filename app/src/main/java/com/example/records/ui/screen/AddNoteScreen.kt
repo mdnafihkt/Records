@@ -282,7 +282,7 @@ fun AddNoteScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Input Contents
+                // Input "Contents
                 BasicTextField(
                     value = contentValue,
                     onValueChange = { contentValue = it },
