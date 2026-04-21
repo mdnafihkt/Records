@@ -13,6 +13,9 @@ interface NoteDao {
     @Query("SELECT * FROM Note")
     fun getAllNotes(): LiveData<List<Note>>
 
+    @Query("SELECT * FROM Note ORDER BY lastUpdated DESC")
+    suspend fun getAllNotesList(): List<Note>
+
     @Query("SELECT * FROM Note WHERE id = :id LIMIT 1")
     suspend fun getNoteById(id: Int): Note?
 

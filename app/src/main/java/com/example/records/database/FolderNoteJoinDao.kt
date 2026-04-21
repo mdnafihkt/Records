@@ -29,7 +29,6 @@ interface FolderNoteJoinDao {
              WHERE FolderNoteJoin.folderId = :folderId
              ORDER BY Note.lastUpdated DESC
     """)
-
     fun getNotesForFolder(folderId: Int): LiveData<List<Note>>
 
     @Query("""

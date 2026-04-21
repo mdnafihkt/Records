@@ -39,7 +39,7 @@ fun BottomNavigationBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(88.dp) // Adjust height as needed
-            .background(Color.Transparent)
+            .background(Color(0xFF252138))
     ) {
         Row(
             modifier = Modifier

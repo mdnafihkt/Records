@@ -116,8 +116,11 @@ fun AppNavHost() {
 
                 val notes by
                         produceState<List<Note>>(initialValue = emptyList(), key1 = folderId) {
-                            val folderNotes = db.folderNoteJoinDao().getNotesForFolderList(folderId)
-                            value = folderNotes
+                            value = if (folderId == 0) {
+                                db.noteDao().getAllNotesList() // Now the types match!
+                            } else {
+                                db.folderNoteJoinDao().getNotesForFolderList(folderId)
+                            }
                         }
 
                 NoteScreen(
