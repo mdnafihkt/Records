@@ -2,8 +2,10 @@ package com.example.records.ui.screen
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -79,13 +81,56 @@ fun SettingsScreen(
                         color = Color(0xFF8692F7),
                         modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
                     )
-                    
-                    SettingItem(title = "App Theme", subtitle = "System Default") {
-                        // TODO: Implement Theme Toggle Logic
+
+                    // Theme Selection
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp,vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(
+                                text = "App Theme",
+                                fontSize = 16.sp,
+                                color = Color.White
+                            )
+                            Text(
+                                text = "selected theme",
+                                fontSize = 12.sp,
+                                color = Color.Gray
+                            )
+                        }
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        AppThemeOption(
+                            painter = painterResource(id = R.drawable.icon_color_outline),
+                            name = "chromatic",
+                            isSelected = false,
+                            onClick = { Toast.makeText(context, "Select theme not implemented", Toast.LENGTH_SHORT).show() }
+                        )
+                        AppThemeOption(
+                            painter = painterResource(id = R.drawable.icon_sun_outline),
+                            name = "light",
+                            isSelected = true,
+                            onClick = { Toast.makeText(context, "Select theme not implemented", Toast.LENGTH_SHORT).show() }
+                        )
+                        AppThemeOption(
+                            painter = painterResource(id = R.drawable.icon_night_outline),
+                            name = "dark",
+                            isSelected = false,
+                            onClick = { Toast.makeText(context, "Select theme not implemented", Toast.LENGTH_SHORT).show() }
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // App Icons Settings
                     Text(
                         text = "App Icon",
                         fontSize = 16.sp,
@@ -93,7 +138,7 @@ fun SettingsScreen(
                         color = Color.White,
                         modifier = Modifier.padding(start = 16.dp, bottom = 12.dp)
                     )
-                    // App Icons Settings
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -202,34 +247,44 @@ fun SettingsScreen(
 }
 
 @Composable
-fun SettingItem(title: String, subtitle: String, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp,vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column {
+fun AppThemeOption(
+    painter: Painter,
+    name: String,
+    isSelected: Boolean,
+    onClick: () -> Unit) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .clickable { onClick() }
+                .clip(RoundedCornerShape(12.dp))
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .border(
+                        width = 1.dp,
+                        color = (if (isSelected) colorResource(id = R.color.lavender).copy(alpha = 0.8f) else Color.Gray),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+            ){
+                Icon(
+                    painter = painter, // Placeholder arrow/icon
+                    contentDescription = name,
+                    tint = (if (isSelected) colorResource(id = R.color.lavender).copy(alpha = 0.8f) else Color.Gray),
+                    modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp))
+                )
+
+            }
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = title,
-                fontSize = 16.sp,
-                color = Color.White
-            )
-            Text(
-                text = subtitle,
-                fontSize = 12.sp,
-                color = Color.Gray
+                text = name,
+                color = Color.White,
+                fontSize = 12.sp
             )
         }
-        Icon(
-            painter = painterResource(id = R.drawable.icon_settings), // Placeholder arrow/icon
-            contentDescription = null,
-            tint = Color.Gray,
-            modifier = Modifier.size(16.dp)
-        )
-    }
+
 }
 
 @Composable
