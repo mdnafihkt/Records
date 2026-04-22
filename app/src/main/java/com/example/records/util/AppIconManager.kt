@@ -6,10 +6,9 @@ import android.content.pm.PackageManager
 
 
 enum class AppIcon(val aliasName: String, val iconResId: Int) {
-    DEFAULT("com.example.records.MainActivity", android.R.mipmap.sym_def_app_icon), // Placeholder ID, UI uses drawable
-    DIARY("com.example.records.MainActivityDiary", 0),
-    GLASSMORPHIC("com.example.records.MainActivityGlassmorphic", 0),
-    LIQUID_GLASS("com.example.records.MainActivityLiquidGlass", 0)
+    DEFAULT("com.example.records.MainActivityDefault", android.R.mipmap.sym_def_app_icon),
+    PRO("com.example.records.MainActivityPro", 0),
+    COOL("com.example.records.MainActivityCool", 0)
 }
 
 object AppIconManager {
@@ -40,9 +39,8 @@ object AppIconManager {
         val packageName = context.packageName
 
         return when {
-            pm.getComponentEnabledSetting(ComponentName(packageName, "com.example.records.MainActivityDiary")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> AppIcon.DIARY
-            pm.getComponentEnabledSetting(ComponentName(packageName, "com.example.records.MainActivityGlassmorphic")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> AppIcon.GLASSMORPHIC
-            pm.getComponentEnabledSetting(ComponentName(packageName, "com.example.records.MainActivityLiquidGlass")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> AppIcon.LIQUID_GLASS
+            pm.getComponentEnabledSetting(ComponentName(packageName, "com.example.records.MainActivityPro")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> AppIcon.PRO
+            pm.getComponentEnabledSetting(ComponentName(packageName, "com.example.records.MainActivityCool")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> AppIcon.COOL
             else -> AppIcon.DEFAULT
         }
     }

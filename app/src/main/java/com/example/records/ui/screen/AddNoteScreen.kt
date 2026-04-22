@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -151,32 +152,43 @@ fun AddNoteScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBackClick) {
                      Icon(
-                        modifier = Modifier
-                            .size(16.dp)
-                            .background(Color.Red),
+                        modifier = Modifier.size(16.dp),
                         painter = painterResource(id = R.drawable.back_icon),
                         contentDescription = "Back",
                         tint = Color.White
                     )
                 }
                 // Folder Selector
-                Box(modifier = Modifier.padding(horizontal = 4.dp)) {
-                    val selectedFolderName = folders.find { it.id == selectedFolderId }?.name ?: "Select Folder"
+                Box() {
+                    val selectedFolderIcon = if (folders.any { it.id == selectedFolderId }) {
+                        R.drawable.folder_icon_2
+                    } else {
+                        R.drawable.icon_folder
+                    }
+//                    val selectedFolderName = folders.find { it.id == selectedFolderId }?.name ?: "Select Folder"
 
                     Row(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color.White.copy(alpha = 0.1f))
                             .clickable { expanded = true }
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                            .padding(horizontal = 8.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = selectedFolderName, color = Color.White, fontSize = 14.sp)
+//                        Text(text = selectedFolderName, color = Color.White, fontSize = 14.sp)
+                        Icon(
+                            modifier = Modifier
+                                .width(32.dp)
+                                .height(28.dp),
+                            painter = painterResource(id = selectedFolderIcon),
+                            contentDescription = "Selected Folder",
+                            tint = Color.White
+                        )
                         Spacer(modifier = Modifier.width(4.dp))
                         Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Select Folder", tint = Color.White)
                     }
@@ -202,11 +214,13 @@ fun AddNoteScreen(
 
                 Text(
                     text = if (initialTitle.isEmpty()) "New Note" else "Edit Note",
+                    modifier = Modifier.weight(1f, fill = false),
                     color = Color(0xFFE6E6FA),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    modifier = Modifier.weight(1f)
+                    fontSize = 20.sp
                 )
+
+                Spacer(modifier = Modifier.weight(1f))
 
                 Box(
                     modifier = Modifier

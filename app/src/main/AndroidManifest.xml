@@ -21,7 +21,7 @@
 
         <!-- Default Icon Alias -->
         <activity-alias
-            android:name=".MainActivity"
+            android:name=".MainActivityDefault"
             android:enabled="true"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_default"
@@ -36,7 +36,7 @@
 
         <!-- Dairy Logo -->
         <activity-alias
-            android:name=".MainActivityDiary"
+            android:name=".MainActivityPro"
             android:enabled="false"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_diary"
@@ -51,27 +51,12 @@
 
          <!-- Glassmorphic Logo -->
         <activity-alias
-            android:name=".MainActivityGlassmorphic"
+            android:name=".MainActivityCool"
             android:enabled="false"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_glassmorphic"
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_glassmorphic_round"
-            android:targetActivity=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity-alias>
-
-        <!-- Liquid_glass Logo -->
-        <activity-alias
-            android:name=".MainActivityLiquidGlass"
-            android:enabled="false"
-            android:exported="true"
-            android:icon="@mipmap/ic_launcher_liquid_glass"
-            android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_liquid_glass_round"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

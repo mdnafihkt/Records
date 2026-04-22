@@ -108,24 +108,17 @@ fun SettingsScreen(
                         }
                         AppIconOption(
                             painter = painterResource(id = R.drawable.logo_diary),
-                            name = "Diary",
-                            isSelected = currentIcon == AppIcon.DIARY
+                            name = "Pro",
+                            isSelected = currentIcon == AppIcon.PRO
                         ) {
-                            showIconChangeDialog = AppIcon.DIARY
+                            showIconChangeDialog = AppIcon.PRO
                         }
                         AppIconOption(
                             painter = painterResource(id = R.drawable.logo_glassmorphic),
-                            name = "Glassmorphic",
-                            isSelected = currentIcon == AppIcon.GLASSMORPHIC
+                            name = "Cool",
+                            isSelected = currentIcon == AppIcon.COOL
                         ) {
-                            showIconChangeDialog = AppIcon.GLASSMORPHIC
-                        }
-                        AppIconOption(
-                            painter = painterResource(id = R.drawable.logo_liquid_glass),
-                            name = "LiquidGlass",
-                            isSelected = currentIcon == AppIcon.LIQUID_GLASS
-                        ) {
-                            showIconChangeDialog = AppIcon.LIQUID_GLASS
+                            showIconChangeDialog = AppIcon.COOL
                         }
                     }
                 }
