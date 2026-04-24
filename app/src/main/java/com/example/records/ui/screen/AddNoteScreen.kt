@@ -21,6 +21,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -34,6 +36,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -90,6 +94,11 @@ fun AddNoteScreen(
             selection = TextRange(selection.start + tag.length + 2 + selectedText.length + tag.length + 3)
         )
     }
+
+    val customTextSelectionColors = TextSelectionColors(
+        handleColor = Color(0xFF64B5F6),
+        backgroundColor = Color(0xFF64B5F6).copy(alpha = 0.4f)
+    )
 
     val richTextVisualTransformation = remember {
         VisualTransformation { text ->
@@ -143,187 +152,208 @@ fun AddNoteScreen(
         }
     }
 
-    GlassmorphicBackground {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            // Header
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onBackClick) {
-                     Icon(
-                        modifier = Modifier.size(16.dp),
-                        painter = painterResource(id = R.drawable.back_icon),
-                        contentDescription = "Back",
-                        tint = Color.White
-                    )
-                }
-                // Folder Selector
-                Box() {
-                    val selectedFolderIcon = if (folders.any { it.id == selectedFolderId }) {
-                        R.drawable.folder_icon_2
-                    } else {
-                        R.drawable.icon_folder
-                    }
-//                    val selectedFolderName = folders.find { it.id == selectedFolderId }?.name ?: "Select Folder"
-
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color.White.copy(alpha = 0.1f))
-                            .clickable { expanded = true }
-                            .padding(horizontal = 8.dp, vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-//                        Text(text = selectedFolderName, color = Color.White, fontSize = 14.sp)
-                        Icon(
-                            modifier = Modifier
-                                .width(32.dp)
-                                .height(28.dp),
-                            painter = painterResource(id = selectedFolderIcon),
-                            contentDescription = "Selected Folder",
-                            tint = Color.White
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Select Folder", tint = Color.White)
-                    }
-
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false },
-                        modifier = Modifier.background(Color(0xFF2D2D2D))
-                    ) {
-                        folders.forEach { folder ->
-                            DropdownMenuItem(
-                                text = { Text(folder.name, color = Color.White) },
-                                onClick = {
-                                    selectedFolderId = folder.id
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = if (initialTitle.isEmpty()) "New Note" else "Edit Note",
-                    modifier = Modifier.weight(1f, fill = false),
-                    color = Color(0xFFE6E6FA),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(
-                                    Color.Magenta.copy(alpha = 0.2f),
-                                    Color.Blue.copy(alpha = 0.2f)
-                                )
-                            )
-                        )
-                        .border(1.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-                        .clickable { onSaveClick(title, contentValue.text, selectedFolderId) }
-                        .padding(horizontal = 20.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        text = "Save",
-                        color = Color.White,
-                        fontSize = 16.sp
-                    )
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Formatting Toolbar
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = { onFormatClick("b") }) {
-                    Text("B", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                }
-                IconButton(onClick = { onFormatClick("i") }) {
-                    Text("I", color = Color.White, fontStyle = FontStyle.Italic, fontSize = 18.sp)
-                }
-                IconButton(onClick = { onFormatClick("u") }) {
-                    Text("U", color = Color.White, textDecoration = TextDecoration.Underline, fontSize = 18.sp)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Content Area
+    CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
+        GlassmorphicBackground {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(rememberScrollState())
             ) {
-                // Title Input
-                BasicTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    textStyle = TextStyle(
-                        color = Color.White,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold
-                    ),
-                    decorationBox = { innerTextField ->
-                        if (title.isEmpty()) {
-                            Text(
-                                text = "Title",
-                                color = Color.Gray,
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.Bold
+                // Header
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            modifier = Modifier.size(16.dp),
+                            painter = painterResource(id = R.drawable.back_icon),
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
+                    }
+                    // Folder Selector
+                    Box() {
+                        val selectedFolderIcon = if (folders.any { it.id == selectedFolderId }) {
+                            R.drawable.folder_icon_2
+                        } else {
+                            R.drawable.icon_folder
+                        }
+//                    val selectedFolderName = folders.find { it.id == selectedFolderId }?.name ?: "Select Folder"
+
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color.White.copy(alpha = 0.1f))
+                                .clickable { expanded = true }
+                                .padding(horizontal = 8.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+//                        Text(text = selectedFolderName, color = Color.White, fontSize = 14.sp)
+                            Icon(
+                                modifier = Modifier
+                                    .width(32.dp)
+                                    .height(28.dp),
+                                painter = painterResource(id = selectedFolderIcon),
+                                contentDescription = "Selected Folder",
+                                tint = Color.White
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = "Select Folder",
+                                tint = Color.White
                             )
                         }
-                        innerTextField()
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Input "Contents
-                BasicTextField(
-                    value = contentValue,
-                    onValueChange = { contentValue = it },
-                    textStyle = TextStyle(
-                        color = Color.White.copy(alpha = 0.9f),
-                        fontSize = 16.sp,
-                        lineHeight = 20.sp
-                    ),
-                    visualTransformation = richTextVisualTransformation,
-                    cursorBrush = Brush.verticalGradient(listOf(Color.White, Color.White)),
-                    decorationBox = { innerTextField ->
-                        if (contentValue.text.isEmpty()) {
-                            Text(
-                                text = "Start typing...",
-                                color = Color.Gray,
-                                fontSize = 14.sp
-                            )
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                            modifier = Modifier.background(Color(0xFF2D2D2D))
+                        ) {
+                            folders.forEach { folder ->
+                                DropdownMenuItem(
+                                    text = { Text(folder.name, color = Color.White) },
+                                    onClick = {
+                                        selectedFolderId = folder.id
+                                        expanded = false
+                                    }
+                                )
+                            }
                         }
-                        innerTextField()
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                
-                Spacer(modifier = Modifier.height(300.dp)) // Extra space at bottom
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+                        text = if (initialTitle.isEmpty()) "New Note" else "Edit Note",
+                        modifier = Modifier.weight(1f, fill = false),
+                        color = Color(0xFFE6E6FA),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(
+                                        Color.Magenta.copy(alpha = 0.2f),
+                                        Color.Blue.copy(alpha = 0.2f)
+                                    )
+                                )
+                            )
+                            .border(1.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                            .clickable { onSaveClick(title, contentValue.text, selectedFolderId) }
+                            .padding(horizontal = 20.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = "Save",
+                            color = Color.White,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Formatting Toolbar
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = { onFormatClick("b") }) {
+                        Text(
+                            "B",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                    }
+                    IconButton(onClick = { onFormatClick("i") }) {
+                        Text(
+                            "I",
+                            color = Color.White,
+                            fontStyle = FontStyle.Italic,
+                            fontSize = 18.sp
+                        )
+                    }
+                    IconButton(onClick = { onFormatClick("u") }) {
+                        Text(
+                            "U",
+                            color = Color.White,
+                            textDecoration = TextDecoration.Underline,
+                            fontSize = 18.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Content Area
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    // Title Input
+                    BasicTextField(
+                        value = title,
+                        onValueChange = { title = it },
+                        textStyle = TextStyle(
+                            color = Color.White,
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        decorationBox = { innerTextField ->
+                            if (title.isEmpty()) {
+                                Text(
+                                    text = "Title",
+                                    color = Color.Gray,
+                                    fontSize = 28.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            innerTextField()
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Input "Contents
+                    BasicTextField(
+                        value = contentValue,
+                        onValueChange = { contentValue = it },
+                        textStyle = TextStyle(
+                            color = Color.White.copy(alpha = 0.9f),
+                            fontSize = 16.sp,
+                            lineHeight = 20.sp
+                        ),
+                        visualTransformation = richTextVisualTransformation,
+                        cursorBrush = SolidColor(Color.White),
+                        decorationBox = { innerTextField ->
+                            if (contentValue.text.isEmpty()) {
+                                Text(
+                                    text = "Start typing...",
+                                    color = Color.Gray,
+                                    fontSize = 14.sp
+                                )
+                            }
+                            innerTextField()
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(300.dp)) // Extra space at bottom
+                }
             }
         }
     }
