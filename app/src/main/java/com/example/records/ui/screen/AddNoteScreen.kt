@@ -65,6 +65,9 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.SpanStyle
+import com.example.records.ui.components.editor.NoteEditor
+import com.example.records.ui.components.editor.toBlocks
+import com.example.records.ui.components.editor.toJson
 
 @Composable
 fun AddNoteScreen(
@@ -76,82 +79,14 @@ fun AddNoteScreen(
     onBackClick: () -> Unit
 ) {
     var title by remember { mutableStateOf(initialTitle) }
-    var contentValue by remember { mutableStateOf(TextFieldValue(initialContent)) }
+    var blocks by remember { mutableStateOf(initialContent.toBlocks()) }
     var selectedFolderId by remember { mutableIntStateOf(initialFolderId) }
     var expanded by remember { mutableStateOf(false) }
-
-    val onFormatClick: (String) -> Unit = { tag ->
-        val selection = contentValue.selection
-        val text = contentValue.text
-        val selectedText = text.substring(selection.start, selection.end)
-        val newText = text.substring(0, selection.start) + 
-                     "<$tag>$selectedText</$tag>" + 
-                     text.substring(selection.end)
-        
-        // Update text and move cursor after the inserted tag
-        contentValue = contentValue.copy(
-            text = newText,
-            selection = TextRange(selection.start + tag.length + 2 + selectedText.length + tag.length + 3)
-        )
-    }
 
     val customTextSelectionColors = TextSelectionColors(
         handleColor = MaterialTheme.colorScheme.primary,
         backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
     )
-
-    val tagColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-    val richTextVisualTransformation = remember(tagColor) {
-        VisualTransformation { text ->
-            val annotatedString = buildAnnotatedString {
-                val input = text.text
-                var currentIndex = 0
-                val tagRegex = Regex("(<[biu]>)|(</[biu]>)")
-                val matches = tagRegex.findAll(input)
-                
-                val activeStyles = mutableSetOf<String>()
-                
-                for (match in matches) {
-                    val segment = input.substring(currentIndex, match.range.first)
-                    if (segment.isNotEmpty()) {
-                        withStyle(style = SpanStyle(
-                            fontWeight = if (activeStyles.contains("b")) FontWeight.Bold else FontWeight.Normal,
-                            fontStyle = if (activeStyles.contains("i")) FontStyle.Italic else FontStyle.Normal,
-                            textDecoration = if (activeStyles.contains("u")) TextDecoration.Underline else TextDecoration.None
-                        )) {
-                            append(segment)
-                        }
-                    }
-                    
-                    // Style the tag itself to make it subtle
-                    withStyle(style = SpanStyle(color = tagColor)) {
-                        append(match.value)
-                    }
-                    
-                    val tag = match.value
-                    if (tag.startsWith("</")) {
-                        activeStyles.remove(tag.substring(2, 3))
-                    } else {
-                        activeStyles.add(tag.substring(1, 2))
-                    }
-                    
-                    currentIndex = match.range.last + 1
-                }
-                
-                if (currentIndex < input.length) {
-                    val remaining = input.substring(currentIndex)
-                    withStyle(style = SpanStyle(
-                        fontWeight = if (activeStyles.contains("b")) FontWeight.Bold else FontWeight.Normal,
-                        fontStyle = if (activeStyles.contains("i")) FontStyle.Italic else FontStyle.Normal,
-                        textDecoration = if (activeStyles.contains("u")) TextDecoration.Underline else TextDecoration.None
-                    )) {
-                        append(remaining)
-                    }
-                }
-            }
-            TransformedText(annotatedString, OffsetMapping.Identity)
-        }
-    }
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
         GlassmorphicBackground {
@@ -249,7 +184,7 @@ fun AddNoteScreen(
                                 )
                             )
                             .border(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-                            .clickable { onSaveClick(title, contentValue.text, selectedFolderId) }
+                            .clickable { onSaveClick(title, blocks.toJson(), selectedFolderId) }
                             .padding(horizontal = 20.dp, vertical = 8.dp)
                     ) {
                         Text(
@@ -262,47 +197,11 @@ fun AddNoteScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Formatting Toolbar
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = { onFormatClick("b") }) {
-                        Text(
-                            "B",
-                            color = MaterialTheme.colorScheme.onBackground,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
-                        )
-                    }
-                    IconButton(onClick = { onFormatClick("i") }) {
-                        Text(
-                            "I",
-                            color = MaterialTheme.colorScheme.onBackground,
-                            fontStyle = FontStyle.Italic,
-                            fontSize = 18.sp
-                        )
-                    }
-                    IconButton(onClick = { onFormatClick("u") }) {
-                        Text(
-                            "U",
-                            color = MaterialTheme.colorScheme.onBackground,
-                            textDecoration = TextDecoration.Underline,
-                            fontSize = 18.sp
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
                 // Content Area
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 16.dp)
-                        .verticalScroll(rememberScrollState())
                 ) {
                     // Title Input
                     BasicTextField(
@@ -329,27 +228,9 @@ fun AddNoteScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Input "Contents
-                    BasicTextField(
-                        value = contentValue,
-                        onValueChange = { contentValue = it },
-                        textStyle = TextStyle(
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f),
-                            fontSize = 16.sp,
-                            lineHeight = 20.sp
-                        ),
-                        visualTransformation = richTextVisualTransformation,
-                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                        decorationBox = { innerTextField ->
-                            if (contentValue.text.isEmpty()) {
-                                Text(
-                                    text = "Start typing...",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    fontSize = 14.sp
-                                )
-                            }
-                            innerTextField()
-                        },
+                    NoteEditor(
+                        blocks = blocks,
+                        onBlocksChange = { blocks = it },
                         modifier = Modifier.fillMaxWidth()
                     )
 

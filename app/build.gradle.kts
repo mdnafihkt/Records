@@ -103,4 +103,8 @@ dependencies {
     // Debugging & Preview Tooling (Compose-only)
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    // Rich Text Editor & Serialization
+    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc10")
+    implementation("com.google.code.gson:gson:2.10.1")
 }

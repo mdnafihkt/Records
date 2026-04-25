@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.records.R
 import com.example.records.database.Note
+import com.example.records.ui.components.editor.toBlocks
+import com.example.records.ui.components.editor.toPlainText
 import com.example.records.ui.theme.GlassmorphicBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -112,7 +114,7 @@ fun NoteItem(
             )
 
             Text(
-                text = com.example.records.util.RichTextParser.toAnnotatedString(note.content),
+                text = note.content.toBlocks().toPlainText(),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                     lineHeight = 20.sp

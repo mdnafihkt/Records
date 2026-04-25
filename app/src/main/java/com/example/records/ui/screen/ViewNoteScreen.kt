@@ -53,6 +53,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.records.R
 import com.example.records.database.Note
+import com.example.records.ui.components.editor.NoteViewer
+import com.example.records.ui.components.editor.toBlocks
 import com.example.records.ui.theme.GlassmorphicBackground
 import com.example.records.ui.theme.GlassmorphicCard
 
@@ -175,21 +177,18 @@ fun ViewNoteScreen(
                 )
 
                 // Content
-                val annotatedContent = remember(note.content, searchQuery) {
-                    com.example.records.util.RichTextParser.toAnnotatedString(note.content, searchQuery)
+                val blocks = remember(note.content) {
+                    note.content.toBlocks()
                 }
 
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
                         .clickable { onEditClick() } // Mimic existing behavior: click content to edit
                 ) {
-                    Text(
-                        text = annotatedContent,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f),
-                        fontSize = 16.sp,
-                        lineHeight = 28.sp
+                    NoteViewer(
+                        blocks = blocks,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             } else {
