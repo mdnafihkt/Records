@@ -63,7 +63,7 @@ fun SettingsScreen(
                     text = "Settings",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
 
@@ -78,7 +78,7 @@ fun SettingsScreen(
                         text = "Appearance",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF8692F7),
+                        color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
                     )
 
@@ -94,12 +94,12 @@ fun SettingsScreen(
                             Text(
                                 text = "App Theme",
                                 fontSize = 16.sp,
-                                color = Color.White
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                             Text(
                                 text = "selected theme",
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -135,7 +135,7 @@ fun SettingsScreen(
                         text = "App Icon",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.padding(start = 16.dp, bottom = 12.dp)
                     )
 
@@ -178,7 +178,7 @@ fun SettingsScreen(
                         text = "Security",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF8692F7),
+                        color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
@@ -194,8 +194,8 @@ fun SettingsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column {
-                            Text(text = "App Lock", fontSize = 16.sp, color = Color.White)
-                            Text(text = "Require authentication on launch", fontSize = 12.sp, color = Color.Gray)
+                            Text(text = "App Lock", fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
+                            Text(text = "Require authentication on launch", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         Switch(
                             checked = isAppLockEnabled,
@@ -207,8 +207,8 @@ fun SettingsScreen(
                                     .apply()
                             },
                              colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color(0xFF8692F7),
-                                checkedTrackColor = Color(0xFF8692F7).copy(alpha = 0.5f)
+                                checkedThumbColor = MaterialTheme.colorScheme.primary,
+                                checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                             )
                         )
                     }
@@ -265,14 +265,14 @@ fun AppThemeOption(
                     .clip(RoundedCornerShape(12.dp))
                     .border(
                         width = 1.dp,
-                        color = (if (isSelected) colorResource(id = R.color.lavender).copy(alpha = 0.8f) else Color.Gray),
+                        color = (if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant),
                         shape = RoundedCornerShape(12.dp)
                     )
             ){
                 Icon(
                     painter = painter, // Placeholder arrow/icon
                     contentDescription = name,
-                    tint = (if (isSelected) colorResource(id = R.color.lavender).copy(alpha = 0.8f) else Color.Gray),
+                    tint = (if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant),
                     modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp))
                 )
 
@@ -280,7 +280,7 @@ fun AppThemeOption(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = name,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 12.sp
             )
         }
@@ -305,7 +305,7 @@ fun AppIconOption(
             modifier = Modifier
                 .size(56.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .background(if (isSelected) colorResource(id = R.color.lavender).copy(alpha = 0.8f) else Color.Transparent)
+                .background(if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f) else Color.Transparent)
         ){
             Image(
                 painter = painter,
@@ -318,7 +318,7 @@ fun AppIconOption(
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = name,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 12.sp
         )
     }

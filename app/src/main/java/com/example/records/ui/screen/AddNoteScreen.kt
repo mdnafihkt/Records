@@ -96,11 +96,12 @@ fun AddNoteScreen(
     }
 
     val customTextSelectionColors = TextSelectionColors(
-        handleColor = Color(0xFF64B5F6),
-        backgroundColor = Color(0xFF64B5F6).copy(alpha = 0.4f)
+        handleColor = MaterialTheme.colorScheme.primary,
+        backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
     )
 
-    val richTextVisualTransformation = remember {
+    val tagColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+    val richTextVisualTransformation = remember(tagColor) {
         VisualTransformation { text ->
             val annotatedString = buildAnnotatedString {
                 val input = text.text
@@ -123,7 +124,7 @@ fun AddNoteScreen(
                     }
                     
                     // Style the tag itself to make it subtle
-                    withStyle(style = SpanStyle(color = Color.Gray.copy(alpha = 0.5f))) {
+                    withStyle(style = SpanStyle(color = tagColor)) {
                         append(match.value)
                     }
                     
@@ -170,7 +171,7 @@ fun AddNoteScreen(
                             modifier = Modifier.size(16.dp),
                             painter = painterResource(id = R.drawable.back_icon),
                             contentDescription = "Back",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                     // Folder Selector
@@ -185,7 +186,7 @@ fun AddNoteScreen(
                         Row(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(Color.White.copy(alpha = 0.1f))
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
                                 .clickable { expanded = true }
                                 .padding(horizontal = 8.dp, vertical = 6.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -197,24 +198,24 @@ fun AddNoteScreen(
                                     .height(28.dp),
                                 painter = painterResource(id = selectedFolderIcon),
                                 contentDescription = "Selected Folder",
-                                tint = Color.White
+                                tint = MaterialTheme.colorScheme.onBackground
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
                                 contentDescription = "Select Folder",
-                                tint = Color.White
+                                tint = MaterialTheme.colorScheme.onBackground
                             )
                         }
 
                         DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false },
-                            modifier = Modifier.background(Color(0xFF2D2D2D))
+                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                         ) {
                             folders.forEach { folder ->
                                 DropdownMenuItem(
-                                    text = { Text(folder.name, color = Color.White) },
+                                    text = { Text(folder.name, color = MaterialTheme.colorScheme.onSurface) },
                                     onClick = {
                                         selectedFolderId = folder.id
                                         expanded = false
@@ -229,7 +230,7 @@ fun AddNoteScreen(
                     Text(
                         text = if (initialTitle.isEmpty()) "New Note" else "Edit Note",
                         modifier = Modifier.weight(1f, fill = false),
-                        color = Color(0xFFE6E6FA),
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     )
@@ -242,18 +243,18 @@ fun AddNoteScreen(
                             .background(
                                 brush = Brush.horizontalGradient(
                                     colors = listOf(
-                                        Color.Magenta.copy(alpha = 0.2f),
-                                        Color.Blue.copy(alpha = 0.2f)
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f)
                                     )
                                 )
                             )
-                            .border(1.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                            .border(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
                             .clickable { onSaveClick(title, contentValue.text, selectedFolderId) }
                             .padding(horizontal = 20.dp, vertical = 8.dp)
                     ) {
                         Text(
                             text = "Save",
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 16.sp
                         )
                     }
@@ -271,7 +272,7 @@ fun AddNoteScreen(
                     IconButton(onClick = { onFormatClick("b") }) {
                         Text(
                             "B",
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
                         )
@@ -279,7 +280,7 @@ fun AddNoteScreen(
                     IconButton(onClick = { onFormatClick("i") }) {
                         Text(
                             "I",
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontStyle = FontStyle.Italic,
                             fontSize = 18.sp
                         )
@@ -287,7 +288,7 @@ fun AddNoteScreen(
                     IconButton(onClick = { onFormatClick("u") }) {
                         Text(
                             "U",
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onBackground,
                             textDecoration = TextDecoration.Underline,
                             fontSize = 18.sp
                         )
@@ -308,7 +309,7 @@ fun AddNoteScreen(
                         value = title,
                         onValueChange = { title = it },
                         textStyle = TextStyle(
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 28.sp,
                             fontWeight = FontWeight.Bold
                         ),
@@ -316,7 +317,7 @@ fun AddNoteScreen(
                             if (title.isEmpty()) {
                                 Text(
                                     text = "Title",
-                                    color = Color.Gray,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 28.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -333,17 +334,17 @@ fun AddNoteScreen(
                         value = contentValue,
                         onValueChange = { contentValue = it },
                         textStyle = TextStyle(
-                            color = Color.White.copy(alpha = 0.9f),
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f),
                             fontSize = 16.sp,
                             lineHeight = 20.sp
                         ),
                         visualTransformation = richTextVisualTransformation,
-                        cursorBrush = SolidColor(Color.White),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                         decorationBox = { innerTextField ->
                             if (contentValue.text.isEmpty()) {
                                 Text(
                                     text = "Start typing...",
-                                    color = Color.Gray,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 14.sp
                                 )
                             }

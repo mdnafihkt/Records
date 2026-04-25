@@ -31,6 +31,7 @@ import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -89,12 +90,12 @@ fun ViewNoteScreen(
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color(0xFFE6E6FA) // Lavender
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Notes",
-                        color = Color(0xFFE6E6FA),
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 16.sp
                     )
                 }
@@ -104,7 +105,7 @@ fun ViewNoteScreen(
                          TextField(
                             value = searchQuery,
                             onValueChange = { searchQuery = it },
-                            placeholder = { Text("Find...", color = Color.Gray) },
+                            placeholder = { Text("Find...", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                             singleLine = true,
                             modifier = Modifier
                                 .width(150.dp)
@@ -112,27 +113,27 @@ fun ViewNoteScreen(
                             colors = TextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
-                                focusedTextColor = Color.White,
-                                unfocusedTextColor = Color.White,
-                                cursorColor = Color.White,
+                                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                cursorColor = MaterialTheme.colorScheme.primary,
                             )
                         )
                     } else {
                         IconButton(onClick = { isSearchVisible = true }) {
-                            Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White)
+                            Icon(Icons.Default.Search, contentDescription = "Search", tint = MaterialTheme.colorScheme.onBackground)
                         }
                     }
                     // Dropdown menu
                     Box {
                         IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Options", tint = Color.White)
+                            Icon(Icons.Default.MoreVert, contentDescription = "Options", tint = MaterialTheme.colorScheme.onBackground)
                         }
                         DropdownMenu(
                             expanded = showMenu,
                             onDismissRequest = { showMenu = false },
                             modifier = Modifier
                                 .width(200.dp)
-                                .background(Color.Black.copy(alpha = 0.1f))
+                                .background(MaterialTheme.colorScheme.surface)
                         ) {
                             DropdownMenuItem(
                                 text = { Text("Edit") },
@@ -151,7 +152,7 @@ fun ViewNoteScreen(
                             DropdownMenuItem(
                                 text = { Text("Delete") },
                                 colors = MenuDefaults.itemColors(
-                                    textColor = Color.Red
+                                    textColor = MaterialTheme.colorScheme.error
                                 ),
                                 onClick = {
                                     showMenu = false
@@ -167,7 +168,7 @@ fun ViewNoteScreen(
                 // Title
                 Text(
                     text = note.title,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(bottom = 16.dp)
@@ -186,14 +187,14 @@ fun ViewNoteScreen(
                 ) {
                     Text(
                         text = annotatedContent,
-                        color = Color.White.copy(alpha = 0.9f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f),
                         fontSize = 16.sp,
                         lineHeight = 28.sp
                     )
                 }
             } else {
                  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                     Text("Loading...", color = Color.Gray)
+                     Text("Loading...", color = MaterialTheme.colorScheme.onSurfaceVariant)
                  }
             }
         }

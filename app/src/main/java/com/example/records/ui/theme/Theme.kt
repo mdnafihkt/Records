@@ -30,16 +30,19 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = Color.White
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF6750A4),
-    secondary = Color(0xFF625B71),
-    background = Color(0xFFF5F5F5),
-    surface = Color.White,
+val LightColorScheme = lightColorScheme(
+    primary = LightPrimary,
+    secondary = LightSecondary,
+    background = LightBackground,
+    surface = LightSurface,
     onPrimary = Color.White,
-    onBackground = Color.Black,
-    onSurface = Color.Black
+    onSecondary = LightTextPrimary,
+    onBackground = LightTextPrimary,
+    onSurface = LightTextPrimary,
+    outline = LightOutline,
+    surfaceVariant = LightSurface,
+    onSurfaceVariant = LightTextSecondary
 )
-
 val ProtonDarkColorScheme = darkColorScheme(
     primary = ProtonDarkPrimary,
     secondary = ProtonDarkSecondary,

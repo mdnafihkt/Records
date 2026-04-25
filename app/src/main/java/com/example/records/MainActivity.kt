@@ -33,7 +33,7 @@ class MainActivity : FragmentActivity() {
             var isLocked by remember { mutableStateOf(isAppLockEnabled) }
 
             // 2. Wrap everything in your custom theme
-            RecordsTheme(appTheme = AppTheme.PROTON_DARK) {
+            RecordsTheme(appTheme = AppTheme.RECORDS_LIGHT) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

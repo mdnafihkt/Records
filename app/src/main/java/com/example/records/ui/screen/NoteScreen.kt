@@ -46,7 +46,7 @@ fun NoteScreen(
                         text = "My Notes",
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onBackground
                         ),
                         modifier = Modifier.padding(vertical = 24.dp)
                     )
@@ -67,8 +67,8 @@ fun NoteScreen(
                     modifier = Modifier
                         .align(Alignment.BottomEnd) // Positions it bottom-right
                         .padding(24.dp),
-                    containerColor = Color(0xFF8692F7), // Optional: Match your theme
-                    contentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary, // Optional: Match your theme
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.add_note_icon),
@@ -92,7 +92,7 @@ fun NoteItem(
             .clickable { onClick() },
         colors = CardDefaults.cardColors(
             // Semi-transparent container to let the glassmorphic background peek through
-            containerColor = Color.White.copy(alpha = 0.1f)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         ),
         shape = MaterialTheme.shapes.medium
     ) {
@@ -105,7 +105,7 @@ fun NoteItem(
                 text = note.title,
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    color = Color.White // Adjust based on your dark theme
+                    color = MaterialTheme.colorScheme.onBackground // Adjust based on your dark theme
                 ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -114,7 +114,7 @@ fun NoteItem(
             Text(
                 text = com.example.records.util.RichTextParser.toAnnotatedString(note.content),
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = Color.White.copy(alpha = 0.7f),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                     lineHeight = 20.sp
                 ),
                 modifier = Modifier.padding(top = 4.dp),

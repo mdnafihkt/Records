@@ -96,7 +96,7 @@ fun FolderScreen(
                 ) {
                     Text(
                         text = "Folders",
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -104,14 +104,14 @@ fun FolderScreen(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFFE6E6FA).copy(alpha = 0.2f))
+                            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f))
                             .clickable { showAddFolderDialog = true }
                             .padding(8.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.CreateNewFolder,
                             contentDescription = "Add Folder",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 }
@@ -135,13 +135,13 @@ fun FolderScreen(
                         Column {
                             Text(
                                 text = "All Notes",
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onBackground,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 text = "$allNotesCount notes",
-                                color = Color.Gray,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 14.sp
                             )
                         }
@@ -218,7 +218,7 @@ fun FolderScreen(
                 ModalBottomSheet(
                     onDismissRequest = { selectedFolderForOptions = null },
                     sheetState = sheetState,
-                    containerColor = Color(0xFF1E1E1E) // Dark background for sheet
+                    containerColor = MaterialTheme.colorScheme.surface
                 ) {
                     Column(
                         modifier = Modifier
@@ -229,7 +229,7 @@ fun FolderScreen(
                             text = selectedFolderForOptions?.name ?: "",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
                         
@@ -247,9 +247,9 @@ fun FolderScreen(
                                 .padding(vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.Edit, contentDescription = null, tint = Color.White)
+                            Icon(Icons.Default.Edit, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
                             Spacer(Modifier.width(16.dp))
-                            Text("Rename", color = Color.White, fontSize = 16.sp)
+                            Text("Rename", color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp)
                         }
                         
                         Row(
@@ -266,9 +266,9 @@ fun FolderScreen(
                                 .padding(vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.Delete, contentDescription = null, tint = Color.Red)
+                            Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error)
                             Spacer(Modifier.width(16.dp))
-                            Text("Delete", color = Color.Red, fontSize = 16.sp)
+                            Text("Delete", color = MaterialTheme.colorScheme.error, fontSize = 16.sp)
                         }
                         
                         Spacer(Modifier.height(32.dp))
@@ -313,13 +313,13 @@ fun FolderItem(
                 Column {
                     Text(
                         text = folderWithCount.folder.name,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
                         text = "${folderWithCount.count} notes",
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 14.sp
                     )
                 }

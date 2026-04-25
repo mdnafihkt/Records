@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +40,7 @@ fun BottomNavigationBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(88.dp) // Adjust height as needed
-            .background(Color(0xFF252138))
+            .background(MaterialTheme.colorScheme.surface)
     ) {
         Row(
             modifier = Modifier
@@ -53,14 +54,14 @@ fun BottomNavigationBar(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(if (currentRoute == Screen.FolderList.route) Color.White.copy(alpha = 0.1f) else Color.Transparent)
+                    .background(if (currentRoute == Screen.FolderList.route) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else Color.Transparent)
                     .clickable { onFolderClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.icon_folder),
                     contentDescription = "Folders",
-                    tint = if (currentRoute == Screen.FolderList.route) colorResource(id = R.color.lavender) else Color.White,
+                    tint = if (currentRoute == Screen.FolderList.route) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -70,14 +71,14 @@ fun BottomNavigationBar(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(if (currentRoute == Screen.NoteList.route) Color.White.copy(alpha = 0.1f) else Color.Transparent)
+                    .background(if (currentRoute == Screen.NoteList.route) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else Color.Transparent)
                     .clickable { onNotesClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.note_icon),
                     contentDescription = "Add Note",
-                    tint = if (currentRoute == Screen.NoteList.route) colorResource(id = R.color.lavender)else Color.White,
+                    tint = if (currentRoute == Screen.NoteList.route) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(28.dp),
                 )
             }
@@ -87,14 +88,14 @@ fun BottomNavigationBar(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(if (currentRoute == Screen.Settings.route) Color.White.copy(alpha = 0.1f) else Color.Transparent)
+                    .background(if (currentRoute == Screen.Settings.route) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else Color.Transparent)
                     .clickable { onSettingsClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.icon_settings),
                     contentDescription = "Settings",
-                    tint = if (currentRoute == Screen.Settings.route) colorResource(id = R.color.lavender) else Color.White,
+                    tint = if (currentRoute == Screen.Settings.route) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(28.dp)
                 )
             }

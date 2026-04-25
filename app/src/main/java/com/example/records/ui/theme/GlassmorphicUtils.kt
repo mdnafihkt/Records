@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun GlassmorphicCard(
@@ -26,8 +27,8 @@ fun GlassmorphicCard(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color.White.copy(alpha = 0.1f),
-                        Color.White.copy(alpha = 0.05f)
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
                     )
                 )
             )
@@ -50,8 +51,8 @@ fun GlassmorphicBackground(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF100E18),
-                        Color(0xFF252138)
+                        MaterialTheme.colorScheme.background,
+                        MaterialTheme.colorScheme.surface
                     )
                 )
             )
