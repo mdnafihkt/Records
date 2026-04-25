@@ -109,8 +109,8 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         AppThemeOption(
-                            painter = painterResource(id = R.drawable.icon_color_outline),
-                            name = "chromatic",
+                            painter = painterResource(id = R.drawable.icon_night_outline),
+                            name = "dark",
                             isSelected = false,
                             onClick = { Toast.makeText(context, "Select theme not implemented", Toast.LENGTH_SHORT).show() }
                         )
@@ -121,8 +121,8 @@ fun SettingsScreen(
                             onClick = { Toast.makeText(context, "Select theme not implemented", Toast.LENGTH_SHORT).show() }
                         )
                         AppThemeOption(
-                            painter = painterResource(id = R.drawable.icon_night_outline),
-                            name = "dark",
+                            painter = painterResource(id = R.drawable.icon_color_outline),
+                            name = "chromatic",
                             isSelected = false,
                             onClick = { Toast.makeText(context, "Select theme not implemented", Toast.LENGTH_SHORT).show() }
                         )
