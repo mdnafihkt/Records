@@ -19,6 +19,7 @@ fun AddNotePreview() {
             Folder(3, "folder 3")
         ),
         onSaveClick = { title, content, folderId -> },
+        onAutoSave = { title, content, folderId -> },
         onBackClick = {}
     )
 }

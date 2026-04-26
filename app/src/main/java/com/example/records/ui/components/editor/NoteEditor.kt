@@ -105,6 +105,7 @@ fun EditorToolbar(
 fun NoteEditor(
     blocks: List<Block>,
     onBlocksChange: (List<Block>) -> Unit,
+    onStructuralChange: (List<Block>) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var fontSize by remember { mutableStateOf(16f) }
@@ -119,10 +120,17 @@ fun NoteEditor(
         richTextStates.keys.retainAll(blockIds)
         
         blocks.forEach { block ->
-            if (block is Block.RichText && !richTextStates.containsKey(block.id)) {
-                val state = RichTextState()
-                state.setHtml(block.htmlContent)
-                richTextStates[block.id] = state
+            if (block is Block.RichText) {
+                if (!richTextStates.containsKey(block.id)) {
+                    val state = RichTextState()
+                    state.setHtml(block.htmlContent)
+                    richTextStates[block.id] = state
+                } else {
+                    val state = richTextStates[block.id]!!
+                    if (state.toHtml() != block.htmlContent) {
+                        state.setHtml(block.htmlContent)
+                    }
+                }
             }
         }
     }
@@ -135,6 +143,7 @@ fun NoteEditor(
             currentFontSize = fontSize,
             onFontSizeChange = { fontSize = it },
             onInsertCheckbox = {
+                onStructuralChange(blocks)
                 val newBlocks = blocks.toMutableList()
                 val idx = newBlocks.indexOfFirst { it.id == focusedBlockId }.takeIf { it != -1 } ?: newBlocks.lastIndex
                 newBlocks.add(idx + 1, Block.Checkbox())
@@ -142,6 +151,7 @@ fun NoteEditor(
                 onBlocksChange(newBlocks)
             },
             onInsertTable = {
+                onStructuralChange(blocks)
                 val newBlocks = blocks.toMutableList()
                 val idx = newBlocks.indexOfFirst { it.id == focusedBlockId }.takeIf { it != -1 } ?: newBlocks.lastIndex
                 newBlocks.add(idx + 1, Block.Table())
@@ -195,6 +205,7 @@ fun NoteEditor(
                         CheckboxBlockComponent(
                             block = block,
                             onBlockChange = { newBlock ->
+                                onStructuralChange(blocks)
                                 val newBlocks = blocks.toMutableList()
                                 newBlocks[index] = newBlock
                                 onBlocksChange(newBlocks)
@@ -207,6 +218,7 @@ fun NoteEditor(
                         TableBlockComponent(
                             block = block,
                             onBlockChange = { newBlock ->
+                                onStructuralChange(blocks)
                                 val newBlocks = blocks.toMutableList()
                                 newBlocks[index] = newBlock
                                 onBlocksChange(newBlocks)

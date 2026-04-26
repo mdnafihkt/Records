@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -210,6 +211,8 @@ fun AppNavHost() {
                                 initialValue = emptyList()
                         ) { value = db.folderDao().getAllFolders() }
 
+                var currentNoteId by androidx.compose.runtime.remember(noteId) { androidx.compose.runtime.mutableIntStateOf(noteId) }
+
                 if (isEdit && noteId != -1 && note == null) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         androidx.compose.material3.CircularProgressIndicator(
@@ -225,10 +228,10 @@ fun AppNavHost() {
                             onSaveClick = { title, content, selectedFolderId ->
                                 scope.launch {
                                     val timestamp = System.currentTimeMillis()
-                                    if (isEdit && noteId != -1) {
+                                    if (currentNoteId != -1) {
                                         val updatedNote =
                                                 Note(
-                                                        id = noteId,
+                                                        id = currentNoteId,
                                                         title = title,
                                                         content = content,
                                                         lastUpdated = timestamp
@@ -238,20 +241,20 @@ fun AppNavHost() {
                                         // Update folder join if changed
                                         val existingJoin =
                                                 db.folderNoteJoinDao()
-                                                        .getFolderNoteJoinByNoteId(noteId)
+                                                        .getFolderNoteJoinByNoteId(currentNoteId)
                                         if (existingJoin.isNotEmpty() &&
                                                         existingJoin[0].folderId != selectedFolderId
                                         ) {
                                             db.folderNoteJoinDao().deleteByNoteId(existingJoin[0].noteId)
                                             db.folderNoteJoinDao()
                                                     .insert(
-                                                            FolderNoteJoin(selectedFolderId, noteId)
+                                                            FolderNoteJoin(selectedFolderId, currentNoteId)
                                                     )
                                         } else if (existingJoin.isEmpty()) {
                                             // Should exist, but if not, insert
                                             db.folderNoteJoinDao()
                                                     .insert(
-                                                            FolderNoteJoin(selectedFolderId, noteId)
+                                                            FolderNoteJoin(selectedFolderId, currentNoteId)
                                                     )
                                         }
                                     } else {
@@ -261,11 +264,32 @@ fun AppNavHost() {
                                                         content = content,
                                                         lastUpdated = timestamp
                                                 )
-                                        val newNoteId = db.noteDao().insert(newNote).toInt()
+                                        currentNoteId = db.noteDao().insert(newNote).toInt()
                                         db.folderNoteJoinDao()
-                                                .insert(FolderNoteJoin(selectedFolderId, newNoteId))
+                                                .insert(FolderNoteJoin(selectedFolderId, currentNoteId))
                                     }
                                     navController.popBackStack()
+                                }
+                            },
+                            onAutoSave = { title, content, selectedFolderId ->
+                                scope.launch {
+                                    val timestamp = System.currentTimeMillis()
+                                    if (currentNoteId != -1) {
+                                        val updatedNote = Note(id = currentNoteId, title = title, content = content, lastUpdated = timestamp)
+                                        db.noteDao().update(updatedNote)
+
+                                        val existingJoin = db.folderNoteJoinDao().getFolderNoteJoinByNoteId(currentNoteId)
+                                        if (existingJoin.isNotEmpty() && existingJoin[0].folderId != selectedFolderId) {
+                                            db.folderNoteJoinDao().deleteByNoteId(existingJoin[0].noteId)
+                                            db.folderNoteJoinDao().insert(FolderNoteJoin(selectedFolderId, currentNoteId))
+                                        } else if (existingJoin.isEmpty()) {
+                                            db.folderNoteJoinDao().insert(FolderNoteJoin(selectedFolderId, currentNoteId))
+                                        }
+                                    } else {
+                                        val newNote = Note(title = title, content = content, lastUpdated = timestamp)
+                                        currentNoteId = db.noteDao().insert(newNote).toInt()
+                                        db.folderNoteJoinDao().insert(FolderNoteJoin(selectedFolderId, currentNoteId))
+                                    }
                                 }
                             },
                             onBackClick = { navController.popBackStack() }

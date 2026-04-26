@@ -90,15 +90,10 @@ fun ViewNoteScreen(
                     modifier = Modifier.clickable { onBackClick() }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        modifier = Modifier.size(16.dp),
+                        painter = painterResource(id = R.drawable.back_icon),
                         contentDescription = "Back",
                         tint = MaterialTheme.colorScheme.onBackground
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Notes",
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = 16.sp
                     )
                 }
 

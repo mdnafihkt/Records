@@ -68,6 +68,14 @@ import androidx.compose.ui.text.SpanStyle
 import com.example.records.ui.components.editor.NoteEditor
 import com.example.records.ui.components.editor.toBlocks
 import com.example.records.ui.components.editor.toJson
+import com.example.records.ui.components.editor.UndoRedoManager
+import kotlinx.coroutines.channels.BufferOverflow
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.filled.Redo
 
 @Composable
 fun AddNoteScreen(
@@ -76,12 +84,29 @@ fun AddNoteScreen(
     initialFolderId: Int,
     folders: List<com.example.records.database.Folder>, // Pass folders for selection
     onSaveClick: (String, String, Int) -> Unit, // Return selected folder ID
+    onAutoSave: (String, String, Int) -> Unit,
     onBackClick: () -> Unit
 ) {
     var title by remember { mutableStateOf(initialTitle) }
-    var blocks by remember { mutableStateOf(initialContent.toBlocks()) }
+    
+    val undoRedoManager = remember { UndoRedoManager(initialContent.toBlocks()) }
+    var blocks by remember { mutableStateOf(undoRedoManager.currentJson.toBlocks()) }
+
     var selectedFolderId by remember { mutableIntStateOf(initialFolderId) }
     var expanded by remember { mutableStateOf(false) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_PAUSE) {
+                onAutoSave(title, blocks.toJson(), selectedFolderId)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     val customTextSelectionColors = TextSelectionColors(
         handleColor = MaterialTheme.colorScheme.primary,
@@ -90,10 +115,11 @@ fun AddNoteScreen(
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
         GlassmorphicBackground {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
                 // Header
                 Row(
                     modifier = Modifier
@@ -162,15 +188,32 @@ fun AddNoteScreen(
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    Text(
-                        text = if (initialTitle.isEmpty()) "New Note" else "Edit Note",
-                        modifier = Modifier.weight(1f, fill = false),
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
 
                     Spacer(modifier = Modifier.weight(1f))
+
+                    // Undo/Redo Buttons
+                    IconButton(
+                        onClick = { 
+                            undoRedoManager.undo()?.let { previousBlocks ->
+                                blocks = previousBlocks
+                            }
+                        },
+                        enabled = undoRedoManager.canUndo()
+                    ) {
+                        Icon(Icons.Default.Undo, contentDescription = "Undo", tint = if (undoRedoManager.canUndo()) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f))
+                    }
+                    IconButton(
+                        onClick = { 
+                            undoRedoManager.redo()?.let { nextBlocks ->
+                                blocks = nextBlocks
+                            }
+                        },
+                        enabled = undoRedoManager.canRedo()
+                    ) {
+                        Icon(Icons.Default.Redo, contentDescription = "Redo", tint = if (undoRedoManager.canRedo()) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f))
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
 
                     Box(
                         modifier = Modifier
@@ -230,7 +273,13 @@ fun AddNoteScreen(
 
                     NoteEditor(
                         blocks = blocks,
-                        onBlocksChange = { blocks = it },
+                        onBlocksChange = { newBlocks -> 
+                            undoRedoManager.onBlocksChanged(newBlocks)
+                            blocks = newBlocks
+                        },
+                        onStructuralChange = { oldBlocks ->
+                            undoRedoManager.forceSnapshot(oldBlocks)
+                        },
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -240,3 +289,5 @@ fun AddNoteScreen(
         }
     }
 }
+}
+
