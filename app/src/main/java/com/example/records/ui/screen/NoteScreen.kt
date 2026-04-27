@@ -18,10 +18,19 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,7 +49,19 @@ fun NoteScreen(
     onNoteClick: (Int) -> Unit,
     onAddNoteClick : () -> Unit
 ) {
-        GlassmorphicBackground {
+    var searchQuery by remember { mutableStateOf("") }
+    val filteredNotes = remember(searchQuery, notes) {
+        if (searchQuery.isBlank()) {
+            notes
+        } else {
+            notes.filter {
+                it.title.contains(searchQuery, ignoreCase = true) ||
+                it.content.toBlocks().toPlainText().contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
+
+    GlassmorphicBackground {
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
                     // Fixed Title
@@ -50,7 +71,50 @@ fun NoteScreen(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onBackground
                         ),
-                        modifier = Modifier.padding(vertical = 24.dp)
+                        modifier = Modifier.padding(top = 24.dp, bottom = 16.dp)
+                    )
+
+                    // Search Bar
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        placeholder = { 
+                            Text(
+                                "Search notes...",
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                            ) 
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search Icon",
+                                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                            )
+                        },
+                        trailingIcon = {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { searchQuery = "" }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Clear,
+                                        contentDescription = "Clear Search",
+                                        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                                    )
+                                }
+                            }
+                        },
+                        singleLine = true,
+                        shape = MaterialTheme.shapes.medium,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
+                        )
                     )
                     // Scrolling List
                     LazyColumn(
@@ -58,7 +122,7 @@ fun NoteScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         contentPadding = PaddingValues(bottom = 80.dp)
                     ) {
-                        items(notes) { note ->
+                        items(filteredNotes) { note ->
                             NoteItem(note = note, onClick = { onNoteClick(note.id) })
                         }
                     }
