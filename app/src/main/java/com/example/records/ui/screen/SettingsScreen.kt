@@ -289,12 +289,6 @@ fun SettingsScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
-                                Icon(
-                                    painter = painterResource(id = R.drawable.icon_night_outline),
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(16.dp)
-                                )
                             }
 
                             DropdownMenu(
@@ -361,12 +355,7 @@ fun SettingsScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
-                                Icon(
-                                    painter = painterResource(id = R.drawable.icon_night_outline),
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(16.dp)
-                                )
+
                             }
 
                             DropdownMenu(
@@ -494,30 +483,27 @@ fun AppThemeOption(
             modifier = Modifier
                 .clickable { onClick() }
                 .clip(RoundedCornerShape(12.dp))
+                .background(if (isSelected) MaterialTheme.colorScheme.onSurfaceVariant.copy(0.2f) else Color.Transparent, RoundedCornerShape(12.dp))
+                .padding(4.dp, 4.dp)
         ) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(56.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .border(
-                        width = 1.dp,
-                        color = (if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant),
-                        shape = RoundedCornerShape(12.dp)
-                    )
+                    .border(1.dp, MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(12.dp))
             ){
                 Icon(
                     painter = painter, // Placeholder arrow/icon
                     contentDescription = name,
-                    tint = (if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant),
-                    modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp))
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(36.dp).clip(RoundedCornerShape(12.dp))
                 )
 
             }
-            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = name,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 12.sp
             )
         }
@@ -542,17 +528,17 @@ fun AppIconOption(
             modifier = Modifier
                 .size(56.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .background(if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f) else Color.Transparent)
+                .border(4.dp, if (isSelected) MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f) else Color.Transparent, RoundedCornerShape(12.dp))
         ){
             Image(
                 painter = painter,
                 contentDescription = name,
-                modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)),
+                modifier = Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Fit
             )
 
         }
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(2.dp))
         Text(
             text = name,
             color = MaterialTheme.colorScheme.onBackground,
