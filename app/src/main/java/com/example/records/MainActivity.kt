@@ -1,6 +1,9 @@
 package com.example.records
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import androidx.activity.compose.setContent
@@ -26,11 +29,10 @@ import com.example.records.ui.screen.UnlockScreen
 import com.example.records.ui.theme.AppTheme
 import com.example.records.ui.theme.RecordsTheme
 import com.example.records.util.BiometricAuthManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class MainActivity : FragmentActivity() {
+
+    private var screenOffReceiver: BroadcastReceiver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +40,7 @@ class MainActivity : FragmentActivity() {
         // Initialize SessionManager
         SessionManager.init(application)
 
-        // Register app lifecycle observer for auto-lock
+        // Register app lifecycle observer for auto-lock on background
         ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStop(owner: LifecycleOwner) {
                 SessionManager.onAppBackgrounded()
@@ -48,8 +50,12 @@ class MainActivity : FragmentActivity() {
             }
         })
 
+        // Register screen-off receiver for instant lock
+        registerScreenOffReceiver()
+
         setContent {
             val isUnlocked by SessionManager.isUnlocked.collectAsState()
+            val requirePasswordReauth by SessionManager.requirePasswordReauth.collectAsState()
             var isEncryptionSetup by remember { mutableStateOf(KeyManager.isSetup(this)) }
             var needsSetup by remember { mutableStateOf(!isEncryptionSetup) }
 
@@ -70,6 +76,7 @@ class MainActivity : FragmentActivity() {
                                     DataMigrationHelper.encryptExistingNotes(db.noteDao(), masterKey)
 
                                     SessionManager.unlock(masterKey)
+                                    SessionManager.recordPasswordAuth()
                                     isEncryptionSetup = true
                                     needsSetup = false
                                 }
@@ -78,10 +85,12 @@ class MainActivity : FragmentActivity() {
 
                         // Vault is locked: show unlock screen
                         !isUnlocked -> {
-                            val showBiometric = remember {
-                                val prefs = getSharedPreferences("settings", Context.MODE_PRIVATE)
-                                val isEnabledInSettings = prefs.getBoolean("biometric_unlock", true)
-                                isEnabledInSettings && BiometricAuthManager.isBiometricAvailable(this@MainActivity)
+                            val prefs = getSharedPreferences("settings", Context.MODE_PRIVATE)
+                            val biometricEnabledInSettings = prefs.getBoolean("biometric_unlock", true)
+                            val showBiometric = remember(biometricEnabledInSettings, requirePasswordReauth) {
+                                biometricEnabledInSettings
+                                    && !requirePasswordReauth
+                                    && BiometricAuthManager.isBiometricAvailable(this@MainActivity)
                             }
 
                             UnlockScreen(
@@ -89,6 +98,7 @@ class MainActivity : FragmentActivity() {
                                     val key = KeyManager.unlockWithPassword(this@MainActivity, password)
                                     if (key != null) {
                                         SessionManager.unlock(key)
+                                        SessionManager.recordPasswordAuth()
                                         true
                                     } else {
                                         false
@@ -107,7 +117,8 @@ class MainActivity : FragmentActivity() {
                                         onFailed = { /* Feedback to user */ }
                                     )
                                 },
-                                showBiometric = showBiometric
+                                showBiometric = showBiometric,
+                                requirePasswordReauth = requirePasswordReauth
                             )
                         }
 
@@ -119,5 +130,28 @@ class MainActivity : FragmentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterScreenOffReceiver()
+    }
+
+    private fun registerScreenOffReceiver() {
+        screenOffReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent?.action == Intent.ACTION_SCREEN_OFF) {
+                    SessionManager.onScreenOff()
+                }
+            }
+        }
+        registerReceiver(screenOffReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF))
+    }
+
+    private fun unregisterScreenOffReceiver() {
+        screenOffReceiver?.let {
+            try { unregisterReceiver(it) } catch (_: Exception) {}
+        }
+        screenOffReceiver = null
     }
 }

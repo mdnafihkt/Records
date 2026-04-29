@@ -25,6 +25,8 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 import com.example.records.ui.theme.GlassmorphicBackground
 import com.example.records.ui.theme.GlassmorphicCard
@@ -39,6 +41,7 @@ fun SettingsScreen(
     onClearDataClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
     var showIconChangeDialog by remember { mutableStateOf<AppIcon?>(null) }
     val currentIcon by remember {
         mutableStateOf(AppIconManager.getCurrentIcon(context))
@@ -49,6 +52,7 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding()
+                .verticalScroll(scrollState)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -238,50 +242,209 @@ fun SettingsScreen(
                         }
                     }
 
-                    // Auto-lock timeout
+                    // ── Auto-Lock Settings (only when encryption is set up) ──
                     if (isEncryptionSetup) {
-                        val timeoutOptions = listOf(
-                            0L to "Immediate",
-                            60_000L to "1 minute",
-                            300_000L to "5 minutes",
-                            1_800_000L to "30 minutes",
+
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.08f)
+                        )
+
+                        Text(
+                            text = "Auto-Lock",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
+                        )
+
+                        // ── 1. Lock after app close ──────────────────────
+                        val appCloseOptions = listOf(
+                            0L to "Immediately",
+                            60_000L to "After 1 minute",
+                            300_000L to "After 5 minutes",
+                            900_000L to "After 15 minutes",
+                            1_800_000L to "After 30 minutes",
                             -1L to "Never"
                         )
-                        var currentTimeout by remember {
-                            mutableStateOf(com.example.records.security.SessionManager.getAutoLockTimeout())
+                        var currentAppClose by remember {
+                            mutableStateOf(com.example.records.security.SessionManager.getAppCloseTimeout())
                         }
-                        var showTimeoutMenu by remember { mutableStateOf(false) }
+                        var showAppCloseMenu by remember { mutableStateOf(false) }
+
+                        Box {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { showAppCloseMenu = true }
+                                    .padding(vertical = 10.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(text = "Lock after app close", fontSize = 14.sp, color = MaterialTheme.colorScheme.onBackground)
+                                    Text(
+                                        text = appCloseOptions.find { it.first == currentAppClose }?.second ?: "Immediately",
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Icon(
+                                    painter = painterResource(id = R.drawable.icon_night_outline),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+
+                            DropdownMenu(
+                                expanded = showAppCloseMenu,
+                                onDismissRequest = { showAppCloseMenu = false }
+                            ) {
+                                appCloseOptions.forEach { (timeout, label) ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                if (currentAppClose == timeout) {
+                                                    Text("✓  ", fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
+                                                }
+                                                Text(label)
+                                            }
+                                        },
+                                        onClick = {
+                                            currentAppClose = timeout
+                                            com.example.records.security.SessionManager.setAppCloseTimeout(timeout)
+                                            showAppCloseMenu = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        // Show warning if "Never" is selected
+                        if (currentAppClose == -1L) {
+                            Text(
+                                text = "⚠ Your vault will stay unlocked even after closing the app. Not recommended.",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.error.copy(alpha = 0.85f),
+                                lineHeight = 14.sp,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                        }
+
+                        // ── 2. Lock after inactivity ─────────────────────
+                        val inactivityOptions = listOf(
+                            60_000L to "After 1 minute",
+                            300_000L to "After 5 minutes",
+                            600_000L to "After 10 minutes",
+                            -1L to "Never"
+                        )
+                        var currentInactivity by remember {
+                            mutableStateOf(com.example.records.security.SessionManager.getInactivityTimeout())
+                        }
+                        var showInactivityMenu by remember { mutableStateOf(false) }
+
+                        Box {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { showInactivityMenu = true }
+                                    .padding(vertical = 10.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(text = "Lock after inactivity", fontSize = 14.sp, color = MaterialTheme.colorScheme.onBackground)
+                                    Text(
+                                        text = inactivityOptions.find { it.first == currentInactivity }?.second ?: "After 5 minutes",
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Icon(
+                                    painter = painterResource(id = R.drawable.icon_night_outline),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+
+                            DropdownMenu(
+                                expanded = showInactivityMenu,
+                                onDismissRequest = { showInactivityMenu = false }
+                            ) {
+                                inactivityOptions.forEach { (timeout, label) ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                if (currentInactivity == timeout) {
+                                                    Text("✓  ", fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
+                                                }
+                                                Text(label)
+                                            }
+                                        },
+                                        onClick = {
+                                            currentInactivity = timeout
+                                            com.example.records.security.SessionManager.setInactivityTimeout(timeout)
+                                            showInactivityMenu = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        // ── 3. Lock when screen turns off ────────────────
+                        var lockOnScreenOff by remember {
+                            mutableStateOf(com.example.records.security.SessionManager.isLockOnScreenOffEnabled())
+                        }
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { showTimeoutMenu = true }
-                                .padding(vertical = 12.dp),
+                                .padding(vertical = 10.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Column {
-                                Text(text = "Auto-Lock", fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
-                                Text(
-                                    text = timeoutOptions.find { it.first == currentTimeout }?.second ?: "1 minute",
-                                    fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(text = "Lock when screen turns off", fontSize = 14.sp, color = MaterialTheme.colorScheme.onBackground)
+                                Text(text = "Instantly lock vault on screen off", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
+                            Switch(
+                                checked = lockOnScreenOff,
+                                onCheckedChange = { enabled ->
+                                    lockOnScreenOff = enabled
+                                    com.example.records.security.SessionManager.setLockOnScreenOff(enabled)
+                                },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = MaterialTheme.colorScheme.primary,
+                                    checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                )
+                            )
                         }
 
-                        androidx.compose.material3.DropdownMenu(
-                            expanded = showTimeoutMenu,
-                            onDismissRequest = { showTimeoutMenu = false }
+                        // ── 4. 7-day re-auth notice ──────────────────────
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.08f)
+                        )
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            timeoutOptions.forEach { (timeout, label) ->
-                                androidx.compose.material3.DropdownMenuItem(
-                                    text = { Text(label) },
-                                    onClick = {
-                                        currentTimeout = timeout
-                                        com.example.records.security.SessionManager.setAutoLockTimeout(timeout)
-                                        showTimeoutMenu = false
-                                    }
+                            Column {
+                                Text(
+                                    text = "Periodic password verification",
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                                Text(
+                                    text = "Master password is required every 7 days, even when biometric unlock is enabled. This ensures you remember your password.",
+                                    fontSize = 11.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    lineHeight = 15.sp
                                 )
                             }
                         }

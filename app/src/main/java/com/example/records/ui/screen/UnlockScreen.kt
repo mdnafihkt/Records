@@ -54,7 +54,8 @@ import kotlinx.coroutines.withContext
 fun UnlockScreen(
     onPasswordUnlock: suspend (password: String) -> Boolean,
     onBiometricUnlock: () -> Unit,
-    showBiometric: Boolean
+    showBiometric: Boolean,
+    requirePasswordReauth: Boolean = false
 ) {
     var password by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
@@ -120,9 +121,14 @@ fun UnlockScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Enter your master password to access your notes",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 14.sp
+                    text = if (requirePasswordReauth) 
+                        "Security verification required: Enter password to continue" 
+                    else 
+                        "Enter your master password to access your notes",
+                    color = if (requirePasswordReauth) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 14.sp,
+                    fontWeight = if (requirePasswordReauth) FontWeight.Medium else FontWeight.Normal,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
