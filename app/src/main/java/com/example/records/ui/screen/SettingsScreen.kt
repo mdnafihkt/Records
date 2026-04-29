@@ -204,36 +204,38 @@ fun SettingsScreen(
                         }
                     }
 
-                    // App Lock toggle
-                    var isAppLockEnabled by remember {
-                         mutableStateOf(context.getSharedPreferences("settings", Context.MODE_PRIVATE).getBoolean("app_lock", false))
-                    }
-
-                    Row(
-                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(text = "App Lock", fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
-                            Text(text = "Require authentication on launch", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    // Biometric Unlock toggle
+                    if (isEncryptionSetup) {
+                        var isBiometricEnabled by remember {
+                            mutableStateOf(context.getSharedPreferences("settings", Context.MODE_PRIVATE).getBoolean("biometric_unlock", true))
                         }
-                        Switch(
-                            checked = isAppLockEnabled,
-                            onCheckedChange = { isEnabled ->
-                                isAppLockEnabled = isEnabled
-                                context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-                                    .edit()
-                                    .putBoolean("app_lock", isEnabled)
-                                    .apply()
-                            },
-                             colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.primary,
-                                checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(text = "Biometric Unlock", fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
+                                Text(text = "Use fingerprint or face to unlock vault", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            Switch(
+                                checked = isBiometricEnabled,
+                                onCheckedChange = { isEnabled ->
+                                    isBiometricEnabled = isEnabled
+                                    context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+                                        .edit()
+                                        .putBoolean("biometric_unlock", isEnabled)
+                                        .apply()
+                                },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = MaterialTheme.colorScheme.primary,
+                                    checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                )
                             )
-                        )
+                        }
                     }
 
                     // Auto-lock timeout

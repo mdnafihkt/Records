@@ -79,7 +79,9 @@ class MainActivity : FragmentActivity() {
                         // Vault is locked: show unlock screen
                         !isUnlocked -> {
                             val showBiometric = remember {
-                                BiometricAuthManager.isBiometricAvailable(this@MainActivity)
+                                val prefs = getSharedPreferences("settings", Context.MODE_PRIVATE)
+                                val isEnabledInSettings = prefs.getBoolean("biometric_unlock", true)
+                                isEnabledInSettings && BiometricAuthManager.isBiometricAvailable(this@MainActivity)
                             }
 
                             UnlockScreen(
