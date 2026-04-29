@@ -24,9 +24,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 
-import com.example.records.database.FolderNoteJoin
-import com.example.records.database.Note
 import com.example.records.database.NoteDatabase
+import com.example.records.repository.DecryptedNote
+import com.example.records.repository.NoteRepository
 import com.example.records.ui.screen.*
 import com.example.records.viewmodel.FolderViewModel
 
@@ -38,6 +38,9 @@ fun AppNavHost() {
     val context = LocalContext.current
     val db = NoteDatabase.getDatabase(context)
     val scope = rememberCoroutineScope()
+
+    // Repository for all note operations
+    val noteRepository = NoteRepository(db.noteDao(), db.folderNoteJoinDao())
 
     // Determine if Bottom Bar should be visible
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -118,16 +121,16 @@ fun AppNavHost() {
                 val folderId = backStackEntry.arguments?.getInt("folderId") ?: 0
 
                 val notes by
-                        produceState<List<Note>>(initialValue = emptyList(), key1 = folderId) {
+                        produceState<List<DecryptedNote>>(initialValue = emptyList(), key1 = folderId) {
                             value = if (folderId == 0) {
-                                db.noteDao().getAllNotesList() // Now the types match!
+                                noteRepository.getAllNotes()
                             } else {
-                                db.folderNoteJoinDao().getNotesForFolderList(folderId)
+                                noteRepository.getNotesForFolder(folderId)
                             }
                         }
 
                 NoteScreen(
-                        notes =  notes,
+                        notes = notes,
                         onNoteClick = { noteId ->
                             navController.navigate(Screen.ViewNote.createRoute(noteId))
                         },
@@ -143,8 +146,8 @@ fun AppNavHost() {
                 val noteId = backStackEntry.arguments?.getInt("noteId") ?: 0
 
                 val note by
-                        produceState<Note?>(initialValue = null, key1 = noteId) {
-                            value = db.noteDao().getNoteById(noteId)
+                        produceState<DecryptedNote?>(initialValue = null, key1 = noteId) {
+                            value = noteRepository.getNoteById(noteId)
                         }
 
                 ViewNoteScreen(
@@ -152,10 +155,7 @@ fun AppNavHost() {
                         onBackClick = { navController.popBackStack() },
                         onEditClick = {
                             scope.launch {
-                                val joinList =
-                                        db.folderNoteJoinDao().getFolderNoteJoinByNoteId(noteId)
-                                val folderId =
-                                        if (joinList.isNotEmpty()) joinList[0].folderId else 1
+                                val folderId = noteRepository.getFolderIdForNote(noteId)
                                 navController.navigate(
                                         Screen.AddEditNote.createRoute(folderId, noteId, true)
                                 )
@@ -166,10 +166,7 @@ fun AppNavHost() {
                         },
                         onDeleteClick = {
                             scope.launch {
-                                note?.let {
-                                    db.noteDao().delete(it)
-                                    db.folderNoteJoinDao().deleteByNoteId(noteId)
-                                }
+                                noteRepository.deleteNote(noteId)
                                 navController.popBackStack()
                             }
                         }
@@ -196,11 +193,11 @@ fun AppNavHost() {
                 val noteId = backStackEntry.arguments?.getInt("noteId") ?: -1
                 val isEdit = backStackEntry.arguments?.getBoolean("isEdit") ?: false
 
-                // State for loading note if editing
+                // Load decrypted note if editing
                 val noteState =
-                        produceState<Note?>(initialValue = null, key1 = noteId) {
+                        produceState<DecryptedNote?>(initialValue = null, key1 = noteId) {
                             if (isEdit && noteId != -1) {
-                                value = db.noteDao().getNoteById(noteId)
+                                value = noteRepository.getNoteById(noteId)
                             }
                         }
                 val note = noteState.value
@@ -228,68 +225,26 @@ fun AppNavHost() {
                             onSaveClick = { title, content, selectedFolderId ->
                                 scope.launch {
                                     val timestamp = System.currentTimeMillis()
-                                    if (currentNoteId != -1) {
-                                        val updatedNote =
-                                                Note(
-                                                        id = currentNoteId,
-                                                        title = title,
-                                                        content = content,
-                                                        lastUpdated = timestamp
-                                                )
-                                        db.noteDao().update(updatedNote)
-
-                                        // Update folder join if changed
-                                        val existingJoin =
-                                                db.folderNoteJoinDao()
-                                                        .getFolderNoteJoinByNoteId(currentNoteId)
-                                        if (existingJoin.isNotEmpty() &&
-                                                        existingJoin[0].folderId != selectedFolderId
-                                        ) {
-                                            db.folderNoteJoinDao().deleteByNoteId(existingJoin[0].noteId)
-                                            db.folderNoteJoinDao()
-                                                    .insert(
-                                                            FolderNoteJoin(selectedFolderId, currentNoteId)
-                                                    )
-                                        } else if (existingJoin.isEmpty()) {
-                                            // Should exist, but if not, insert
-                                            db.folderNoteJoinDao()
-                                                    .insert(
-                                                            FolderNoteJoin(selectedFolderId, currentNoteId)
-                                                    )
-                                        }
-                                    } else {
-                                        val newNote =
-                                                Note(
-                                                        title = title,
-                                                        content = content,
-                                                        lastUpdated = timestamp
-                                                )
-                                        currentNoteId = db.noteDao().insert(newNote).toInt()
-                                        db.folderNoteJoinDao()
-                                                .insert(FolderNoteJoin(selectedFolderId, currentNoteId))
-                                    }
+                                    val decryptedNote = DecryptedNote(
+                                        id = currentNoteId,
+                                        title = title,
+                                        content = content,
+                                        lastUpdated = timestamp
+                                    )
+                                    currentNoteId = noteRepository.saveNote(decryptedNote, selectedFolderId)
                                     navController.popBackStack()
                                 }
                             },
                             onAutoSave = { title, content, selectedFolderId ->
                                 scope.launch {
                                     val timestamp = System.currentTimeMillis()
-                                    if (currentNoteId != -1) {
-                                        val updatedNote = Note(id = currentNoteId, title = title, content = content, lastUpdated = timestamp)
-                                        db.noteDao().update(updatedNote)
-
-                                        val existingJoin = db.folderNoteJoinDao().getFolderNoteJoinByNoteId(currentNoteId)
-                                        if (existingJoin.isNotEmpty() && existingJoin[0].folderId != selectedFolderId) {
-                                            db.folderNoteJoinDao().deleteByNoteId(existingJoin[0].noteId)
-                                            db.folderNoteJoinDao().insert(FolderNoteJoin(selectedFolderId, currentNoteId))
-                                        } else if (existingJoin.isEmpty()) {
-                                            db.folderNoteJoinDao().insert(FolderNoteJoin(selectedFolderId, currentNoteId))
-                                        }
-                                    } else {
-                                        val newNote = Note(title = title, content = content, lastUpdated = timestamp)
-                                        currentNoteId = db.noteDao().insert(newNote).toInt()
-                                        db.folderNoteJoinDao().insert(FolderNoteJoin(selectedFolderId, currentNoteId))
-                                    }
+                                    val decryptedNote = DecryptedNote(
+                                        id = currentNoteId,
+                                        title = title,
+                                        content = content,
+                                        lastUpdated = timestamp
+                                    )
+                                    currentNoteId = noteRepository.saveNote(decryptedNote, selectedFolderId)
                                 }
                             },
                             onBackClick = { navController.popBackStack() }

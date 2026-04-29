@@ -37,7 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.records.R
-import com.example.records.database.Note
+import com.example.records.repository.DecryptedNote
 import com.example.records.ui.components.editor.toBlocks
 import com.example.records.ui.components.editor.toPlainText
 import com.example.records.ui.theme.GlassmorphicBackground
@@ -45,7 +45,7 @@ import com.example.records.ui.theme.GlassmorphicBackground
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteScreen(
-    notes: List<Note>,
+    notes: List<DecryptedNote>,
     onNoteClick: (Int) -> Unit,
     onAddNoteClick : () -> Unit
 ) {
@@ -122,7 +122,7 @@ fun NoteScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         contentPadding = PaddingValues(bottom = 80.dp)
                     ) {
-                        items(filteredNotes) { note ->
+                        items(filteredNotes, key = { it.id }) { note ->
                             NoteItem(note = note, onClick = { onNoteClick(note.id) })
                         }
                     }
@@ -148,7 +148,7 @@ fun NoteScreen(
 
 @Composable
 fun NoteItem(
-    note: Note,
+    note: DecryptedNote,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {

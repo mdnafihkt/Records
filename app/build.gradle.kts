@@ -107,4 +107,8 @@ dependencies {
     // Rich Text Editor & Serialization
     implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc10")
     implementation("com.google.code.gson:gson:2.10.1")
+
+    // Security & Encryption
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation("androidx.lifecycle:lifecycle-process:2.8.6")
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.records.database.Folder
 import com.example.records.database.NoteDatabase
+import com.example.records.repository.FolderRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -17,9 +18,8 @@ data class FolderWithCount(
 class FolderViewModel(application: Application) : AndroidViewModel(application) {
 
     private val db = NoteDatabase.getDatabase(application)
-    private val folderDao = db.folderDao()
+    private val folderRepository = FolderRepository(db.folderDao(), db.folderNoteJoinDao())
     private val noteDao = db.noteDao()
-    private val folderNoteJoinDao = db.folderNoteJoinDao()
 
     private val _folders = MutableStateFlow<List<FolderWithCount>>(emptyList())
     val folders = _folders.asStateFlow()
@@ -33,38 +33,35 @@ class FolderViewModel(application: Application) : AndroidViewModel(application) 
 
     fun loadFolders() {
         viewModelScope.launch {
-            val allFoldersList = folderDao.getAllFolders()
+            val allFoldersList = folderRepository.getAllFolders()
             val foldersWithCount = allFoldersList.map { folder ->
-                val count = folderNoteJoinDao.getNoteCountForFolder(folder.id)
+                val count = folderRepository.getNoteCountForFolder(folder.id)
                 FolderWithCount(folder, count)
             }
             _folders.value = foldersWithCount
 
-            // Update All Notes count (using folderId 0 for 'All Notes' convention from original code)
+            // Update All Notes count
             _allNotesCount.value = noteDao.getAllNotesList().size
         }
     }
 
     fun addFolder(name: String) {
         viewModelScope.launch {
-            val newFolder = Folder(0, name = name)
-            folderDao.insert(newFolder)
+            folderRepository.addFolder(name)
             loadFolders()
         }
     }
 
     fun renameFolder(folder: Folder, newName: String) {
         viewModelScope.launch {
-            folder.name = newName
-            folderDao.update(folder)
+            folderRepository.renameFolder(folder, newName)
             loadFolders()
         }
     }
 
     fun deleteFolder(folder: Folder) {
         viewModelScope.launch {
-            folderDao.delete(folder)
-            folderNoteJoinDao.deleteByFolderId(folder.id)
+            folderRepository.deleteFolder(folder)
             loadFolders()
         }
     }

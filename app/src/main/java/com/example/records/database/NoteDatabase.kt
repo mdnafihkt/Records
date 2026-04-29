@@ -10,7 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [Note::class, Folder::class, FolderNoteJoin::class], version = 2)
+@Database(entities = [Note::class, Folder::class, FolderNoteJoin::class], version = 3)
 abstract class NoteDatabase : RoomDatabase() {
     abstract fun noteDao(): NoteDao
     abstract fun folderDao(): FolderDao
@@ -27,7 +27,7 @@ abstract class NoteDatabase : RoomDatabase() {
                     NoteDatabase::class.java,
                     "note_database"
                 )
-                    .addMigrations(MIGRATION_1_2) // Add migration here
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build()
                 INSTANCE = instance
                 instance
@@ -37,6 +37,14 @@ abstract class NoteDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // Add the lastUpdated column with a default value
                 database.execSQL("ALTER TABLE Note ADD COLUMN lastUpdated INTEGER DEFAULT 0 NOT NULL")
+            }
+        }
+
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Add encryption support columns
+                database.execSQL("ALTER TABLE Note ADD COLUMN searchIndex TEXT NOT NULL DEFAULT ''")
+                database.execSQL("ALTER TABLE Note ADD COLUMN isEncrypted INTEGER NOT NULL DEFAULT 0")
             }
         }
     }

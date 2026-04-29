@@ -2,42 +2,50 @@ package com.example.records.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import com.example.records.database.Note
+import androidx.lifecycle.viewModelScope
 import com.example.records.database.NoteDatabase
+import com.example.records.repository.DecryptedNote
+import com.example.records.repository.NoteRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class NoteViewModel(application: Application) : AndroidViewModel(application) {
 
     private val db = NoteDatabase.getDatabase(application)
-    private val noteDao = db.noteDao()
-    private val folderNoteJoinDao = db.folderNoteJoinDao()
+    private val repository = NoteRepository(db.noteDao(), db.folderNoteJoinDao())
 
-    private val _notes = MediatorLiveData<List<Note>>()
-    val notes: LiveData<List<Note>> = _notes
+    private val _notes = MutableStateFlow<List<DecryptedNote>>(emptyList())
+    val notes = _notes.asStateFlow()
 
-    private var currentSource: LiveData<List<Note>>? = null
+    private var currentFolderId: Int = 0
 
-    /** Call once when screen opens */
+    /** Load notes for a folder (0 = all notes). */
     fun loadNotes(folderId: Int) {
-        switchSource(folderNoteJoinDao.getNotesForFolder(folderId))
+        currentFolderId = folderId
+        viewModelScope.launch {
+            _notes.value = if (folderId == 0) {
+                repository.getAllNotes()
+            } else {
+                repository.getNotesForFolder(folderId)
+            }
+        }
     }
 
-    /** Call on every search change */
+    /** Search notes using the HMAC blind index. */
     fun searchNotes(query: String) {
-        if (query.isBlank()) {
-            // reload current folder
-            currentSource?.let { switchSource(it) }
-        } else {
-            switchSource(noteDao.searchNotesByTitle("%$query%"))
+        viewModelScope.launch {
+            _notes.value = if (query.isBlank()) {
+                if (currentFolderId == 0) repository.getAllNotes()
+                else repository.getNotesForFolder(currentFolderId)
+            } else {
+                repository.searchNotes(query)
+            }
         }
     }
 
-    private fun switchSource(newSource: LiveData<List<Note>>) {
-        currentSource?.let { _notes.removeSource(it) }
-        currentSource = newSource
-        _notes.addSource(newSource) { list ->
-            _notes.value = list
-        }
+    /** Clears decrypted data from memory (called on session lock). */
+    fun clearSensitiveData() {
+        _notes.value = emptyList()
     }
 }

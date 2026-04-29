@@ -52,7 +52,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.records.R
-import com.example.records.database.Note
+import com.example.records.repository.DecryptedNote
 import com.example.records.ui.components.editor.NoteViewer
 import com.example.records.ui.components.editor.toBlocks
 import com.example.records.ui.theme.GlassmorphicBackground
@@ -60,7 +60,7 @@ import com.example.records.ui.theme.GlassmorphicCard
 
 @Composable
 fun ViewNoteScreen(
-    note: Note?,
+    note: DecryptedNote?,
     onBackClick: () -> Unit,
     onEditClick: () -> Unit,
     onMoveClick: () -> Unit,

@@ -182,6 +182,29 @@ fun SettingsScreen(
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
+                    // Encryption status
+                    val isEncryptionSetup = remember {
+                        com.example.records.security.KeyManager.isSetup(context)
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(text = "Encryption", fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
+                            Text(
+                                text = if (isEncryptionSetup) "AES-256-GCM · Active" else "Not configured",
+                                fontSize = 12.sp,
+                                color = if (isEncryptionSetup) androidx.compose.ui.graphics.Color(0xFF43A047) else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
+                    // App Lock toggle
                     var isAppLockEnabled by remember {
                          mutableStateOf(context.getSharedPreferences("settings", Context.MODE_PRIVATE).getBoolean("app_lock", false))
                     }
@@ -211,6 +234,55 @@ fun SettingsScreen(
                                 checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                             )
                         )
+                    }
+
+                    // Auto-lock timeout
+                    if (isEncryptionSetup) {
+                        val timeoutOptions = listOf(
+                            0L to "Immediate",
+                            60_000L to "1 minute",
+                            300_000L to "5 minutes",
+                            1_800_000L to "30 minutes",
+                            -1L to "Never"
+                        )
+                        var currentTimeout by remember {
+                            mutableStateOf(com.example.records.security.SessionManager.getAutoLockTimeout())
+                        }
+                        var showTimeoutMenu by remember { mutableStateOf(false) }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showTimeoutMenu = true }
+                                .padding(vertical = 12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(text = "Auto-Lock", fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
+                                Text(
+                                    text = timeoutOptions.find { it.first == currentTimeout }?.second ?: "1 minute",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
+                        androidx.compose.material3.DropdownMenu(
+                            expanded = showTimeoutMenu,
+                            onDismissRequest = { showTimeoutMenu = false }
+                        ) {
+                            timeoutOptions.forEach { (timeout, label) ->
+                                androidx.compose.material3.DropdownMenuItem(
+                                    text = { Text(label) },
+                                    onClick = {
+                                        currentTimeout = timeout
+                                        com.example.records.security.SessionManager.setAutoLockTimeout(timeout)
+                                        showTimeoutMenu = false
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }

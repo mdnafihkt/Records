@@ -14,4 +14,6 @@ sealed class Screen(val route: String) {
         }
     }
     object Settings : Screen("settings")
+    object SetupPassword : Screen("setup_password")
+    object Unlock : Screen("unlock")
 }
