@@ -18,7 +18,12 @@ interface FolderNoteJoinDao {
     @Query("DELETE FROM FolderNoteJoin WHERE folderId = :folderId")
     suspend fun deleteByFolderId(folderId: Int)
 
-    @Query("SELECT COUNT(*) FROM FolderNoteJoin WHERE folderId = :folderId")
+    @Query("""
+        SELECT COUNT(*) 
+        FROM FolderNoteJoin 
+        INNER JOIN Note ON FolderNoteJoin.noteId = Note.id 
+        WHERE FolderNoteJoin.folderId = :folderId AND Note.deletedAt IS NULL
+    """)
     suspend fun getNoteCountForFolder(folderId: Int): Int
 
     @Query("""
@@ -26,7 +31,7 @@ interface FolderNoteJoinDao {
              FROM Note
              INNER JOIN FolderNoteJoin
              ON Note.id = FolderNoteJoin.noteId
-             WHERE FolderNoteJoin.folderId = :folderId
+             WHERE FolderNoteJoin.folderId = :folderId AND Note.deletedAt IS NULL
              ORDER BY Note.lastUpdated DESC
     """)
     fun getNotesForFolder(folderId: Int): LiveData<List<Note>>
@@ -36,7 +41,7 @@ interface FolderNoteJoinDao {
              FROM Note
              INNER JOIN FolderNoteJoin
              ON Note.id = FolderNoteJoin.noteId
-             WHERE FolderNoteJoin.folderId = :folderId
+             WHERE FolderNoteJoin.folderId = :folderId AND Note.deletedAt IS NULL
              ORDER BY Note.lastUpdated DESC
     """)
     suspend fun getNotesForFolderList(folderId: Int): List<Note>

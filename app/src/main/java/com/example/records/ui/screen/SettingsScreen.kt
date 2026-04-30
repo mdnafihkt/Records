@@ -441,7 +441,78 @@ fun SettingsScreen(
                 }
             }
 
-             Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Recycle Bin Settings
+            GlassmorphicCard(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Recycle Bin",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    val retentionOptions = listOf(
+                        86_400_000L to "1 day",
+                        604_800_000L to "7 days",
+                        2_592_000_000L to "30 days",
+                        -1L to "Never delete"
+                    )
+                    
+                    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+                    var currentRetention by remember {
+                        mutableLongStateOf(prefs.getLong("recycle_bin_retention", 604_800_000L))
+                    }
+                    var showRetentionMenu by remember { mutableStateOf(false) }
+
+                    Box {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showRetentionMenu = true }
+                                .padding(vertical = 12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(text = "Retention Period", fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
+                                Text(
+                                    text = retentionOptions.find { it.first == currentRetention }?.second ?: "7 days",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
+                        DropdownMenu(
+                            expanded = showRetentionMenu,
+                            onDismissRequest = { showRetentionMenu = false }
+                        ) {
+                            retentionOptions.forEach { (millis, label) ->
+                                DropdownMenuItem(
+                                    text = { Text(label) },
+                                    onClick = {
+                                        currentRetention = millis
+                                        prefs.edit().putLong("recycle_bin_retention", millis).apply()
+                                        showRetentionMenu = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    
+                    Text(
+                        text = "Notes in the recycle bin will be permanently deleted after this period.",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
         
         if (showIconChangeDialog != null) {

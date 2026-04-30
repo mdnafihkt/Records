@@ -38,6 +38,10 @@ class NoteRepository(
         return folderNoteJoinDao.getNotesForFolderList(folderId).map { decryptNote(it) }
     }
 
+    suspend fun getDeletedNotes(): List<DecryptedNote> {
+        return noteDao.getDeletedNotesList().map { decryptNote(it) }
+    }
+
     /**
      * Searches notes using the HMAC blind index.
      * Falls back to in-memory search for unencrypted notes.
@@ -106,8 +110,27 @@ class NoteRepository(
     }
 
     suspend fun deleteNote(noteId: Int) {
+        noteDao.getNoteById(noteId)?.let { note ->
+            val deletedNote = note.copy(deletedAt = System.currentTimeMillis())
+            noteDao.update(deletedNote)
+        }
+    }
+
+    suspend fun restoreNote(noteId: Int) {
+        noteDao.getNoteById(noteId)?.let { note ->
+            val restoredNote = note.copy(deletedAt = null)
+            noteDao.update(restoredNote)
+        }
+    }
+
+    suspend fun permanentlyDeleteNote(noteId: Int) {
         noteDao.getNoteById(noteId)?.let { noteDao.delete(it) }
         folderNoteJoinDao.deleteByNoteId(noteId)
+    }
+
+    suspend fun cleanUpOldDeletedNotes(retentionMillis: Long) {
+        val cutoff = System.currentTimeMillis() - retentionMillis
+        noteDao.deleteOlderThan(cutoff)
     }
 
     suspend fun getFolderIdForNote(noteId: Int): Int {
@@ -130,7 +153,8 @@ class NoteRepository(
                 content = EncryptionManager.encrypt(decryptedNote.content, key),
                 searchIndex = SecureSearchIndexer.buildIndex(indexText, indexKey),
                 lastUpdated = decryptedNote.lastUpdated,
-                isEncrypted = true
+                isEncrypted = true,
+                deletedAt = decryptedNote.deletedAt
             )
         } else {
             Note(
@@ -139,7 +163,8 @@ class NoteRepository(
                 content = decryptedNote.content,
                 searchIndex = "",
                 lastUpdated = decryptedNote.lastUpdated,
-                isEncrypted = false
+                isEncrypted = false,
+                deletedAt = decryptedNote.deletedAt
             )
         }
     }
@@ -150,7 +175,8 @@ class NoteRepository(
                 id = note.id,
                 title = note.title,
                 content = note.content,
-                lastUpdated = note.lastUpdated
+                lastUpdated = note.lastUpdated,
+                deletedAt = note.deletedAt
             )
         }
 
@@ -161,7 +187,8 @@ class NoteRepository(
             id = note.id,
             title = EncryptionManager.decrypt(note.title, key),
             content = EncryptionManager.decrypt(note.content, key),
-            lastUpdated = note.lastUpdated
+            lastUpdated = note.lastUpdated,
+            deletedAt = note.deletedAt
         )
     }
 }

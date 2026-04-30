@@ -42,6 +42,15 @@ fun AppNavHost() {
     // Repository for all note operations
     val noteRepository = NoteRepository(db.noteDao(), db.folderNoteJoinDao())
 
+    // Cleanup old deleted notes
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        val prefs = context.getSharedPreferences("settings", android.content.Context.MODE_PRIVATE)
+        val retentionMillis = prefs.getLong("recycle_bin_retention", 604_800_000L)
+        if (retentionMillis != -1L) {
+            noteRepository.cleanUpOldDeletedNotes(retentionMillis)
+        }
+    }
+
     // Determine if Bottom Bar should be visible
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -108,7 +117,11 @@ fun AppNavHost() {
                 FolderScreen(
                         folderViewModel = folderViewModel,
                         onFolderClick = { folderId ->
-                            navController.navigate(Screen.NoteList.createRoute(folderId))
+                            if (folderId == -1) {
+                                navController.navigate(Screen.RecycleBin.route)
+                            } else {
+                                navController.navigate(Screen.NoteList.createRoute(folderId))
+                            }
                         }
                 )
             }
@@ -257,6 +270,13 @@ fun AppNavHost() {
                 SettingsScreen(
                         onBackClick = { navController.popBackStack() },
                         onClearDataClick = {}
+                )
+            }
+
+            // Recycle Bin
+            composable(Screen.RecycleBin.route) {
+                RecycleBinScreen(
+                    onBackClick = { navController.popBackStack() }
                 )
             }
         }

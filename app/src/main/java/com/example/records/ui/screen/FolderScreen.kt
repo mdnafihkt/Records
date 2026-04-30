@@ -150,6 +150,40 @@ fun FolderScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                GlassmorphicCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onFolderClick(-1) } // We'll use -1 to signal Recycle Bin or handle it via a new callback
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = androidx.compose.material.icons.Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.size(40.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column {
+                            Text(
+                                text = "Recycle Bin",
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Recently deleted notes",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 // Folders List
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
