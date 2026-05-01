@@ -128,6 +128,13 @@ class NoteRepository(
         folderNoteJoinDao.deleteByNoteId(noteId)
     }
 
+    suspend fun togglePinNote(noteId: Int) {
+        noteDao.getNoteById(noteId)?.let { note ->
+            val pinnedNote = note.copy(isPinned = !note.isPinned)
+            noteDao.update(pinnedNote)
+        }
+    }
+
     suspend fun cleanUpOldDeletedNotes(retentionMillis: Long) {
         val cutoff = System.currentTimeMillis() - retentionMillis
         noteDao.deleteOlderThan(cutoff)
@@ -154,7 +161,8 @@ class NoteRepository(
                 searchIndex = SecureSearchIndexer.buildIndex(indexText, indexKey),
                 lastUpdated = decryptedNote.lastUpdated,
                 isEncrypted = true,
-                deletedAt = decryptedNote.deletedAt
+                deletedAt = decryptedNote.deletedAt,
+                isPinned = decryptedNote.isPinned
             )
         } else {
             Note(
@@ -164,7 +172,8 @@ class NoteRepository(
                 searchIndex = "",
                 lastUpdated = decryptedNote.lastUpdated,
                 isEncrypted = false,
-                deletedAt = decryptedNote.deletedAt
+                deletedAt = decryptedNote.deletedAt,
+                isPinned = decryptedNote.isPinned
             )
         }
     }
@@ -176,7 +185,8 @@ class NoteRepository(
                 title = note.title,
                 content = note.content,
                 lastUpdated = note.lastUpdated,
-                deletedAt = note.deletedAt
+                deletedAt = note.deletedAt,
+                isPinned = note.isPinned
             )
         }
 
@@ -188,7 +198,8 @@ class NoteRepository(
             title = EncryptionManager.decrypt(note.title, key),
             content = EncryptionManager.decrypt(note.content, key),
             lastUpdated = note.lastUpdated,
-            deletedAt = note.deletedAt
+            deletedAt = note.deletedAt,
+            isPinned = note.isPinned
         )
     }
 }

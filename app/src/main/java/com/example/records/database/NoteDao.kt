@@ -6,11 +6,11 @@ import androidx.room.*
 @Dao
 interface NoteDao {
 
-    @Query("SELECT * FROM Note WHERE deletedAt IS NULL AND title LIKE :query COLLATE NOCASE ORDER BY lastUpdated DESC")
+    @Query("SELECT * FROM Note WHERE deletedAt IS NULL AND title LIKE :query COLLATE NOCASE ORDER BY isPinned DESC, lastUpdated DESC")
     fun searchNotesByTitle(query: String): LiveData<List<Note>>
 
     /** Blind-index search: matches HMAC tokens stored in searchIndex. */
-    @Query("SELECT * FROM Note WHERE deletedAt IS NULL AND searchIndex LIKE :token ORDER BY lastUpdated DESC")
+    @Query("SELECT * FROM Note WHERE deletedAt IS NULL AND searchIndex LIKE :token ORDER BY isPinned DESC, lastUpdated DESC")
     fun searchByIndex(token: String): LiveData<List<Note>>
 
     /** Returns all unencrypted notes (for migration). */
@@ -20,7 +20,7 @@ interface NoteDao {
     @Query("SELECT * FROM Note WHERE deletedAt IS NULL")
     fun getAllNotes(): LiveData<List<Note>>
 
-    @Query("SELECT * FROM Note WHERE deletedAt IS NULL ORDER BY lastUpdated DESC")
+    @Query("SELECT * FROM Note WHERE deletedAt IS NULL ORDER BY isPinned DESC, lastUpdated DESC")
     suspend fun getAllNotesList(): List<Note>
 
     @Query("SELECT * FROM Note WHERE id = :id LIMIT 1")

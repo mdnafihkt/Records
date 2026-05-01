@@ -11,5 +11,6 @@ data class Note(
     val searchIndex: String = "",
     val lastUpdated: Long,
     val isEncrypted: Boolean = false,
-    val deletedAt: Long? = null
+    val deletedAt: Long? = null,
+    val isPinned: Boolean = false
 )

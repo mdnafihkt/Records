@@ -32,7 +32,7 @@ interface FolderNoteJoinDao {
              INNER JOIN FolderNoteJoin
              ON Note.id = FolderNoteJoin.noteId
              WHERE FolderNoteJoin.folderId = :folderId AND Note.deletedAt IS NULL
-             ORDER BY Note.lastUpdated DESC
+             ORDER BY Note.isPinned DESC, Note.lastUpdated DESC
     """)
     fun getNotesForFolder(folderId: Int): LiveData<List<Note>>
 
@@ -42,7 +42,7 @@ interface FolderNoteJoinDao {
              INNER JOIN FolderNoteJoin
              ON Note.id = FolderNoteJoin.noteId
              WHERE FolderNoteJoin.folderId = :folderId AND Note.deletedAt IS NULL
-             ORDER BY Note.lastUpdated DESC
+             ORDER BY Note.isPinned DESC, Note.lastUpdated DESC
     """)
     suspend fun getNotesForFolderList(folderId: Int): List<Note>
 

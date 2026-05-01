@@ -182,6 +182,11 @@ fun AppNavHost() {
                                 noteRepository.deleteNote(noteId)
                                 navController.popBackStack()
                             }
+                        },
+                        onPinClick = {
+                            scope.launch {
+                                noteRepository.togglePinNote(noteId)
+                            }
                         }
                 )
             }

@@ -9,5 +9,6 @@ data class DecryptedNote(
     val title: String,
     val content: String,
     val lastUpdated: Long,
-    val deletedAt: Long? = null
+    val deletedAt: Long? = null,
+    val isPinned: Boolean = false
 )

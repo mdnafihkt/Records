@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -64,7 +65,8 @@ fun ViewNoteScreen(
     onBackClick: () -> Unit,
     onEditClick: () -> Unit,
     onMoveClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onPinClick: () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -116,6 +118,13 @@ fun ViewNoteScreen(
                             )
                         )
                     } else {
+                        IconButton(onClick = onPinClick) {
+                            Icon(
+                                imageVector = Icons.Default.PushPin,
+                                contentDescription = if (note?.isPinned == true) "Unpin" else "Pin",
+                                tint = if (note?.isPinned == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                            )
+                        }
                         IconButton(onClick = { isSearchVisible = true }) {
                             Icon(Icons.Default.Search, contentDescription = "Search", tint = MaterialTheme.colorScheme.onBackground)
                         }
