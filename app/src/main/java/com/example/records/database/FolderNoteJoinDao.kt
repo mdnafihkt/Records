@@ -42,6 +42,7 @@ interface FolderNoteJoinDao {
              INNER JOIN FolderNoteJoin ON Note.id = FolderNoteJoin.noteId
              INNER JOIN Folder ON FolderNoteJoin.folderId = Folder.id
              WHERE FolderNoteJoin.folderId = :folderId AND Note.deletedAt IS NULL
+             GROUP BY Note.id
              ORDER BY Note.isPinned DESC, Note.lastUpdated DESC
     """)
     suspend fun getNotesForFolderWithColor(folderId: Int): List<NoteWithColor>

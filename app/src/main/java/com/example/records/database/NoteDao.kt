@@ -12,6 +12,7 @@ interface NoteDao {
         LEFT JOIN FolderNoteJoin ON Note.id = FolderNoteJoin.noteId 
         LEFT JOIN Folder ON FolderNoteJoin.folderId = Folder.id 
         WHERE Note.deletedAt IS NULL AND Note.title LIKE :query COLLATE NOCASE 
+        GROUP BY Note.id
         ORDER BY Note.isPinned DESC, Note.lastUpdated DESC
     """)
     suspend fun searchNotesWithColor(query: String): List<NoteWithColor>
@@ -33,6 +34,7 @@ interface NoteDao {
         LEFT JOIN FolderNoteJoin ON Note.id = FolderNoteJoin.noteId 
         LEFT JOIN Folder ON FolderNoteJoin.folderId = Folder.id 
         WHERE Note.deletedAt IS NULL 
+        GROUP BY Note.id
         ORDER BY Note.isPinned DESC, Note.lastUpdated DESC
     """)
     suspend fun getAllNotesWithColor(): List<NoteWithColor>
