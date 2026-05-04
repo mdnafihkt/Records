@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 class NoteViewModel(application: Application) : AndroidViewModel(application) {
 
     private val db = NoteDatabase.getDatabase(application)
-    private val repository = NoteRepository(db.noteDao(), db.folderNoteJoinDao())
+    private val repository = NoteRepository(db.noteDao(), db.folderNoteJoinDao(), db.folderDao())
 
     private val _notes = MutableStateFlow<List<DecryptedNote>>(emptyList())
     val notes = _notes.asStateFlow()

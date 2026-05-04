@@ -15,12 +15,13 @@ class FolderRepository(
 ) {
     suspend fun getAllFolders(): List<Folder> = folderDao.getAllFolders()
 
-    suspend fun addFolder(name: String) {
-        folderDao.insert(Folder(0, name = name))
+    suspend fun addFolder(name: String, color: Int) {
+        folderDao.insert(Folder(0, name = name, color = color))
     }
 
-    suspend fun renameFolder(folder: Folder, newName: String) {
+    suspend fun updateFolder(folder: Folder, newName: String, newColor: Int) {
         folder.name = newName
+        folder.color = newColor
         folderDao.update(folder)
     }
 

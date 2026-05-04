@@ -10,5 +10,6 @@ data class DecryptedNote(
     val content: String,
     val lastUpdated: Long,
     val deletedAt: Long? = null,
-    val isPinned: Boolean = false
+    val isPinned: Boolean = false,
+    val folderColor: Int = 0
 )

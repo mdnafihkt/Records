@@ -37,14 +37,14 @@ interface FolderNoteJoinDao {
     fun getNotesForFolder(folderId: Int): LiveData<List<Note>>
 
     @Query("""
-             SELECT *
+             SELECT Note.*, COALESCE(Folder.color, 0) as folderColor
              FROM Note
-             INNER JOIN FolderNoteJoin
-             ON Note.id = FolderNoteJoin.noteId
+             INNER JOIN FolderNoteJoin ON Note.id = FolderNoteJoin.noteId
+             INNER JOIN Folder ON FolderNoteJoin.folderId = Folder.id
              WHERE FolderNoteJoin.folderId = :folderId AND Note.deletedAt IS NULL
              ORDER BY Note.isPinned DESC, Note.lastUpdated DESC
     """)
-    suspend fun getNotesForFolderList(folderId: Int): List<Note>
+    suspend fun getNotesForFolderWithColor(folderId: Int): List<NoteWithColor>
 
     @Query("SELECT * FROM FolderNoteJoin WHERE noteId = :noteId")
     suspend fun getFolderNoteJoinByNoteId(noteId: Int): List<FolderNoteJoin>

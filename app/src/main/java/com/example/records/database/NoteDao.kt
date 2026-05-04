@@ -6,8 +6,15 @@ import androidx.room.*
 @Dao
 interface NoteDao {
 
-    @Query("SELECT * FROM Note WHERE deletedAt IS NULL AND title LIKE :query COLLATE NOCASE ORDER BY isPinned DESC, lastUpdated DESC")
-    fun searchNotesByTitle(query: String): LiveData<List<Note>>
+    @Query("""
+        SELECT Note.*, COALESCE(Folder.color, 0) as folderColor 
+        FROM Note 
+        LEFT JOIN FolderNoteJoin ON Note.id = FolderNoteJoin.noteId 
+        LEFT JOIN Folder ON FolderNoteJoin.folderId = Folder.id 
+        WHERE Note.deletedAt IS NULL AND Note.title LIKE :query COLLATE NOCASE 
+        ORDER BY Note.isPinned DESC, Note.lastUpdated DESC
+    """)
+    suspend fun searchNotesWithColor(query: String): List<NoteWithColor>
 
     /** Blind-index search: matches HMAC tokens stored in searchIndex. */
     @Query("SELECT * FROM Note WHERE deletedAt IS NULL AND searchIndex LIKE :token ORDER BY isPinned DESC, lastUpdated DESC")
@@ -20,8 +27,15 @@ interface NoteDao {
     @Query("SELECT * FROM Note WHERE deletedAt IS NULL")
     fun getAllNotes(): LiveData<List<Note>>
 
-    @Query("SELECT * FROM Note WHERE deletedAt IS NULL ORDER BY isPinned DESC, lastUpdated DESC")
-    suspend fun getAllNotesList(): List<Note>
+    @Query("""
+        SELECT Note.*, COALESCE(Folder.color, 0) as folderColor 
+        FROM Note 
+        LEFT JOIN FolderNoteJoin ON Note.id = FolderNoteJoin.noteId 
+        LEFT JOIN Folder ON FolderNoteJoin.folderId = Folder.id 
+        WHERE Note.deletedAt IS NULL 
+        ORDER BY Note.isPinned DESC, Note.lastUpdated DESC
+    """)
+    suspend fun getAllNotesWithColor(): List<NoteWithColor>
 
     @Query("SELECT * FROM Note WHERE id = :id LIMIT 1")
     suspend fun getNoteById(id: Int): Note?

@@ -2,6 +2,7 @@ package com.example.records.ui.screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -34,6 +36,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -204,8 +207,9 @@ fun FolderScreen(
                 FolderDialog(
                     title = "New Folder",
                     initialName = "",
-                    onConfirm = { name ->
-                        folderViewModel.addFolder(name)
+                    initialColor = 0,
+                    onConfirm = { name, color ->
+                        folderViewModel.addFolder(name, color)
                         showAddFolderDialog = false
                     },
                     onDismiss = { showAddFolderDialog = false }
@@ -216,8 +220,9 @@ fun FolderScreen(
                 FolderDialog(
                     title = "Rename Folder",
                     initialName = folder.name,
-                    onConfirm = { newName ->
-                        folderViewModel.renameFolder(folder, newName)
+                    initialColor = folder.color,
+                    onConfirm = { newName, newColor ->
+                        folderViewModel.updateFolder(folder, newName, newColor)
                         showRenameFolderDialog = null
                     },
                     onDismiss = { showRenameFolderDialog = null }
@@ -340,7 +345,7 @@ fun FolderItem(
                 Icon(
                     painter = painterResource(id = R.drawable.folder_icon_2),
                     contentDescription = null,
-                    tint = Color.Unspecified,
+                    tint = if (folderWithCount.folder.color != 0) Color(folderWithCount.folder.color) else Color.Unspecified,
                     modifier = Modifier.size(40.dp)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
@@ -366,26 +371,82 @@ fun FolderItem(
 fun FolderDialog(
     title: String,
     initialName: String,
-    onConfirm: (String) -> Unit,
+    initialColor: Int = 0,
+    onConfirm: (String, Int) -> Unit,
     onDismiss: () -> Unit
 ) {
     var text by remember { mutableStateOf(initialName) }
+    var selectedColor by remember { mutableIntStateOf(initialColor) }
     
+    val colors = listOf(
+        0, // Default/None
+        0xFFE57373.toInt(), // Red
+        0xFF81C784.toInt(), // Green
+        0xFF64B5F6.toInt(), // Blue
+        0xFFFFF176.toInt(), // Yellow
+        0xFFBA68C8.toInt(), // Purple
+        0xFFFFB74D.toInt(), // Orange
+        0xFF4DB6AC.toInt(), // Teal
+    )
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
-            TextField(
-                value = text,
-                onValueChange = { text = it },
-                label = { Text("Folder Name") }
-            )
+            Column {
+                TextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    label = { Text("Folder Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Text(
+                    text = "Folder Color",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    colors.forEach { colorInt ->
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(CircleShape)
+                                .background(if (colorInt == 0) MaterialTheme.colorScheme.surfaceVariant else Color(colorInt))
+                                .border(
+                                    width = if (selectedColor == colorInt) 2.dp else 0.dp,
+                                    color = if (selectedColor == colorInt) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                    shape = CircleShape
+                                )
+                                .clickable { selectedColor = colorInt },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (colorInt == 0) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.folder_icon_2),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         },
         confirmButton = {
             Button(
                 onClick = {
                     if (text.isNotBlank()) {
-                        onConfirm(text)
+                        onConfirm(text, selectedColor)
                     }
                 }
             ) {

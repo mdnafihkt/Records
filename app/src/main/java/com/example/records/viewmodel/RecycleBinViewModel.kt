@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 class RecycleBinViewModel(application: Application) : AndroidViewModel(application) {
 
     private val db = NoteDatabase.getDatabase(application)
-    private val repository = NoteRepository(db.noteDao(), db.folderNoteJoinDao())
+    private val repository = NoteRepository(db.noteDao(), db.folderNoteJoinDao(), db.folderDao())
 
     private val _deletedNotes = MutableStateFlow<List<DecryptedNote>>(emptyList())
     val deletedNotes = _deletedNotes.asStateFlow()

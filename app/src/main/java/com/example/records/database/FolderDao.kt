@@ -15,4 +15,12 @@ interface FolderDao {
 
     @Update
     suspend fun update(folder: Folder)
+
+    @Query("""
+        SELECT Folder.color FROM Folder 
+        INNER JOIN FolderNoteJoin ON Folder.id = FolderNoteJoin.folderId 
+        WHERE FolderNoteJoin.noteId = :noteId 
+        LIMIT 1
+    """)
+    suspend fun getColorForNote(noteId: Int): Int?
 }

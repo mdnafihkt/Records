@@ -40,7 +40,7 @@ fun AppNavHost() {
     val scope = rememberCoroutineScope()
 
     // Repository for all note operations
-    val noteRepository = NoteRepository(db.noteDao(), db.folderNoteJoinDao())
+    val noteRepository = NoteRepository(db.noteDao(), db.folderNoteJoinDao(), db.folderDao())
 
     // Cleanup old deleted notes
     androidx.compose.runtime.LaunchedEffect(Unit) {

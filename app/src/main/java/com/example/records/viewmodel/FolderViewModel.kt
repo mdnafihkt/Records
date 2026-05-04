@@ -41,20 +41,20 @@ class FolderViewModel(application: Application) : AndroidViewModel(application) 
             _folders.value = foldersWithCount
 
             // Update All Notes count
-            _allNotesCount.value = noteDao.getAllNotesList().size
+            _allNotesCount.value = noteDao.getAllNotesWithColor().size
         }
     }
 
-    fun addFolder(name: String) {
+    fun addFolder(name: String, color: Int) {
         viewModelScope.launch {
-            folderRepository.addFolder(name)
+            folderRepository.addFolder(name, color)
             loadFolders()
         }
     }
 
-    fun renameFolder(folder: Folder, newName: String) {
+    fun updateFolder(folder: Folder, newName: String, newColor: Int) {
         viewModelScope.launch {
-            folderRepository.renameFolder(folder, newName)
+            folderRepository.updateFolder(folder, newName, newColor)
             loadFolders()
         }
     }

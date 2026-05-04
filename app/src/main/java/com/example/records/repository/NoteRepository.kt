@@ -21,21 +21,24 @@ import javax.crypto.SecretKey
  */
 class NoteRepository(
     private val noteDao: NoteDao,
-    private val folderNoteJoinDao: FolderNoteJoinDao
+    private val folderNoteJoinDao: FolderNoteJoinDao,
+    private val folderDao: com.example.records.database.FolderDao
 ) {
 
     // ── Read Operations ──────────────────────────────────────────
 
     suspend fun getAllNotes(): List<DecryptedNote> {
-        return noteDao.getAllNotesList().map { decryptNote(it) }
+        return noteDao.getAllNotesWithColor().map { decryptNote(it.note, it.folderColor) }
     }
 
     suspend fun getNoteById(id: Int): DecryptedNote? {
-        return noteDao.getNoteById(id)?.let { decryptNote(it) }
+        val note = noteDao.getNoteById(id) ?: return null
+        val color = folderDao.getColorForNote(id) ?: 0
+        return decryptNote(note, color)
     }
 
     suspend fun getNotesForFolder(folderId: Int): List<DecryptedNote> {
-        return folderNoteJoinDao.getNotesForFolderList(folderId).map { decryptNote(it) }
+        return folderNoteJoinDao.getNotesForFolderWithColor(folderId).map { decryptNote(it.note, it.folderColor) }
     }
 
     suspend fun getDeletedNotes(): List<DecryptedNote> {
@@ -56,21 +59,21 @@ class NoteRepository(
             if (tokens.isEmpty()) return emptyList()
 
             // Get all notes and filter by index match
-            val allNotes = noteDao.getAllNotesList()
+            val allNotes = noteDao.getAllNotesWithColor()
             return allNotes
-                .filter { note ->
-                    tokens.all { token -> note.searchIndex.contains(token) }
+                .filter { item ->
+                    tokens.all { token -> item.note.searchIndex.contains(token) }
                 }
-                .map { decryptNote(it) }
+                .map { decryptNote(it.note, it.folderColor) }
         } else {
             // Fallback: unencrypted plaintext search
-            val allNotes = noteDao.getAllNotesList()
+            val allNotes = noteDao.getAllNotesWithColor()
             return allNotes
-                .filter { note ->
-                    note.title.contains(query, ignoreCase = true) ||
-                    note.content.contains(query, ignoreCase = true)
+                .filter { item ->
+                    item.note.title.contains(query, ignoreCase = true) ||
+                    item.note.content.contains(query, ignoreCase = true)
                 }
-                .map { decryptNote(it) }
+                .map { decryptNote(it.note, it.folderColor) }
         }
     }
 
@@ -178,7 +181,7 @@ class NoteRepository(
         }
     }
 
-    private fun decryptNote(note: Note): DecryptedNote {
+    private fun decryptNote(note: Note, folderColor: Int = 0): DecryptedNote {
         if (!note.isEncrypted) {
             return DecryptedNote(
                 id = note.id,
@@ -186,7 +189,8 @@ class NoteRepository(
                 content = note.content,
                 lastUpdated = note.lastUpdated,
                 deletedAt = note.deletedAt,
-                isPinned = note.isPinned
+                isPinned = note.isPinned,
+                folderColor = folderColor
             )
         }
 
@@ -199,7 +203,8 @@ class NoteRepository(
             content = EncryptionManager.decrypt(note.content, key),
             lastUpdated = note.lastUpdated,
             deletedAt = note.deletedAt,
-            isPinned = note.isPinned
+            isPinned = note.isPinned,
+            folderColor = folderColor
         )
     }
 }
