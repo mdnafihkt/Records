@@ -228,13 +228,13 @@ fun AppNavHost() {
 
                 var currentNoteId by androidx.compose.runtime.remember(noteId) { androidx.compose.runtime.mutableIntStateOf(noteId) }
 
-                if (isEdit && noteId != -1 && note == null) {
+                if (isEdit && noteId != -1 && note == null) {   // Loading notes indicator
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         androidx.compose.material3.CircularProgressIndicator(
                                 color = MaterialTheme.colorScheme.primary
                         )
                     }
-                } else {
+                } else {        // Show notes
                     AddNoteScreen(
                             initialTitle = note?.title ?: "",
                             initialContent = note?.content ?: "",

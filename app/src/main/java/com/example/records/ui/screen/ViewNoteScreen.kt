@@ -188,7 +188,7 @@ fun ViewNoteScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .clickable { onEditClick() } // Mimic existing behavior: click content to edit
+                        .clickable { onEditClick() } // Click on content to edit
                 ) {
                     NoteViewer(
                         blocks = blocks,
