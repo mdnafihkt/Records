@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
@@ -27,8 +28,6 @@ import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 @Composable
 fun EditorToolbar(
     currentRichTextState: RichTextState?,
-    currentFontSize: Float,
-    onFontSizeChange: (Float) -> Unit,
     onInsertCheckbox: () -> Unit,
     onInsertTable: () -> Unit
 ) {
@@ -38,7 +37,8 @@ fun EditorToolbar(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-            .padding(horizontal = 8.dp, vertical = 4.dp),
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .focusProperties { canFocus = false },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -46,7 +46,8 @@ fun EditorToolbar(
         val isBold = currentRichTextState?.currentSpanStyle?.fontWeight == FontWeight.Bold
         IconButton(
             onClick = { currentRichTextState?.toggleSpanStyle(androidx.compose.ui.text.SpanStyle(fontWeight = FontWeight.Bold)) },
-            enabled = currentRichTextState != null
+            enabled = currentRichTextState != null,
+            modifier = Modifier.focusProperties { canFocus = false }
         ) {
             Text("B", fontWeight = FontWeight.Bold, color = if (isBold) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
         }
@@ -54,7 +55,8 @@ fun EditorToolbar(
         val isItalic = currentRichTextState?.currentSpanStyle?.fontStyle == FontStyle.Italic
         IconButton(
             onClick = { currentRichTextState?.toggleSpanStyle(androidx.compose.ui.text.SpanStyle(fontStyle = FontStyle.Italic)) },
-            enabled = currentRichTextState != null
+            enabled = currentRichTextState != null,
+            modifier = Modifier.focusProperties { canFocus = false }
         ) {
             Text("I", fontStyle = FontStyle.Italic, color = if (isItalic) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
         }
@@ -62,7 +64,8 @@ fun EditorToolbar(
         val isStrikethrough = currentRichTextState?.currentSpanStyle?.textDecoration == TextDecoration.LineThrough
         IconButton(
             onClick = { currentRichTextState?.toggleSpanStyle(androidx.compose.ui.text.SpanStyle(textDecoration = TextDecoration.LineThrough)) },
-            enabled = currentRichTextState != null
+            enabled = currentRichTextState != null,
+            modifier = Modifier.focusProperties { canFocus = false }
         ) {
             Text("S", textDecoration = TextDecoration.LineThrough, color = if (isStrikethrough) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
         }
@@ -70,31 +73,42 @@ fun EditorToolbar(
         Spacer(modifier = Modifier.weight(1f))
 
         // Font Size Dropdown
-        Box {
-            IconButton(onClick = { fontMenuExpanded = true }) {
+        Box(modifier = Modifier.focusProperties { canFocus = false }) {
+            IconButton(
+                onClick = { fontMenuExpanded = true },
+                modifier = Modifier.focusProperties { canFocus = false }
+            ) {
                 Icon(Icons.Default.FormatSize, contentDescription = "Font Size", tint = MaterialTheme.colorScheme.onBackground)
             }
             DropdownMenu(
                 expanded = fontMenuExpanded,
-                onDismissRequest = { fontMenuExpanded = false }
+                onDismissRequest = { fontMenuExpanded = false },
+                modifier = Modifier.focusProperties { canFocus = false }
             ) {
                 listOf(12f, 14f, 16f, 18f, 20f, 24f).forEach { size ->
                     DropdownMenuItem(
                         text = { Text("${size.toInt()} pt") },
                         onClick = {
-                            onFontSizeChange(size)
+                            currentRichTextState?.toggleSpanStyle(androidx.compose.ui.text.SpanStyle(fontSize = size.sp))
                             fontMenuExpanded = false
-                        }
+                        },
+                        modifier = Modifier.focusProperties { canFocus = false }
                     )
                 }
             }
         }
 
         // Insert blocks
-        IconButton(onClick = onInsertCheckbox) {
+        IconButton(
+            onClick = onInsertCheckbox,
+            modifier = Modifier.focusProperties { canFocus = false }
+        ) {
             Text("☑", color = MaterialTheme.colorScheme.onBackground)
         }
-        IconButton(onClick = onInsertTable) {
+        IconButton(
+            onClick = onInsertTable,
+            modifier = Modifier.focusProperties { canFocus = false }
+        ) {
             Text("⊞", color = MaterialTheme.colorScheme.onBackground)
         }
     }
@@ -108,7 +122,6 @@ fun NoteEditor(
     onStructuralChange: (List<Block>) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var fontSize by remember { mutableStateOf(16f) }
     var focusedBlockId by remember { mutableStateOf<String?>(null) }
     
     // Maintain a map of RichTextStates so they don't get recreated when scrolling
@@ -140,8 +153,6 @@ fun NoteEditor(
 
         EditorToolbar(
             currentRichTextState = focusedRichTextState,
-            currentFontSize = fontSize,
-            onFontSizeChange = { fontSize = it },
             onInsertCheckbox = {
                 onStructuralChange(blocks)
                 val newBlocks = blocks.toMutableList()
@@ -181,7 +192,7 @@ fun NoteEditor(
                                     },
                                 textStyle = LocalTextStyle.current.copy(
                                     color = MaterialTheme.colorScheme.onBackground,
-                                    fontSize = fontSize.sp
+                                    fontSize = 16.sp
                                 ),
                                 colors = RichTextEditorDefaults.richTextEditorColors(
                                     containerColor = Color.Transparent,
@@ -210,7 +221,7 @@ fun NoteEditor(
                                 newBlocks[index] = newBlock
                                 onBlocksChange(newBlocks)
                             },
-                            fontSize = fontSize,
+                            fontSize = 16f,
                             readOnly = false
                         )
                     }
@@ -223,7 +234,7 @@ fun NoteEditor(
                                 newBlocks[index] = newBlock
                                 onBlocksChange(newBlocks)
                             },
-                            fontSize = fontSize,
+                            fontSize = 16f,
                             readOnly = false
                         )
                     }
