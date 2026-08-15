@@ -40,6 +40,7 @@ fun NoteViewer(
                     CheckboxBlockComponent(
                         block = block,
                         onBlockChange = {},
+                        onFocusChanged = {},
                         readOnly = true,
                         fontSize = 16f
                     )

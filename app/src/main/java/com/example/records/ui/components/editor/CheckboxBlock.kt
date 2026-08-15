@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.sp
 fun CheckboxBlockComponent(
     block: Block.Checkbox,
     onBlockChange: (Block.Checkbox) -> Unit,
+    onFocusChanged: (Boolean) -> Unit = {},
     readOnly: Boolean = false,
     fontSize: Float = 16f
 ) {
@@ -57,7 +59,8 @@ fun CheckboxBlockComponent(
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 8.dp),
+                .padding(start = 8.dp)
+                .onFocusChanged { onFocusChanged(it.isFocused) },
             readOnly = readOnly
         )
     }

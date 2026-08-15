@@ -28,6 +28,7 @@ import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 @Composable
 fun EditorToolbar(
     currentRichTextState: RichTextState?,
+    isCheckboxFocused: Boolean,
     onInsertCheckbox: () -> Unit,
     onInsertTable: () -> Unit
 ) {
@@ -103,7 +104,7 @@ fun EditorToolbar(
             onClick = onInsertCheckbox,
             modifier = Modifier.focusProperties { canFocus = false }
         ) {
-            Text("☑", color = MaterialTheme.colorScheme.onBackground)
+            Text("☑", color = if (isCheckboxFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
         }
         IconButton(
             onClick = onInsertTable,
@@ -150,15 +151,24 @@ fun NoteEditor(
 
     Column(modifier = modifier.fillMaxSize()) {
         val focusedRichTextState = focusedBlockId?.let { richTextStates[it] }
+        val isCheckboxFocused = focusedBlockId?.let { id ->
+            blocks.any { it.id == id && it is Block.Checkbox }
+        } ?: false
 
         EditorToolbar(
             currentRichTextState = focusedRichTextState,
+            isCheckboxFocused = isCheckboxFocused,
             onInsertCheckbox = {
                 onStructuralChange(blocks)
                 val newBlocks = blocks.toMutableList()
                 val idx = newBlocks.indexOfFirst { it.id == focusedBlockId }.takeIf { it != -1 } ?: newBlocks.lastIndex
-                newBlocks.add(idx + 1, Block.Checkbox())
-                newBlocks.add(idx + 2, Block.RichText()) // add text block after checkbox
+                if (idx != -1 && newBlocks[idx] is Block.Checkbox) {
+                    val checkbox = newBlocks[idx] as Block.Checkbox
+                    newBlocks[idx] = Block.RichText(id = checkbox.id, htmlContent = checkbox.text)
+                } else {
+                    newBlocks.add(idx + 1, Block.Checkbox())
+                    newBlocks.add(idx + 2, Block.RichText()) // add text block after checkbox
+                }
                 onBlocksChange(newBlocks)
             },
             onInsertTable = {
@@ -220,6 +230,11 @@ fun NoteEditor(
                                 val newBlocks = blocks.toMutableList()
                                 newBlocks[index] = newBlock
                                 onBlocksChange(newBlocks)
+                            },
+                            onFocusChanged = { isFocused ->
+                                if (isFocused) {
+                                    focusedBlockId = block.id
+                                }
                             },
                             fontSize = 16f,
                             readOnly = false
