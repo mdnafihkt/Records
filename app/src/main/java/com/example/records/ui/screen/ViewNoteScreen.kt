@@ -2,6 +2,7 @@ package com.example.records.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -171,29 +173,39 @@ fun ViewNoteScreen(
             }
 
             if (note != null) {
-                // Title
-                Text(
-                    text = note.title,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                // Content
-                val blocks = remember(note.content) {
-                    note.content.toBlocks()
-                }
-
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .clickable { onEditClick() } // Click on content to edit
+                        .verticalScroll(rememberScrollState())
                 ) {
-                    NoteViewer(
-                        blocks = blocks,
-                        modifier = Modifier.fillMaxWidth()
+                    // Title
+                    Text(
+                        text = note.title,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(bottom = 16.dp)
                     )
+
+                    // Content
+                    val blocks = remember(note.content) {
+                        note.content.toBlocks()
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onDoubleTap = { onEditClick() }
+                                )
+                            }
+                    ) {
+                        NoteViewer(
+                            blocks = blocks,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             } else {
                  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
