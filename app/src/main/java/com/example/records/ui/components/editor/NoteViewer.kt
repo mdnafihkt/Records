@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mohamedrejeb.richeditor.model.RichTextState
@@ -40,7 +41,9 @@ fun NoteViewer(
                     CheckboxBlockComponent(
                         block = block,
                         onBlockChange = {},
+                        focusRequester = remember { FocusRequester() },
                         onFocusChanged = {},
+                        onBackspacePressed = {},
                         readOnly = true,
                         fontSize = 16f
                     )

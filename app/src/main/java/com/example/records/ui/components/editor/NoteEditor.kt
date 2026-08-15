@@ -11,9 +11,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -124,6 +127,16 @@ fun NoteEditor(
     modifier: Modifier = Modifier
 ) {
     var focusedBlockId by remember { mutableStateOf<String?>(null) }
+    var blockToFocus by remember { mutableStateOf<String?>(null) }
+    
+    val focusRequesters = remember { mutableStateMapOf<String, FocusRequester>() }
+    
+    LaunchedEffect(blockToFocus) {
+        blockToFocus?.let { id ->
+            focusRequesters[id]?.requestFocus()
+            blockToFocus = null
+        }
+    }
     
     // Maintain a map of RichTextStates so they don't get recreated when scrolling
     val richTextStates = remember { mutableStateMapOf<String, RichTextState>() }
@@ -165,9 +178,13 @@ fun NoteEditor(
                 if (idx != -1 && newBlocks[idx] is Block.Checkbox) {
                     val checkbox = newBlocks[idx] as Block.Checkbox
                     newBlocks[idx] = Block.RichText(id = checkbox.id, htmlContent = checkbox.text)
+                    blockToFocus = checkbox.id
                 } else {
-                    newBlocks.add(idx + 1, Block.Checkbox())
-                    newBlocks.add(idx + 2, Block.RichText()) // add text block after checkbox
+                    val newCheckbox = Block.Checkbox()
+                    val newText = Block.RichText()
+                    newBlocks.add(idx + 1, newCheckbox)
+                    newBlocks.add(idx + 2, newText) // add text block after checkbox
+                    blockToFocus = newCheckbox.id
                 }
                 onBlocksChange(newBlocks)
             },
@@ -187,6 +204,8 @@ fun NoteEditor(
                 .padding(16.dp)
         ) {
             itemsIndexed(blocks, key = { _, block -> block.id }) { index, block ->
+                val focusRequester = focusRequesters.getOrPut(block.id) { FocusRequester() }
+                
                 when (block) {
                     is Block.RichText -> {
                         val state = richTextStates[block.id]
@@ -195,9 +214,29 @@ fun NoteEditor(
                                 state = state,
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .focusRequester(focusRequester)
                                     .onFocusChanged { 
                                         if (it.isFocused) {
                                             focusedBlockId = block.id 
+                                        }
+                                    }
+                                    .onKeyEvent { keyEvent ->
+                                        if (keyEvent.type == KeyEventType.KeyDown &&
+                                            keyEvent.key == Key.Backspace &&
+                                            state.annotatedString.isEmpty()
+                                        ) {
+                                            if (index > 0) {
+                                                onStructuralChange(blocks)
+                                                val newBlocks = blocks.toMutableList()
+                                                blockToFocus = newBlocks[index - 1].id
+                                                newBlocks.removeAt(index)
+                                                onBlocksChange(newBlocks)
+                                                true
+                                            } else {
+                                                false
+                                            }
+                                        } else {
+                                            false
                                         }
                                     },
                                 textStyle = LocalTextStyle.current.copy(
@@ -231,10 +270,18 @@ fun NoteEditor(
                                 newBlocks[index] = newBlock
                                 onBlocksChange(newBlocks)
                             },
+                            focusRequester = focusRequester,
                             onFocusChanged = { isFocused ->
                                 if (isFocused) {
                                     focusedBlockId = block.id
                                 }
+                            },
+                            onBackspacePressed = {
+                                onStructuralChange(blocks)
+                                val newBlocks = blocks.toMutableList()
+                                newBlocks[index] = Block.RichText(id = block.id, htmlContent = "")
+                                blockToFocus = block.id
+                                onBlocksChange(newBlocks)
                             },
                             fontSize = 16f,
                             readOnly = false
