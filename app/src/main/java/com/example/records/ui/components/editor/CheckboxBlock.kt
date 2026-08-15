@@ -53,9 +53,25 @@ fun CheckboxBlockComponent(
         
         val textDecoration = if (block.checked) TextDecoration.LineThrough else TextDecoration.None
 
+        val invisibleChar = "\u200B"
+        val displayValue = if (block.text.startsWith(invisibleChar)) block.text else invisibleChar + block.text
+
         BasicTextField(
-            value = block.text,
-            onValueChange = { if (!readOnly) onBlockChange(block.copy(text = it)) },
+            value = displayValue,
+            onValueChange = { newText ->
+                if (!readOnly) {
+                    if (newText.isEmpty()) {
+                        onBackspacePressed()
+                    } else {
+                        val cleanedText = if (newText.startsWith(invisibleChar)) {
+                            newText.substring(1)
+                        } else {
+                            newText
+                        }
+                        onBlockChange(block.copy(text = cleanedText))
+                    }
+                }
+            },
             textStyle = TextStyle(
                 color = textColor,
                 fontSize = fontSize.sp,
