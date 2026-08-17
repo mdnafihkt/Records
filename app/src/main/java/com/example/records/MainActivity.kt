@@ -14,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -59,7 +60,35 @@ class MainActivity : FragmentActivity() {
             var isEncryptionSetup by remember { mutableStateOf(KeyManager.isSetup(this)) }
             var needsSetup by remember { mutableStateOf(!isEncryptionSetup) }
 
-            RecordsTheme(appTheme = AppTheme.RECORDS_LIGHT) {
+            val prefs = remember { getSharedPreferences("settings", Context.MODE_PRIVATE) }
+            var appThemeState by remember {
+                mutableStateOf(
+                    try {
+                        AppTheme.valueOf(prefs.getString("app_theme", AppTheme.RECORDS_DARK.name) ?: AppTheme.RECORDS_DARK.name)
+                    } catch (e: Exception) {
+                        AppTheme.RECORDS_DARK
+                    }
+                )
+            }
+
+            DisposableEffect(prefs) {
+                val listener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+                    if (key == "app_theme") {
+                        val themeName = prefs.getString("app_theme", AppTheme.RECORDS_DARK.name) ?: AppTheme.RECORDS_DARK.name
+                        appThemeState = try {
+                            AppTheme.valueOf(themeName)
+                        } catch (e: Exception) {
+                            AppTheme.RECORDS_DARK
+                        }
+                    }
+                }
+                prefs.registerOnSharedPreferenceChangeListener(listener)
+                onDispose {
+                    prefs.unregisterOnSharedPreferenceChangeListener(listener)
+                }
+            }
+
+            RecordsTheme(appTheme = appThemeState) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

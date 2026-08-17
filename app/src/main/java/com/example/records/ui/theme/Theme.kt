@@ -63,7 +63,7 @@ val ProtonLightColorScheme = darkColorScheme(
 
 @Composable
 fun RecordsTheme(
-    appTheme: AppTheme = AppTheme.RECORDS_LIGHT,
+    appTheme: AppTheme = AppTheme.RECORDS_DARK,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when (appTheme) {

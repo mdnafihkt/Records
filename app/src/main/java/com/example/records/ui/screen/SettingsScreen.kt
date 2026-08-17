@@ -30,6 +30,7 @@ import androidx.compose.foundation.verticalScroll
 
 import com.example.records.ui.theme.GlassmorphicBackground
 import com.example.records.ui.theme.GlassmorphicCard
+import com.example.records.ui.theme.AppTheme
 import com.example.records.util.AppIcon
 import com.example.records.util.AppIconManager
 import com.example.records.R
@@ -43,6 +44,13 @@ fun SettingsScreen(
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     var showIconChangeDialog by remember { mutableStateOf<AppIcon?>(null) }
+    
+    val prefs = remember { context.getSharedPreferences("settings", Context.MODE_PRIVATE) }
+    var currentTheme by remember {
+        mutableStateOf(
+            prefs.getString("app_theme", AppTheme.RECORDS_DARK.name) ?: AppTheme.RECORDS_DARK.name
+        )
+    }
     val currentIcon by remember {
         mutableStateOf(AppIconManager.getCurrentIcon(context))
     }
@@ -115,14 +123,20 @@ fun SettingsScreen(
                         AppThemeOption(
                             painter = painterResource(id = R.drawable.icon_night_outline),
                             name = "dark",
-                            isSelected = false,
-                            onClick = { Toast.makeText(context, "Select theme not implemented", Toast.LENGTH_SHORT).show() }
+                            isSelected = currentTheme == AppTheme.RECORDS_DARK.name,
+                            onClick = {
+                                prefs.edit().putString("app_theme", AppTheme.RECORDS_DARK.name).apply()
+                                currentTheme = AppTheme.RECORDS_DARK.name
+                            }
                         )
                         AppThemeOption(
                             painter = painterResource(id = R.drawable.icon_sun_outline),
                             name = "light",
-                            isSelected = true,
-                            onClick = { Toast.makeText(context, "Select theme not implemented", Toast.LENGTH_SHORT).show() }
+                            isSelected = currentTheme == AppTheme.RECORDS_LIGHT.name,
+                            onClick = {
+                                prefs.edit().putString("app_theme", AppTheme.RECORDS_LIGHT.name).apply()
+                                currentTheme = AppTheme.RECORDS_LIGHT.name
+                            }
                         )
                     }
 
