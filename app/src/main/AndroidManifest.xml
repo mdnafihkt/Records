@@ -17,7 +17,8 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Records" />
+            android:theme="@style/Theme.Records"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- Default Icon Alias -->
         <activity-alias

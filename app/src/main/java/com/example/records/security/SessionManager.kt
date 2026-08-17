@@ -21,7 +21,7 @@ import javax.crypto.SecretKey
  * 2. **Inactivity timeout** — lock N minutes after the last user interaction.
  * 3. **Screen-off lock** — lock immediately when the device screen turns off.
  *
- * Additionally enforces master-password re-authentication after 7 days of
+ * Enforces master-password re-authentication after 7 days of
  * biometric-only usage to ensure the user hasn't forgotten their password.
  */
 object SessionManager {

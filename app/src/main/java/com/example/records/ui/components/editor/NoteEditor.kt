@@ -153,7 +153,7 @@ fun NoteEditor(
                     val state = RichTextState()
                     state.setHtml(initialHtml)
                     richTextStates[block.id] = state
-                } else {
+                } else if (focusedBlockId != block.id) {
                     val state = richTextStates[block.id]!!
                     val currentHtml = state.toHtml()
                     val cleanedHtml = if (currentHtml.contains("\u200B")) currentHtml.replace("\u200B", "") else currentHtml
