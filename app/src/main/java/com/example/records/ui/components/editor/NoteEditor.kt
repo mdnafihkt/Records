@@ -148,14 +148,17 @@ fun NoteEditor(
         
         blocks.forEach { block ->
             if (block is Block.RichText) {
+                val initialHtml = if (block.htmlContent.isEmpty()) "\u200B" else block.htmlContent
                 if (!richTextStates.containsKey(block.id)) {
                     val state = RichTextState()
-                    state.setHtml(block.htmlContent)
+                    state.setHtml(initialHtml)
                     richTextStates[block.id] = state
                 } else {
                     val state = richTextStates[block.id]!!
-                    if (state.toHtml() != block.htmlContent) {
-                        state.setHtml(block.htmlContent)
+                    val currentHtml = state.toHtml()
+                    val cleanedHtml = if (currentHtml.contains("\u200B")) currentHtml.replace("\u200B", "") else currentHtml
+                    if (cleanedHtml != block.htmlContent) {
+                        state.setHtml(initialHtml)
                     }
                 }
             }
@@ -252,11 +255,23 @@ fun NoteEditor(
                             
                             // Auto-save HTML content to block when state changes
                             LaunchedEffect(state.annotatedString) {
-                                val html = state.toHtml()
-                                if (html != block.htmlContent) {
-                                    val newBlocks = blocks.toMutableList()
-                                    newBlocks[index] = block.copy(htmlContent = html)
-                                    onBlocksChange(newBlocks)
+                                val plainText = state.annotatedString.text
+                                if (plainText.isEmpty()) {
+                                    if (index > 0) {
+                                        onStructuralChange(blocks)
+                                        val newBlocks = blocks.toMutableList()
+                                        blockToFocus = newBlocks[index - 1].id
+                                        newBlocks.removeAt(index)
+                                        onBlocksChange(newBlocks)
+                                    }
+                                } else {
+                                    val html = state.toHtml()
+                                    val cleanedHtml = if (html.contains("\u200B")) html.replace("\u200B", "") else html
+                                    if (cleanedHtml != block.htmlContent) {
+                                        val newBlocks = blocks.toMutableList()
+                                        newBlocks[index] = block.copy(htmlContent = cleanedHtml)
+                                        onBlocksChange(newBlocks)
+                                    }
                                 }
                             }
                         }
