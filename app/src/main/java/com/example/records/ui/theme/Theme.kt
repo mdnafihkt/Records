@@ -10,15 +10,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.compose.ui.graphics.Color
 
-val ChromaticColorScheme = lightColorScheme(
-    primary = Color(0xFF6200EE),
-    secondary = Color(0xFF03DAC6),
-    background = Color(0xFFF5F5F5),
-    surface = Color.White,
-    onPrimary = Color.White,
-    onBackground = Color.Black,
-    onSurface = Color.Black
-    )
 
 private val DarkColorScheme = darkColorScheme(
     primary = Color(0xFFD0BCFF),
@@ -76,7 +67,6 @@ fun RecordsTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = when (appTheme) {
-        AppTheme.RECORDS_CHROMATIC -> ChromaticColorScheme
         AppTheme.RECORDS_LIGHT -> LightColorScheme
         AppTheme.RECORDS_DARK -> DarkColorScheme
         AppTheme.PROTON_DARK -> ProtonDarkColorScheme
@@ -85,7 +75,7 @@ fun RecordsTheme(
 
     // Determine if we are in a "Light" theme to fix icon visibility
     val isLightSide = when(appTheme) {
-        AppTheme.RECORDS_LIGHT, AppTheme.RECORDS_CHROMATIC, AppTheme.PROTON_AMOLED -> true
+        AppTheme.RECORDS_LIGHT, AppTheme.PROTON_AMOLED -> true
         else -> false
     }
 
@@ -109,7 +99,6 @@ fun RecordsTheme(
 }
 
 enum class AppTheme {
-    RECORDS_CHROMATIC,
     RECORDS_LIGHT,
     RECORDS_DARK,
     PROTON_DARK,

@@ -21,7 +21,7 @@ Your notes are encrypted at the field level before being committed to disk:
 - **Automated Lifecycle Protection:** Instantly locks the session on application backgrounding or when the screen turns off.
 
 ### 🎨 Personalization & UX
-- **Beautiful Material 3 Themes:** Choose from multiple built-in color schemes, including Records Light/Dark, Chromatic, Proton Dark, and true black **Proton AMOLED**.
+- **Beautiful Material 3 Themes:** Choose from multiple built-in color schemes, including Records Light/Dark, Proton Dark, and true black **Proton AMOLED**.
 - **Dynamic App Icons:** Dynamically customize your home screen appearance by choosing between Default, Pro, and Cool app launcher icons.
 - **Biometric Authentication:** Lock and unlock your vault effortlessly with Fingerprint or Face unlock via the Android Biometric API.
 - **Recycle Bin:** Safeguard your data with a soft-delete trash container that tracks deletion timestamps for recovery or permanent removal.

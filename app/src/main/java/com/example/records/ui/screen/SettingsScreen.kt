@@ -124,12 +124,6 @@ fun SettingsScreen(
                             isSelected = true,
                             onClick = { Toast.makeText(context, "Select theme not implemented", Toast.LENGTH_SHORT).show() }
                         )
-                        AppThemeOption(
-                            painter = painterResource(id = R.drawable.icon_color_outline),
-                            name = "chromatic",
-                            isSelected = false,
-                            onClick = { Toast.makeText(context, "Select theme not implemented", Toast.LENGTH_SHORT).show() }
-                        )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
