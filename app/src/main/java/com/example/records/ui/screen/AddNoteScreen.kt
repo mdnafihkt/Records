@@ -281,10 +281,10 @@ fun AddNoteScreen(
                         onStructuralChange = { oldBlocks ->
                             undoRedoManager.forceSnapshot(oldBlocks)
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
                     )
-
-                    Spacer(modifier = Modifier.height(300.dp)) // Extra space at bottom
                 }
             }
         }

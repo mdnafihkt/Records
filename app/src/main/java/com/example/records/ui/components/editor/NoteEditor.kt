@@ -130,13 +130,7 @@ fun NoteEditor(
     var blockToFocus by remember { mutableStateOf<String?>(null) }
     
     val focusRequesters = remember { mutableStateMapOf<String, FocusRequester>() }
-    
-    LaunchedEffect(blockToFocus) {
-        blockToFocus?.let { id ->
-            focusRequesters[id]?.requestFocus()
-            blockToFocus = null
-        }
-    }
+    val lastSavedHtml = remember { mutableStateMapOf<String, String>() }
     
     // Maintain a map of RichTextStates so they don't get recreated when scrolling
     val richTextStates = remember { mutableStateMapOf<String, RichTextState>() }
@@ -145,6 +139,7 @@ fun NoteEditor(
     LaunchedEffect(blocks) {
         val blockIds = blocks.map { it.id }.toSet()
         richTextStates.keys.retainAll(blockIds)
+        lastSavedHtml.keys.retainAll(blockIds)
         
         blocks.forEach { block ->
             if (block is Block.RichText) {
@@ -153,12 +148,16 @@ fun NoteEditor(
                     val state = RichTextState()
                     state.setHtml(initialHtml)
                     richTextStates[block.id] = state
-                } else if (focusedBlockId != block.id) {
+                    lastSavedHtml[block.id] = block.htmlContent
+                } else {
                     val state = richTextStates[block.id]!!
                     val currentHtml = state.toHtml()
                     val cleanedHtml = if (currentHtml.contains("\u200B")) currentHtml.replace("\u200B", "") else currentHtml
-                    if (cleanedHtml != block.htmlContent) {
+                    
+                    val lastSaved = lastSavedHtml[block.id]
+                    if (block.htmlContent != lastSaved && cleanedHtml != block.htmlContent) {
                         state.setHtml(initialHtml)
+                        lastSavedHtml[block.id] = block.htmlContent
                     }
                 }
             }
@@ -213,6 +212,13 @@ fun NoteEditor(
                     is Block.RichText -> {
                         val state = richTextStates[block.id]
                         if (state != null) {
+                            LaunchedEffect(blockToFocus) {
+                                if (blockToFocus == block.id) {
+                                    focusRequester.requestFocus()
+                                    blockToFocus = null
+                                }
+                            }
+
                             RichTextEditor(
                                 state = state,
                                 modifier = Modifier
@@ -268,6 +274,7 @@ fun NoteEditor(
                                     val html = state.toHtml()
                                     val cleanedHtml = if (html.contains("\u200B")) html.replace("\u200B", "") else html
                                     if (cleanedHtml != block.htmlContent) {
+                                        lastSavedHtml[block.id] = cleanedHtml
                                         val newBlocks = blocks.toMutableList()
                                         newBlocks[index] = block.copy(htmlContent = cleanedHtml)
                                         onBlocksChange(newBlocks)
@@ -277,6 +284,13 @@ fun NoteEditor(
                         }
                     }
                     is Block.Checkbox -> {
+                        LaunchedEffect(blockToFocus) {
+                            if (blockToFocus == block.id) {
+                                focusRequester.requestFocus()
+                                blockToFocus = null
+                            }
+                        }
+
                         CheckboxBlockComponent(
                             block = block,
                             onBlockChange = { newBlock ->
