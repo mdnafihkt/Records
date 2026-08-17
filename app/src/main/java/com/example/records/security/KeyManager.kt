@@ -104,6 +104,9 @@ object KeyManager {
      * the stored key from Android Keystore.
      */
     fun unlockWithBiometric(context: Context): SecretKey? {
+        if (SessionManager.checkPasswordReauthRequired()) {
+            return null
+        }
         return try {
             unwrapStoredKey(context)
         } catch (e: Exception) {

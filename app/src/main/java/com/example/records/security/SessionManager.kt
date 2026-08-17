@@ -60,7 +60,6 @@ object SessionManager {
     fun unlock(key: SecretKey) {
         _masterKey.value = key
         _isUnlocked.value = true
-        _requirePasswordReauth.value = false
         resetInactivityTimer()
     }
 
@@ -84,6 +83,7 @@ object SessionManager {
         _isUnlocked.value = false
         appCloseJob?.cancel()
         inactivityJob?.cancel()
+        checkPasswordReauthRequired()
     }
 
     /** Returns the current master key, or null if locked. */
@@ -143,10 +143,13 @@ object SessionManager {
         if (!::application.isInitialized) return false
         val prefs = application.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val lastAuth = prefs.getLong(KEY_LAST_PASSWORD_AUTH, 0L)
-        if (lastAuth == 0L) return false // Never set → first launch, skip
+        if (lastAuth == 0L) {
+            prefs.edit().putLong(KEY_LAST_PASSWORD_AUTH, System.currentTimeMillis()).apply()
+            return false
+        }
 
         val elapsed = System.currentTimeMillis() - lastAuth
-        val required = elapsed >= REAUTH_INTERVAL_MS
+        val required = elapsed >= REAUTH_INTERVAL_MS || elapsed < 0
         _requirePasswordReauth.value = required
         return required
     }
