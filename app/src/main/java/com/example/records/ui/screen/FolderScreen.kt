@@ -71,6 +71,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.material3.IconButton
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.shadow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,7 +92,19 @@ fun FolderScreen(
     val scope = rememberCoroutineScope()
 
 
-    GlassmorphicBackground {
+    val backgroundGradient = Brush.verticalGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.background,
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+            MaterialTheme.colorScheme.background
+        )
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(backgroundGradient)
+    ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
@@ -159,6 +173,8 @@ fun FolderScreen(
                                 subtitle = "Deleted notes",
                                 onClick = { onFolderClick(-1) },
                                 showChevron = false,
+                                titleFontSize = 14.sp,
+                                subtitleFontSize = 11.sp,
                                 modifier = Modifier.weight(1f)
                             )
                             FolderCardItem(
@@ -171,6 +187,8 @@ fun FolderScreen(
                                     Toast.makeText(context, "Archive not yet implemented", Toast.LENGTH_SHORT).show()
                                 },
                                 showChevron = false,
+                                titleFontSize = 14.sp,
+                                subtitleFontSize = 11.sp,
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -335,6 +353,8 @@ fun FolderCardItem(
     iconBgColor: Color = Color.Transparent,
     showMenuIcon: Boolean = false,
     showChevron: Boolean = false,
+    titleFontSize: androidx.compose.ui.unit.TextUnit = 18.sp,
+    subtitleFontSize: androidx.compose.ui.unit.TextUnit = 14.sp,
     modifier: Modifier = Modifier
 ) {
     val clickableModifier = if (onLongClick != null) {
@@ -346,15 +366,23 @@ fun FolderCardItem(
         Modifier.clickable { onClick() }
     }
 
-    GlassmorphicCard(
-        modifier = modifier.fillMaxWidth(),
-        cornerRadius = 16.dp
+    val baseBorderColor = if (iconTint != Color.Unspecified && iconTint != Color.Transparent) {
+        iconTint.copy(alpha = 0.25f)
+    } else {
+        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp))
+            .border(1.dp, baseBorderColor, RoundedCornerShape(16.dp))
+            .then(clickableModifier)
+            .padding(16.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .then(clickableModifier)
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -393,13 +421,13 @@ fun FolderCardItem(
                     Text(
                         text = title,
                         color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = 18.sp,
+                        fontSize = titleFontSize,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
                         text = subtitle,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                        fontSize = 14.sp
+                        fontSize = subtitleFontSize
                     )
                 }
             }
