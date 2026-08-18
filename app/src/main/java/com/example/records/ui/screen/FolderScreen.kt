@@ -64,6 +64,14 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.ui.tooling.preview.Preview
 
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Archive
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.material3.IconButton
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FolderScreen(
@@ -119,84 +127,79 @@ fun FolderScreen(
                     }
                 }
 
-                GlassmorphicCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onFolderClick(0) }
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.folder),
-                            contentDescription = null,
-                            tint = Color.Unspecified,
-                            modifier = Modifier.size(40.dp)
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column {
-                            Text(
-                                text = "All Notes",
-                                color = MaterialTheme.colorScheme.onBackground,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = "$allNotesCount notes",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 14.sp
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                GlassmorphicCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onFolderClick(-1) } // We'll use -1 to signal Recycle Bin or handle it via a new callback
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = androidx.compose.material.icons.Icons.Default.Delete,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.size(40.dp)
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column {
-                            Text(
-                                text = "Recycle Bin",
-                                color = MaterialTheme.colorScheme.onBackground,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = "Recently deleted notes",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 14.sp
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Folders List
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(bottom = 80.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(bottom = 80.dp),
+                    modifier = Modifier.fillMaxSize()
                 ) {
+                    // All Notes Card (Full Width)
+                    item {
+                        FolderCardItem(
+                            iconPainter = painterResource(id = R.drawable.folder),
+                            iconTint = Color.Unspecified,
+                            iconBgColor = Color(0xFFE8F5E9),
+                            title = "All Notes",
+                            subtitle = "$allNotesCount notes",
+                            onClick = { onFolderClick(0) }
+                        )
+                    }
+
+                    // Recycle Bin & Archive (Side by Side Row)
+                    item {
+                        val context = LocalContext.current
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            FolderCardItem(
+                                iconImageVector = androidx.compose.material.icons.Icons.Default.Delete,
+                                iconTint = Color(0xFFD32F2F),
+                                iconBgColor = Color(0xFFFFEBEE),
+                                title = "Recycle Bin",
+                                subtitle = "Deleted notes",
+                                onClick = { onFolderClick(-1) },
+                                showChevron = false,
+                                modifier = Modifier.weight(1f)
+                            )
+                            FolderCardItem(
+                                iconImageVector = androidx.compose.material.icons.Icons.Default.Archive,
+                                iconTint = Color(0xFF1976D2),
+                                iconBgColor = Color(0xFFE3F2FD),
+                                title = "Archive",
+                                subtitle = "Archived notes",
+                                onClick = {
+                                    Toast.makeText(context, "Archive not yet implemented", Toast.LENGTH_SHORT).show()
+                                },
+                                showChevron = false,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+
+                    // MY FOLDERS Header Section
+                    item {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "MY FOLDERS",
+                            color = Color(0xFF6750A4),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
+
+                    // User Created Folders
                     items(folders) { folderWithCount ->
-                        FolderItem(
-                            folderWithCount = folderWithCount,
+                        val folderColor = if (folderWithCount.folder.color != 0) Color(folderWithCount.folder.color) else Color(0xFF6750A4)
+                        FolderCardItem(
+                            iconPainter = painterResource(id = R.drawable.folder_icon_2),
+                            iconTint = folderColor,
+                            iconBgColor = folderColor.copy(alpha = 0.08f),
+                            title = folderWithCount.folder.name,
+                            subtitle = "${folderWithCount.count} notes",
                             onClick = { onFolderClick(folderWithCount.folder.id) },
-                            onLongClick = { selectedFolderForOptions = folderWithCount.folder }
+                            onLongClick = { selectedFolderForOptions = folderWithCount.folder },
+                            showMenuIcon = true
                         )
                     }
                 }
@@ -321,51 +324,106 @@ fun FolderScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FolderItem(
-    folderWithCount: FolderWithCount,
+fun FolderCardItem(
+    title: String,
+    subtitle: String,
     onClick: () -> Unit,
-    onLongClick: () -> Unit
+    onLongClick: (() -> Unit)? = null,
+    iconPainter: Painter? = null,
+    iconImageVector: ImageVector? = null,
+    iconTint: Color = Color.Unspecified,
+    iconBgColor: Color = Color.Transparent,
+    showMenuIcon: Boolean = false,
+    showChevron: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
+    val clickableModifier = if (onLongClick != null) {
+        Modifier.combinedClickable(
+            onClick = onClick,
+            onLongClick = onLongClick
+        )
+    } else {
+        Modifier.clickable { onClick() }
+    }
+
     GlassmorphicCard(
-        modifier = Modifier,
+        modifier = modifier.fillMaxWidth(),
         cornerRadius = 16.dp
     ) {
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = onLongClick
-                )
+                .then(clickableModifier)
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f)
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.folder_icon_2),
-                    contentDescription = null,
-                    tint = if (folderWithCount.folder.color != 0) Color(folderWithCount.folder.color) else Color.Unspecified,
-                    modifier = Modifier.size(40.dp)
-                )
+                // Rounded square container for icon
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(iconBgColor),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (iconPainter != null) {
+                        Icon(
+                            painter = iconPainter,
+                            contentDescription = null,
+                            tint = iconTint,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    } else if (iconImageVector != null) {
+                        Icon(
+                            imageVector = iconImageVector,
+                            contentDescription = null,
+                            tint = iconTint,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+                
                 Spacer(modifier = Modifier.width(16.dp))
+                
                 Column {
                     Text(
-                        text = folderWithCount.folder.name,
+                        text = title,
                         color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "${folderWithCount.count} notes",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        text = subtitle,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                         fontSize = 14.sp
                     )
                 }
             }
+            
+            if (showMenuIcon) {
+                IconButton(onClick = { onLongClick?.invoke() }) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Default.MoreVert,
+                        contentDescription = "Options",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    )
+                }
+            } else if (showChevron) {
+                Icon(
+                    imageVector = androidx.compose.material.icons.Icons.Default.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     }
 }
+
 
 @Composable
 fun FolderDialog(
