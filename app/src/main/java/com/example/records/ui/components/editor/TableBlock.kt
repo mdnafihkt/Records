@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.sp
 fun TableBlockComponent(
     block: Block.Table,
     onBlockChange: (Block.Table) -> Unit,
+    onDeleteClick: (() -> Unit)? = null,
     readOnly: Boolean = false,
     fontSize: Float = 16f
 ) {
@@ -91,6 +93,18 @@ fun TableBlockComponent(
                     modifier = Modifier.size(24.dp)
                 ) {
                     Icon(Icons.Default.Remove, contentDescription = "Remove Column", modifier = Modifier.size(16.dp))
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                IconButton(
+                    onClick = { onDeleteClick?.invoke() },
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete Table",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
             }
         }

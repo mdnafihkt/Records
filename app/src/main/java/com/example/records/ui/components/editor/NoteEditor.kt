@@ -325,6 +325,12 @@ fun NoteEditor(
                                 newBlocks[index] = newBlock
                                 onBlocksChange(newBlocks)
                             },
+                            onDeleteClick = {
+                                onStructuralChange(blocks)
+                                val newBlocks = blocks.toMutableList()
+                                newBlocks.removeAt(index)
+                                onBlocksChange(newBlocks)
+                            },
                             fontSize = 16f,
                             readOnly = false
                         )
