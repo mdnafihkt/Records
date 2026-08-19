@@ -27,6 +27,7 @@ fun CheckboxBlockComponent(
     focusRequester: FocusRequester,
     onFocusChanged: (Boolean) -> Unit = {},
     onBackspacePressed: () -> Unit = {},
+    onEnterPressed: (String) -> Unit = {},
     readOnly: Boolean = false,
     fontSize: Float = 16f
 ) {
@@ -60,7 +61,20 @@ fun CheckboxBlockComponent(
             value = displayValue,
             onValueChange = { newText ->
                 if (!readOnly) {
-                    if (newText.isEmpty()) {
+                    if (newText.contains("\n")) {
+                        val index = newText.indexOf("\n")
+                        val before = newText.substring(0, index)
+                        val after = newText.substring(index + 1)
+                        
+                        val cleanedBefore = if (before.startsWith(invisibleChar)) {
+                            before.substring(1)
+                        } else {
+                            before
+                        }
+                        
+                        onBlockChange(block.copy(text = cleanedBefore))
+                        onEnterPressed(after)
+                    } else if (newText.isEmpty()) {
                         onBackspacePressed()
                     } else {
                         val cleanedText = if (newText.startsWith(invisibleChar)) {
@@ -89,6 +103,11 @@ fun CheckboxBlockComponent(
                         block.text.isEmpty()
                     ) {
                         onBackspacePressed()
+                        true
+                    } else if (keyEvent.type == KeyEventType.KeyDown && 
+                        keyEvent.key == Key.Enter
+                    ) {
+                        onEnterPressed("")
                         true
                     } else {
                         false

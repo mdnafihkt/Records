@@ -312,6 +312,14 @@ fun NoteEditor(
                                 blockToFocus = block.id
                                 onBlocksChange(newBlocks)
                             },
+                            onEnterPressed = { remainingText ->
+                                onStructuralChange(blocks)
+                                val newBlocks = blocks.toMutableList()
+                                val newCheckbox = Block.Checkbox(text = remainingText)
+                                newBlocks.add(index + 1, newCheckbox)
+                                blockToFocus = newCheckbox.id
+                                onBlocksChange(newBlocks)
+                            },
                             fontSize = 16f,
                             readOnly = false
                         )
