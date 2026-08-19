@@ -125,7 +125,7 @@ fun AddNoteScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                        .padding(horizontal = 16.dp, vertical = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = onBackClick) {
@@ -243,9 +243,7 @@ fun AddNoteScreen(
 
                 // Content Area
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     // Title Input
                     BasicTextField(
@@ -267,7 +265,9 @@ fun AddNoteScreen(
                             }
                             innerTextField()
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
