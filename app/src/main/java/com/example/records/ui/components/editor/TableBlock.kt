@@ -16,7 +16,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.colorResource
+import com.example.records.R
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -115,6 +118,13 @@ fun TableBlockComponent(
                     Box(
                         modifier = Modifier
                             .weight(1f)
+                            .let {
+                                if (rowIndex == 0) {
+                                    it.background(color = colorResource(R.color.lavender).copy(alpha = 0.5f))
+                                } else {
+                                    it
+                                }
+                            }
                             .border(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f))
                             .padding(8.dp)
                     ) {
@@ -129,7 +139,8 @@ fun TableBlockComponent(
                             },
                             textStyle = TextStyle(
                                 color = MaterialTheme.colorScheme.onBackground,
-                                fontSize = fontSize.sp
+                                fontSize = fontSize.sp,
+                                fontWeight = if (rowIndex == 0) androidx.compose.ui.text.font.FontWeight.Bold else androidx.compose.ui.text.font.FontWeight.Normal
                             ),
                             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                             modifier = Modifier.fillMaxWidth(),
