@@ -11,7 +11,7 @@ import com.example.records.database.Folder
 fun AddNotePreview() {
     AddNoteScreen(
         initialTitle = "Test Note",
-        initialContent = "Testing Note",
+        initialContent = "Testing Note chelavan darul oloom devara sing appendix chavara",
         initialFolderId = 0,
         folders = listOf(
             Folder(1, "folder 1"),

@@ -17,11 +17,13 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.records.R
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
@@ -107,13 +109,13 @@ fun EditorToolbar(
             onClick = onInsertCheckbox,
             modifier = Modifier.focusProperties { canFocus = false }
         ) {
-            Text("☑", color = if (isCheckboxFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
+            Icon(painter = painterResource(R.drawable.checkbox), contentDescription = "Insert checklist", tint = if (isCheckboxFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
         }
         IconButton(
             onClick = onInsertTable,
             modifier = Modifier.focusProperties { canFocus = false }
         ) {
-            Text("⊞", color = MaterialTheme.colorScheme.onBackground)
+            Icon(painter = painterResource(R.drawable.table), contentDescription = "Insert table", tint = MaterialTheme.colorScheme.onBackground)
         }
     }
 }
@@ -203,7 +205,7 @@ fun NoteEditor(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(8.dp)
         ) {
             itemsIndexed(blocks, key = { _, block -> block.id }) { index, block ->
                 val focusRequester = focusRequesters.getOrPut(block.id) { FocusRequester() }

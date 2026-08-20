@@ -34,24 +34,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
-
-        <!-- Dairy Logo -->
-        <activity-alias
-            android:name=".MainActivityPro"
-            android:enabled="false"
-            android:exported="true"
-            android:icon="@mipmap/ic_launcher_diary"
-            android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_diary_round"
-            android:targetActivity=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity-alias>
-
-
-
     </application>
 
 </manifest>

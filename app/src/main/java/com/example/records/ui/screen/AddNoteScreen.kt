@@ -36,6 +36,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Redo
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableIntStateOf
@@ -77,6 +79,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material.icons.filled.Redo
+import androidx.compose.ui.res.colorResource
 
 @Composable
 fun AddNoteScreen(
@@ -201,7 +204,7 @@ fun AddNoteScreen(
                         },
                         enabled = undoRedoManager.canUndo()
                     ) {
-                        Icon(Icons.Default.Undo, contentDescription = "Undo", tint = if (undoRedoManager.canUndo()) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f))
+                        Icon(painter = painterResource(R.drawable.undo) , contentDescription = "Undo", tint = if (undoRedoManager.canUndo()) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f))
                     }
                     IconButton(
                         onClick = { 
@@ -211,7 +214,7 @@ fun AddNoteScreen(
                         },
                         enabled = undoRedoManager.canRedo()
                     ) {
-                        Icon(Icons.Default.Redo, contentDescription = "Redo", tint = if (undoRedoManager.canRedo()) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f))
+                        Icon(painter = painterResource(R.drawable.redo), contentDescription = "Redo", tint = if (undoRedoManager.canRedo()) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f))
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -219,21 +222,14 @@ fun AddNoteScreen(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
-                            .background(
-                                brush = Brush.horizontalGradient(
-                                    colors = listOf(
-                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f)
-                                    )
-                                )
-                            )
-                            .border(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                            .background(color = colorResource(R.color.lavender))
+                            .border( 1.dp, colorResource(R.color.lavender) ,RoundedCornerShape(12.dp))
                             .clickable { onSaveClick(title, blocks.toJson(), selectedFolderId) }
                             .padding(horizontal = 20.dp, vertical = 8.dp)
                     ) {
                         Text(
                             text = "Save",
-                            color = MaterialTheme.colorScheme.onBackground,
+                            color = Color.White,
                             fontSize = 16.sp
                         )
                     }
