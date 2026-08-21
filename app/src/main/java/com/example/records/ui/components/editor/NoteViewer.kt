@@ -19,6 +19,7 @@ fun NoteViewer(
     blocks: List<Block>,
     modifier: Modifier = Modifier
 ) {
+    val prefixes = remember(blocks) { calculateNumberedListPrefixes(blocks) }
     Column(modifier = modifier) {
         blocks.forEach { block ->
             when (block) {
@@ -44,6 +45,17 @@ fun NoteViewer(
                         focusRequester = remember { FocusRequester() },
                         onFocusChanged = {},
                         onBackspacePressed = {},
+                        readOnly = true,
+                        fontSize = 16f
+                    )
+                }
+                is Block.NumberedList -> {
+                    val prefix = prefixes[block.id] ?: ""
+                    NumberedListBlockComponent(
+                        block = block,
+                        prefix = prefix,
+                        onBlockChange = {},
+                        focusRequester = remember { FocusRequester() },
                         readOnly = true,
                         fontSize = 16f
                     )

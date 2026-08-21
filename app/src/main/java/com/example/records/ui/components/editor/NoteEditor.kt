@@ -29,12 +29,16 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditorToolbar(
     currentRichTextState: RichTextState?,
     isCheckboxFocused: Boolean,
+    isNumberedListFocused: Boolean,
     onInsertCheckbox: () -> Unit,
+    onInsertNumberedList: () -> Unit,
     onInsertTable: () -> Unit
 ) {
     var fontMenuExpanded by remember { mutableStateOf(false) }
@@ -121,6 +125,12 @@ fun EditorToolbar(
             Icon(painter = painterResource(R.drawable.checkbox), contentDescription = "Insert checklist", tint = if (isCheckboxFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
         }
         IconButton(
+            onClick = onInsertNumberedList,
+            modifier = Modifier.focusProperties { canFocus = false }
+        ) {
+            Icon(painter = painterResource(R.drawable.format_list_numbered), contentDescription = "Insert numbered list", tint = if (isNumberedListFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
+        }
+        IconButton(
             onClick = onInsertTable,
             modifier = Modifier.focusProperties { canFocus = false }
         ) {
@@ -180,10 +190,15 @@ fun NoteEditor(
         val isCheckboxFocused = focusedBlockId?.let { id ->
             blocks.any { it.id == id && it is Block.Checkbox }
         } ?: false
+        val isNumberedListFocused = focusedBlockId?.let { id ->
+            blocks.any { it.id == id && it is Block.NumberedList }
+        } ?: false
+        val prefixes = remember(blocks) { calculateNumberedListPrefixes(blocks) }
 
         EditorToolbar(
             currentRichTextState = focusedRichTextState,
             isCheckboxFocused = isCheckboxFocused,
+            isNumberedListFocused = isNumberedListFocused,
             onInsertCheckbox = {
                 onStructuralChange(blocks)
                 val newBlocks = blocks.toMutableList()
@@ -198,6 +213,23 @@ fun NoteEditor(
                     newBlocks.add(idx + 1, newCheckbox)
                     newBlocks.add(idx + 2, newText) // add text block after checkbox
                     blockToFocus = newCheckbox.id
+                }
+                onBlocksChange(newBlocks)
+            },
+            onInsertNumberedList = {
+                onStructuralChange(blocks)
+                val newBlocks = blocks.toMutableList()
+                val idx = newBlocks.indexOfFirst { it.id == focusedBlockId }.takeIf { it != -1 } ?: newBlocks.lastIndex
+                if (idx != -1 && newBlocks[idx] is Block.NumberedList) {
+                    val numberedList = newBlocks[idx] as Block.NumberedList
+                    newBlocks[idx] = Block.RichText(id = numberedList.id, htmlContent = numberedList.text)
+                    blockToFocus = numberedList.id
+                } else {
+                    val newNumberedList = Block.NumberedList()
+                    val newText = Block.RichText()
+                    newBlocks.add(idx + 1, newNumberedList)
+                    newBlocks.add(idx + 2, newText)
+                    blockToFocus = newNumberedList.id
                 }
                 onBlocksChange(newBlocks)
             },
@@ -329,6 +361,78 @@ fun NoteEditor(
                                 val newCheckbox = Block.Checkbox(text = remainingText)
                                 newBlocks.add(index + 1, newCheckbox)
                                 blockToFocus = newCheckbox.id
+                                onBlocksChange(newBlocks)
+                            },
+                            fontSize = 16f,
+                            readOnly = false
+                        )
+                    }
+                    is Block.NumberedList -> {
+                        LaunchedEffect(blockToFocus) {
+                            if (blockToFocus == block.id) {
+                                focusRequester.requestFocus()
+                                blockToFocus = null
+                            }
+                        }
+
+                        val prefix = prefixes[block.id] ?: ""
+                        NumberedListBlockComponent(
+                            block = block,
+                            prefix = prefix,
+                            onBlockChange = { newBlock ->
+                                onStructuralChange(blocks)
+                                val newBlocks = blocks.toMutableList()
+                                newBlocks[index] = newBlock
+                                onBlocksChange(newBlocks)
+                            },
+                            focusRequester = focusRequester,
+                            onFocusChanged = { isFocused ->
+                                if (isFocused) {
+                                    focusedBlockId = block.id
+                                }
+                            },
+                            onBackspacePressed = {
+                                onStructuralChange(blocks)
+                                val newBlocks = blocks.toMutableList()
+                                if (block.indentLevel > 0) {
+                                    newBlocks[index] = block.copy(indentLevel = block.indentLevel - 1)
+                                } else {
+                                    newBlocks[index] = Block.RichText(id = block.id, htmlContent = "")
+                                    blockToFocus = block.id
+                                }
+                                onBlocksChange(newBlocks)
+                            },
+                            onEnterPressed = { remainingText ->
+                                onStructuralChange(blocks)
+                                val newBlocks = blocks.toMutableList()
+                                if (block.text.isEmpty()) {
+                                    newBlocks[index] = Block.RichText(id = block.id, htmlContent = "")
+                                    blockToFocus = block.id
+                                } else {
+                                    val newNumberedList = Block.NumberedList(
+                                        text = remainingText,
+                                        indentLevel = block.indentLevel
+                                    )
+                                    newBlocks.add(index + 1, newNumberedList)
+                                    blockToFocus = newNumberedList.id
+                                }
+                                onBlocksChange(newBlocks)
+                            },
+                            onTabPressed = {
+                                onStructuralChange(blocks)
+                                val newBlocks = blocks.toMutableList()
+                                newBlocks[index] = block.copy(indentLevel = block.indentLevel + 1)
+                                onBlocksChange(newBlocks)
+                            },
+                            onShiftTabPressed = {
+                                onStructuralChange(blocks)
+                                val newBlocks = blocks.toMutableList()
+                                if (block.indentLevel > 0) {
+                                    newBlocks[index] = block.copy(indentLevel = block.indentLevel - 1)
+                                } else {
+                                    newBlocks[index] = Block.RichText(id = block.id, htmlContent = block.text)
+                                    blockToFocus = block.id
+                                }
                                 onBlocksChange(newBlocks)
                             },
                             fontSize = 16f,
