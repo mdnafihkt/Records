@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.records.R
 import com.mohamedrejeb.richeditor.model.RichTextState
-import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 
@@ -66,7 +64,7 @@ fun EditorToolbar(
             enabled = currentRichTextState != null,
             modifier = Modifier.focusProperties { canFocus = false }
         ) {
-            Text("B", fontWeight = FontWeight.Bold, color = if (isBold) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
+            Icon( painter = painterResource(R.drawable.format_bold), contentDescription = "Bold format", tint = if (isBold) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
         }
         
         val isItalic = currentRichTextState?.currentSpanStyle?.fontStyle == FontStyle.Italic
@@ -75,7 +73,7 @@ fun EditorToolbar(
             enabled = currentRichTextState != null,
             modifier = Modifier.focusProperties { canFocus = false }
         ) {
-            Text("I", fontStyle = FontStyle.Italic, color = if (isItalic) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
+            Icon( painter = painterResource(R.drawable.format_italic), contentDescription = "Italics format", tint = if (isItalic) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
         }
         
         val isStrikethrough = currentRichTextState?.currentSpanStyle?.textDecoration == TextDecoration.LineThrough
@@ -84,7 +82,7 @@ fun EditorToolbar(
             enabled = currentRichTextState != null,
             modifier = Modifier.focusProperties { canFocus = false }
         ) {
-            Text("S", textDecoration = TextDecoration.LineThrough, color = if (isStrikethrough) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
+            Icon( painter = painterResource(R.drawable.format_strikethrough), contentDescription = "Strike-through format", tint = if (isStrikethrough) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
         }
 
         Spacer(modifier = Modifier.weight(1f))
