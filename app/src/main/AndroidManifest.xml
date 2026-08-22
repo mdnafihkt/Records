@@ -22,7 +22,7 @@
 
         <!-- Default Icon Alias -->
         <activity-alias
-            android:name=".MainActivityDefault"
+            android:name=".MainActivityLight"
             android:enabled="true"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_light"
