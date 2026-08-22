@@ -2,6 +2,8 @@ package com.example.records.ui.components.editor
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -56,6 +58,7 @@ fun EditorToolbar(
                 color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(16.dp)
             )
+            .horizontalScroll(rememberScrollState())
             .padding(horizontal = 12.dp, vertical = 8.dp)
             .focusProperties { canFocus = false },
         verticalAlignment = Alignment.CenterVertically,
