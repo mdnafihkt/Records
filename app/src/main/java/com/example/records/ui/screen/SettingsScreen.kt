@@ -213,9 +213,9 @@ fun SettingsScreen(
                         AppIconOption(
                             painter = painterResource(id = R.drawable.logo_dark),
                             name = "Dark",
-                            isSelected = currentIcon == AppIcon.PRO
+                            isSelected = currentIcon == AppIcon.DARK
                         ) {
-                            showIconChangeDialog = AppIcon.PRO
+                            showIconChangeDialog = AppIcon.DARK
                         }
                     }
                 }

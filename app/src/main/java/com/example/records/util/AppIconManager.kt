@@ -7,7 +7,7 @@ import android.content.pm.PackageManager
 
 enum class AppIcon(val aliasName: String, val iconResId: Int) {
     DEFAULT("com.example.records.MainActivityDefault", android.R.mipmap.sym_def_app_icon),
-    PRO("com.example.records.MainActivityPro", 0)
+    DARK("com.example.records.MainActivityDark", 0)
 }
 
 object AppIconManager {
@@ -38,7 +38,7 @@ object AppIconManager {
         val packageName = context.packageName
 
         return when {
-            pm.getComponentEnabledSetting(ComponentName(packageName, "com.example.records.MainActivityPro")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> AppIcon.PRO
+            pm.getComponentEnabledSetting(ComponentName(packageName, "com.example.records.MainActivityPro")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> AppIcon.DARK
             else -> AppIcon.DEFAULT
         }
     }
