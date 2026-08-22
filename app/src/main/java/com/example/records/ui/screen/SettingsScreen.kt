@@ -56,7 +56,7 @@ fun SettingsScreen(
             prefs.getString("app_theme", AppTheme.RECORDS_DARK.name) ?: AppTheme.RECORDS_DARK.name
         )
     }
-    val currentIcon by remember {
+    var currentIcon by remember {
         mutableStateOf(AppIconManager.getCurrentIcon(context))
     }
 
@@ -574,6 +574,7 @@ fun SettingsScreen(
                             val icon = showIconChangeDialog
                             if (icon != null) {
                                 AppIconManager.setAppIcon(context, icon)
+                                currentIcon = icon
                             }
                             showIconChangeDialog = null
                         }
