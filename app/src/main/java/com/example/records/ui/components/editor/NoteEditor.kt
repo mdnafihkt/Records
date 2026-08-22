@@ -92,6 +92,15 @@ fun EditorToolbar(
             Icon( painter = painterResource(R.drawable.format_strikethrough), contentDescription = "Strike-through format", tint = if (isStrikethrough) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
         }
 
+        val isUnderline = currentRichTextState?.currentSpanStyle?.textDecoration == TextDecoration.Underline
+        IconButton(
+            onClick = { currentRichTextState?.toggleSpanStyle(androidx.compose.ui.text.SpanStyle(textDecoration = TextDecoration.Underline)) },
+            enabled = currentRichTextState != null,
+            modifier = Modifier.focusProperties { canFocus = false }
+        ) {
+            Icon( painter = painterResource(R.drawable.format_underline), contentDescription = "Underline format", tint = if (isUnderline) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
+        }
+
         Spacer(modifier = Modifier.weight(1f))
 
         // Font Size Dropdown
