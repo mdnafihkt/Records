@@ -44,8 +44,9 @@ fun EditorToolbar(
     onInsertTable: () -> Unit
 ) {
     var fontMenuExpanded by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
 
-    Row(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -58,95 +59,192 @@ fun EditorToolbar(
                 color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(16.dp)
             )
-            .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-            .focusProperties { canFocus = false },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    )  {
-        // Formatting specific to RichText
-        val isBold = currentRichTextState?.currentSpanStyle?.fontWeight == FontWeight.Bold
-        IconButton(
-            onClick = { currentRichTextState?.toggleSpanStyle(androidx.compose.ui.text.SpanStyle(fontWeight = FontWeight.Bold)) },
-            enabled = currentRichTextState != null,
-            modifier = Modifier.focusProperties { canFocus = false }
+            .focusProperties { canFocus = false }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(scrollState)
+                .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Icon( painter = painterResource(R.drawable.format_bold), contentDescription = "Bold format", tint = if (isBold) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
-        }
-        
-        val isItalic = currentRichTextState?.currentSpanStyle?.fontStyle == FontStyle.Italic
-        IconButton(
-            onClick = { currentRichTextState?.toggleSpanStyle(androidx.compose.ui.text.SpanStyle(fontStyle = FontStyle.Italic)) },
-            enabled = currentRichTextState != null,
-            modifier = Modifier.focusProperties { canFocus = false }
-        ) {
-            Icon( painter = painterResource(R.drawable.format_italic), contentDescription = "Italics format", tint = if (isItalic) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
-        }
-        
-        val isStrikethrough = currentRichTextState?.currentSpanStyle?.textDecoration == TextDecoration.LineThrough
-        IconButton(
-            onClick = { currentRichTextState?.toggleSpanStyle(androidx.compose.ui.text.SpanStyle(textDecoration = TextDecoration.LineThrough)) },
-            enabled = currentRichTextState != null,
-            modifier = Modifier.focusProperties { canFocus = false }
-        ) {
-            Icon( painter = painterResource(R.drawable.format_strikethrough), contentDescription = "Strike-through format", tint = if (isStrikethrough) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
-        }
-
-        val isUnderline = currentRichTextState?.currentSpanStyle?.textDecoration == TextDecoration.Underline
-        IconButton(
-            onClick = { currentRichTextState?.toggleSpanStyle(androidx.compose.ui.text.SpanStyle(textDecoration = TextDecoration.Underline)) },
-            enabled = currentRichTextState != null,
-            modifier = Modifier.focusProperties { canFocus = false }
-        ) {
-            Icon( painter = painterResource(R.drawable.format_underline), contentDescription = "Underline format", tint = if (isUnderline) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Font Size Dropdown
-        Box(modifier = Modifier.focusProperties { canFocus = false }) {
+            // Formatting specific to RichText
+            val isBold = currentRichTextState?.currentSpanStyle?.fontWeight == FontWeight.Bold
             IconButton(
-                onClick = { fontMenuExpanded = true },
+                onClick = {
+                    currentRichTextState?.toggleSpanStyle(
+                        androidx.compose.ui.text.SpanStyle(
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                },
+                enabled = currentRichTextState != null,
                 modifier = Modifier.focusProperties { canFocus = false }
             ) {
-                Icon(Icons.Default.FormatSize, contentDescription = "Font Size", tint = MaterialTheme.colorScheme.onBackground)
+                Icon(
+                    painter = painterResource(R.drawable.format_bold),
+                    contentDescription = "Bold format",
+                    tint = if (isBold) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                )
             }
-            DropdownMenu(
-                expanded = fontMenuExpanded,
-                onDismissRequest = { fontMenuExpanded = false },
+
+            val isItalic = currentRichTextState?.currentSpanStyle?.fontStyle == FontStyle.Italic
+            IconButton(
+                onClick = {
+                    currentRichTextState?.toggleSpanStyle(
+                        androidx.compose.ui.text.SpanStyle(
+                            fontStyle = FontStyle.Italic
+                        )
+                    )
+                },
+                enabled = currentRichTextState != null,
                 modifier = Modifier.focusProperties { canFocus = false }
             ) {
-                listOf(12f, 14f, 16f, 18f, 20f, 24f).forEach { size ->
-                    DropdownMenuItem(
-                        text = { Text("${size.toInt()} pt") },
-                        onClick = {
-                            currentRichTextState?.toggleSpanStyle(androidx.compose.ui.text.SpanStyle(fontSize = size.sp))
-                            fontMenuExpanded = false
-                        },
-                        modifier = Modifier.focusProperties { canFocus = false }
+                Icon(
+                    painter = painterResource(R.drawable.format_italic),
+                    contentDescription = "Italics format",
+                    tint = if (isItalic) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            val isStrikethrough =
+                currentRichTextState?.currentSpanStyle?.textDecoration == TextDecoration.LineThrough
+            IconButton(
+                onClick = {
+                    currentRichTextState?.toggleSpanStyle(
+                        androidx.compose.ui.text.SpanStyle(
+                            textDecoration = TextDecoration.LineThrough
+                        )
+                    )
+                },
+                enabled = currentRichTextState != null,
+                modifier = Modifier.focusProperties { canFocus = false }
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.format_strikethrough),
+                    contentDescription = "Strike-through format",
+                    tint = if (isStrikethrough) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            val isUnderline =
+                currentRichTextState?.currentSpanStyle?.textDecoration == TextDecoration.Underline
+            IconButton(
+                onClick = {
+                    currentRichTextState?.toggleSpanStyle(
+                        androidx.compose.ui.text.SpanStyle(
+                            textDecoration = TextDecoration.Underline
+                        )
+                    )
+                },
+                enabled = currentRichTextState != null,
+                modifier = Modifier.focusProperties { canFocus = false }
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.format_underline),
+                    contentDescription = "Underline format",
+                    tint = if (isUnderline) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Font Size Dropdown
+            Box(modifier = Modifier.focusProperties { canFocus = false }) {
+                IconButton(
+                    onClick = { fontMenuExpanded = true },
+                    modifier = Modifier.focusProperties { canFocus = false }
+                ) {
+                    Icon(
+                        Icons.Default.FormatSize,
+                        contentDescription = "Font Size",
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
+                DropdownMenu(
+                    expanded = fontMenuExpanded,
+                    onDismissRequest = { fontMenuExpanded = false },
+                    modifier = Modifier.focusProperties { canFocus = false }
+                ) {
+                    listOf(12f, 14f, 16f, 18f, 20f, 24f).forEach { size ->
+                        DropdownMenuItem(
+                            text = { Text("${size.toInt()} pt") },
+                            onClick = {
+                                currentRichTextState?.toggleSpanStyle(
+                                    androidx.compose.ui.text.SpanStyle(
+                                        fontSize = size.sp
+                                    )
+                                )
+                                fontMenuExpanded = false
+                            },
+                            modifier = Modifier.focusProperties { canFocus = false }
+                        )
+                    }
+                }
+            }
+
+            // Insert blocks
+            IconButton(
+                onClick = onInsertCheckbox,
+                modifier = Modifier.focusProperties { canFocus = false }
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.checkbox),
+                    contentDescription = "Insert checklist",
+                    tint = if (isCheckboxFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                )
+            }
+            IconButton(
+                onClick = onInsertNumberedList,
+                modifier = Modifier.focusProperties { canFocus = false }
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.format_list_numbered),
+                    contentDescription = "Insert numbered list",
+                    tint = if (isNumberedListFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                )
+            }
+            IconButton(
+                onClick = onInsertTable,
+                modifier = Modifier.focusProperties { canFocus = false }
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.table),
+                    contentDescription = "Insert table",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
             }
         }
+        // Horizontal Scrollbar Indicator
+        if (scrollState.maxValue > 0) {
+            val trackWidth = 60.dp
+            val thumbWidth = 20.dp
+            val scrollProgress = scrollState.value.toFloat() / scrollState.maxValue.toFloat()
+            val thumbOffset = (trackWidth - thumbWidth) * scrollProgress
 
-        // Insert blocks
-        IconButton(
-            onClick = onInsertCheckbox,
-            modifier = Modifier.focusProperties { canFocus = false }
-        ) {
-            Icon(painter = painterResource(R.drawable.checkbox), contentDescription = "Insert checklist", tint = if (isCheckboxFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
-        }
-        IconButton(
-            onClick = onInsertNumberedList,
-            modifier = Modifier.focusProperties { canFocus = false }
-        ) {
-            Icon(painter = painterResource(R.drawable.format_list_numbered), contentDescription = "Insert numbered list", tint = if (isNumberedListFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground)
-        }
-        IconButton(
-            onClick = onInsertTable,
-            modifier = Modifier.focusProperties { canFocus = false }
-        ) {
-            Icon(painter = painterResource(R.drawable.table), contentDescription = "Insert table", tint = MaterialTheme.colorScheme.onBackground)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 4.dp)
+                    .width(trackWidth)
+                    .height(3.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                        shape = RoundedCornerShape(1.5.dp)
+                    )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .offset(x = thumbOffset)
+                        .width(thumbWidth)
+                        .fillMaxHeight()
+                        .background(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(1.5.dp)
+                        )
+                )
+            }
         }
     }
 }
