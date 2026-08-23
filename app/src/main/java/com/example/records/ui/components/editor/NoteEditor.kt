@@ -10,6 +10,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FormatSize
+import androidx.compose.material.icons.automirrored.filled.FormatAlignLeft
+import androidx.compose.material.icons.filled.FormatAlignCenter
+import androidx.compose.material.icons.automirrored.filled.FormatAlignRight
+import androidx.compose.material.icons.filled.FormatAlignJustify
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -145,6 +149,79 @@ fun EditorToolbar(
                     painter = painterResource(R.drawable.format_underline),
                     contentDescription = "Underline format",
                     tint = if (isUnderline) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            val currentAlign = currentRichTextState?.currentParagraphStyle?.textAlign
+            IconButton(
+                onClick = {
+                    currentRichTextState?.toggleParagraphStyle(
+                        androidx.compose.ui.text.ParagraphStyle(
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Left
+                        )
+                    )
+                },
+                enabled = currentRichTextState != null,
+                modifier = Modifier.focusProperties { canFocus = false }
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.FormatAlignLeft,
+                    contentDescription = "Align Left",
+                    tint = if (currentAlign == androidx.compose.ui.text.style.TextAlign.Left) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            IconButton(
+                onClick = {
+                    currentRichTextState?.toggleParagraphStyle(
+                        androidx.compose.ui.text.ParagraphStyle(
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    )
+                },
+                enabled = currentRichTextState != null,
+                modifier = Modifier.focusProperties { canFocus = false }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.FormatAlignCenter,
+                    contentDescription = "Align Center",
+                    tint = if (currentAlign == androidx.compose.ui.text.style.TextAlign.Center) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            IconButton(
+                onClick = {
+                    currentRichTextState?.toggleParagraphStyle(
+                        androidx.compose.ui.text.ParagraphStyle(
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Right
+                        )
+                    )
+                },
+                enabled = currentRichTextState != null,
+                modifier = Modifier.focusProperties { canFocus = false }
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.FormatAlignRight,
+                    contentDescription = "Align Right",
+                    tint = if (currentAlign == androidx.compose.ui.text.style.TextAlign.Right) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            IconButton(
+                onClick = {
+                    currentRichTextState?.toggleParagraphStyle(
+                        androidx.compose.ui.text.ParagraphStyle(
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Justify
+                        )
+                    )
+                },
+                enabled = currentRichTextState != null,
+                modifier = Modifier.focusProperties { canFocus = false }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.FormatAlignJustify,
+                    contentDescription = "Align Justify",
+                    tint = if (currentAlign == androidx.compose.ui.text.style.TextAlign.Justify) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                 )
             }
 
