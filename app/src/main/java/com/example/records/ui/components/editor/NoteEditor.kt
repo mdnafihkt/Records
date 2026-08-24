@@ -1,5 +1,11 @@
 package com.example.records.ui.components.editor
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
@@ -37,6 +43,7 @@ import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 
 
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditorToolbar(
@@ -48,283 +55,354 @@ fun EditorToolbar(
     onInsertTable: () -> Unit
 ) {
     var fontMenuExpanded by remember { mutableStateOf(false) }
+    var isAlignmentMenuExpanded by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outlineVariant,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .background(
-                color = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .focusProperties { canFocus = false }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .horizontalScroll(scrollState)
-                .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .background(
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .focusProperties { canFocus = false }
         ) {
-            // Formatting specific to RichText
-            val isBold = currentRichTextState?.currentSpanStyle?.fontWeight == FontWeight.Bold
-            IconButton(
-                onClick = {
-                    currentRichTextState?.toggleSpanStyle(
-                        androidx.compose.ui.text.SpanStyle(
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                },
-                enabled = currentRichTextState != null,
-                modifier = Modifier.focusProperties { canFocus = false }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(scrollState)
+                    .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.format_bold),
-                    contentDescription = "Bold format",
-                    tint = if (isBold) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-                )
-            }
-
-            val isItalic = currentRichTextState?.currentSpanStyle?.fontStyle == FontStyle.Italic
-            IconButton(
-                onClick = {
-                    currentRichTextState?.toggleSpanStyle(
-                        androidx.compose.ui.text.SpanStyle(
-                            fontStyle = FontStyle.Italic
-                        )
-                    )
-                },
-                enabled = currentRichTextState != null,
-                modifier = Modifier.focusProperties { canFocus = false }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.format_italic),
-                    contentDescription = "Italics format",
-                    tint = if (isItalic) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-                )
-            }
-
-            val isStrikethrough =
-                currentRichTextState?.currentSpanStyle?.textDecoration == TextDecoration.LineThrough
-            IconButton(
-                onClick = {
-                    currentRichTextState?.toggleSpanStyle(
-                        androidx.compose.ui.text.SpanStyle(
-                            textDecoration = TextDecoration.LineThrough
-                        )
-                    )
-                },
-                enabled = currentRichTextState != null,
-                modifier = Modifier.focusProperties { canFocus = false }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.format_strikethrough),
-                    contentDescription = "Strike-through format",
-                    tint = if (isStrikethrough) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-                )
-            }
-
-            val isUnderline =
-                currentRichTextState?.currentSpanStyle?.textDecoration == TextDecoration.Underline
-            IconButton(
-                onClick = {
-                    currentRichTextState?.toggleSpanStyle(
-                        androidx.compose.ui.text.SpanStyle(
-                            textDecoration = TextDecoration.Underline
-                        )
-                    )
-                },
-                enabled = currentRichTextState != null,
-                modifier = Modifier.focusProperties { canFocus = false }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.format_underline),
-                    contentDescription = "Underline format",
-                    tint = if (isUnderline) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-                )
-            }
-
-            val currentAlign = currentRichTextState?.currentParagraphStyle?.textAlign
-            IconButton(
-                onClick = {
-                    currentRichTextState?.toggleParagraphStyle(
-                        androidx.compose.ui.text.ParagraphStyle(
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Left
-                        )
-                    )
-                },
-                enabled = currentRichTextState != null,
-                modifier = Modifier.focusProperties { canFocus = false }
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.FormatAlignLeft,
-                    contentDescription = "Align Left",
-                    tint = if (currentAlign == androidx.compose.ui.text.style.TextAlign.Left) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-                )
-            }
-
-            IconButton(
-                onClick = {
-                    currentRichTextState?.toggleParagraphStyle(
-                        androidx.compose.ui.text.ParagraphStyle(
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
-                    )
-                },
-                enabled = currentRichTextState != null,
-                modifier = Modifier.focusProperties { canFocus = false }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.FormatAlignCenter,
-                    contentDescription = "Align Center",
-                    tint = if (currentAlign == androidx.compose.ui.text.style.TextAlign.Center) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-                )
-            }
-
-            IconButton(
-                onClick = {
-                    currentRichTextState?.toggleParagraphStyle(
-                        androidx.compose.ui.text.ParagraphStyle(
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Right
-                        )
-                    )
-                },
-                enabled = currentRichTextState != null,
-                modifier = Modifier.focusProperties { canFocus = false }
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.FormatAlignRight,
-                    contentDescription = "Align Right",
-                    tint = if (currentAlign == androidx.compose.ui.text.style.TextAlign.Right) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-                )
-            }
-
-            IconButton(
-                onClick = {
-                    currentRichTextState?.toggleParagraphStyle(
-                        androidx.compose.ui.text.ParagraphStyle(
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Justify
-                        )
-                    )
-                },
-                enabled = currentRichTextState != null,
-                modifier = Modifier.focusProperties { canFocus = false }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.FormatAlignJustify,
-                    contentDescription = "Align Justify",
-                    tint = if (currentAlign == androidx.compose.ui.text.style.TextAlign.Justify) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-                )
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Font Size Dropdown
-            Box(modifier = Modifier.focusProperties { canFocus = false }) {
+                // Formatting specific to RichText
+                val isBold = currentRichTextState?.currentSpanStyle?.fontWeight == FontWeight.Bold
                 IconButton(
-                    onClick = { fontMenuExpanded = true },
+                    onClick = {
+                        isAlignmentMenuExpanded = false
+                        currentRichTextState?.toggleSpanStyle(
+                            androidx.compose.ui.text.SpanStyle(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    },
+                    enabled = currentRichTextState != null,
                     modifier = Modifier.focusProperties { canFocus = false }
                 ) {
                     Icon(
-                        Icons.Default.FormatSize,
-                        contentDescription = "Font Size",
+                        painter = painterResource(R.drawable.format_bold),
+                        contentDescription = "Bold format",
+                        tint = if (isBold) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                    )
+                }
+
+                val isItalic = currentRichTextState?.currentSpanStyle?.fontStyle == FontStyle.Italic
+                IconButton(
+                    onClick = {
+                        isAlignmentMenuExpanded = false
+                        currentRichTextState?.toggleSpanStyle(
+                            androidx.compose.ui.text.SpanStyle(
+                                fontStyle = FontStyle.Italic
+                            )
+                        )
+                    },
+                    enabled = currentRichTextState != null,
+                    modifier = Modifier.focusProperties { canFocus = false }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.format_italic),
+                        contentDescription = "Italics format",
+                        tint = if (isItalic) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                    )
+                }
+
+                val isStrikethrough =
+                    currentRichTextState?.currentSpanStyle?.textDecoration == TextDecoration.LineThrough
+                IconButton(
+                    onClick = {
+                        isAlignmentMenuExpanded = false
+                        currentRichTextState?.toggleSpanStyle(
+                            androidx.compose.ui.text.SpanStyle(
+                                textDecoration = TextDecoration.LineThrough
+                            )
+                        )
+                    },
+                    enabled = currentRichTextState != null,
+                    modifier = Modifier.focusProperties { canFocus = false }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.format_strikethrough),
+                        contentDescription = "Strike-through format",
+                        tint = if (isStrikethrough) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                    )
+                }
+
+                val isUnderline =
+                    currentRichTextState?.currentSpanStyle?.textDecoration == TextDecoration.Underline
+                IconButton(
+                    onClick = {
+                        isAlignmentMenuExpanded = false
+                        currentRichTextState?.toggleSpanStyle(
+                            androidx.compose.ui.text.SpanStyle(
+                                textDecoration = TextDecoration.Underline
+                            )
+                        )
+                    },
+                    enabled = currentRichTextState != null,
+                    modifier = Modifier.focusProperties { canFocus = false }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.format_underline),
+                        contentDescription = "Underline format",
+                        tint = if (isUnderline) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                    )
+                }
+
+                val currentAlign = currentRichTextState?.currentParagraphStyle?.textAlign
+                val alignmentIcon = when (currentAlign) {
+                    androidx.compose.ui.text.style.TextAlign.Center -> Icons.Filled.FormatAlignCenter
+                    androidx.compose.ui.text.style.TextAlign.Right -> Icons.AutoMirrored.Filled.FormatAlignRight
+                    androidx.compose.ui.text.style.TextAlign.Justify -> Icons.Filled.FormatAlignJustify
+                    else -> Icons.AutoMirrored.Filled.FormatAlignLeft
+                }
+
+                // Primary Alignment Button on Main Toolbar
+                IconButton(
+                    onClick = {
+                        isAlignmentMenuExpanded = !isAlignmentMenuExpanded
+                    },
+                    enabled = currentRichTextState != null,
+                    modifier = Modifier.focusProperties { canFocus = false }
+                ) {
+                    Icon(
+                        imageVector = alignmentIcon,
+                        contentDescription = "Text Alignment",
+                        tint = if (isAlignmentMenuExpanded || currentAlign != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                    )
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Font Size Dropdown
+                Box(modifier = Modifier.focusProperties { canFocus = false }) {
+                    IconButton(
+                        onClick = {
+                            isAlignmentMenuExpanded = false
+                            fontMenuExpanded = true
+                        },
+                        modifier = Modifier.focusProperties { canFocus = false }
+                    ) {
+                        Icon(
+                            Icons.Default.FormatSize,
+                            contentDescription = "Font Size",
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = fontMenuExpanded,
+                        onDismissRequest = { fontMenuExpanded = false },
+                        modifier = Modifier.focusProperties { canFocus = false }
+                    ) {
+                        listOf(12f, 14f, 16f, 18f, 20f, 24f).forEach { size ->
+                            DropdownMenuItem(
+                                text = { Text("${size.toInt()} pt") },
+                                onClick = {
+                                    currentRichTextState?.toggleSpanStyle(
+                                        androidx.compose.ui.text.SpanStyle(
+                                            fontSize = size.sp
+                                        )
+                                    )
+                                    fontMenuExpanded = false
+                                },
+                                modifier = Modifier.focusProperties { canFocus = false }
+                            )
+                        }
+                    }
+                }
+
+                // Insert blocks
+                IconButton(
+                    onClick = {
+                        isAlignmentMenuExpanded = false
+                        onInsertCheckbox()
+                    },
+                    modifier = Modifier.focusProperties { canFocus = false }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.checkbox),
+                        contentDescription = "Insert checklist",
+                        tint = if (isCheckboxFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        isAlignmentMenuExpanded = false
+                        onInsertNumberedList()
+                    },
+                    modifier = Modifier.focusProperties { canFocus = false }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.format_list_numbered),
+                        contentDescription = "Insert numbered list",
+                        tint = if (isNumberedListFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        isAlignmentMenuExpanded = false
+                        onInsertTable()
+                    },
+                    modifier = Modifier.focusProperties { canFocus = false }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.table),
+                        contentDescription = "Insert table",
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
-                DropdownMenu(
-                    expanded = fontMenuExpanded,
-                    onDismissRequest = { fontMenuExpanded = false },
-                    modifier = Modifier.focusProperties { canFocus = false }
+            }
+            // Horizontal Scrollbar Indicator
+            if (scrollState.maxValue > 0) {
+                val trackWidth = 60.dp
+                val thumbWidth = 20.dp
+                val scrollProgress = scrollState.value.toFloat() / scrollState.maxValue.toFloat()
+                val thumbOffset = (trackWidth - thumbWidth) * scrollProgress
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 4.dp)
+                        .width(trackWidth)
+                        .height(3.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                            shape = RoundedCornerShape(1.5.dp)
+                        )
                 ) {
-                    listOf(12f, 14f, 16f, 18f, 20f, 24f).forEach { size ->
-                        DropdownMenuItem(
-                            text = { Text("${size.toInt()} pt") },
-                            onClick = {
-                                currentRichTextState?.toggleSpanStyle(
-                                    androidx.compose.ui.text.SpanStyle(
-                                        fontSize = size.sp
-                                    )
+                    Box(
+                        modifier = Modifier
+                            .offset(x = thumbOffset)
+                            .width(thumbWidth)
+                            .fillMaxHeight()
+                            .background(
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(1.5.dp)
+                            )
+                    )
+                }
+            }
+        }
+
+        // Secondary Floating Container for Alignment Options
+        AnimatedVisibility(
+            visible = isAlignmentMenuExpanded,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            Surface(
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .focusProperties { canFocus = false },
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 6.dp,
+                shadowElevation = 4.dp,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val currentAlign = currentRichTextState?.currentParagraphStyle?.textAlign
+
+                    IconButton(
+                        onClick = {
+                            currentRichTextState?.toggleParagraphStyle(
+                                androidx.compose.ui.text.ParagraphStyle(
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Left
                                 )
-                                fontMenuExpanded = false
-                            },
-                            modifier = Modifier.focusProperties { canFocus = false }
+                            )
+                        },
+                        enabled = currentRichTextState != null,
+                        modifier = Modifier.focusProperties { canFocus = false }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.FormatAlignLeft,
+                            contentDescription = "Align Left",
+                            tint = if (currentAlign == androidx.compose.ui.text.style.TextAlign.Left) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+
+                    IconButton(
+                        onClick = {
+                            currentRichTextState?.toggleParagraphStyle(
+                                androidx.compose.ui.text.ParagraphStyle(
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+                            )
+                        },
+                        enabled = currentRichTextState != null,
+                        modifier = Modifier.focusProperties { canFocus = false }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.FormatAlignCenter,
+                            contentDescription = "Align Center",
+                            tint = if (currentAlign == androidx.compose.ui.text.style.TextAlign.Center) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+
+                    IconButton(
+                        onClick = {
+                            currentRichTextState?.toggleParagraphStyle(
+                                androidx.compose.ui.text.ParagraphStyle(
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Right
+                                )
+                            )
+                        },
+                        enabled = currentRichTextState != null,
+                        modifier = Modifier.focusProperties { canFocus = false }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.FormatAlignRight,
+                            contentDescription = "Align Right",
+                            tint = if (currentAlign == androidx.compose.ui.text.style.TextAlign.Right) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+
+                    IconButton(
+                        onClick = {
+                            currentRichTextState?.toggleParagraphStyle(
+                                androidx.compose.ui.text.ParagraphStyle(
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Justify
+                                )
+                            )
+                        },
+                        enabled = currentRichTextState != null,
+                        modifier = Modifier.focusProperties { canFocus = false }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.FormatAlignJustify,
+                            contentDescription = "Align Justify",
+                            tint = if (currentAlign == androidx.compose.ui.text.style.TextAlign.Justify) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                         )
                     }
                 }
             }
-
-            // Insert blocks
-            IconButton(
-                onClick = onInsertCheckbox,
-                modifier = Modifier.focusProperties { canFocus = false }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.checkbox),
-                    contentDescription = "Insert checklist",
-                    tint = if (isCheckboxFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-                )
-            }
-            IconButton(
-                onClick = onInsertNumberedList,
-                modifier = Modifier.focusProperties { canFocus = false }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.format_list_numbered),
-                    contentDescription = "Insert numbered list",
-                    tint = if (isNumberedListFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-                )
-            }
-            IconButton(
-                onClick = onInsertTable,
-                modifier = Modifier.focusProperties { canFocus = false }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.table),
-                    contentDescription = "Insert table",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-        }
-        // Horizontal Scrollbar Indicator
-        if (scrollState.maxValue > 0) {
-            val trackWidth = 60.dp
-            val thumbWidth = 20.dp
-            val scrollProgress = scrollState.value.toFloat() / scrollState.maxValue.toFloat()
-            val thumbOffset = (trackWidth - thumbWidth) * scrollProgress
-
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 4.dp)
-                    .width(trackWidth)
-                    .height(3.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-                        shape = RoundedCornerShape(1.5.dp)
-                    )
-            ) {
-                Box(
-                    modifier = Modifier
-                        .offset(x = thumbOffset)
-                        .width(thumbWidth)
-                        .fillMaxHeight()
-                        .background(
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(1.5.dp)
-                        )
-                )
-            }
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
