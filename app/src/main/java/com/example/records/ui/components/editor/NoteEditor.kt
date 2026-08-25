@@ -938,6 +938,7 @@ fun NoteEditor(
                                     lastFocusedTableBlockId = block.id
                                 }
                             },
+                            isFocused = (block.id == targetTableBlockId),
                             fontSize = 16f,
                             readOnly = false
                         )
