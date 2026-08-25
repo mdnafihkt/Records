@@ -370,9 +370,6 @@ fun EditorToolbar(
                         onClick = {
                             isAlignmentMenuExpanded = false
                             fontMenuExpanded = false
-                            if (!isTableFocused && !isTableMenuExpanded) {
-                                onInsertTable()
-                            }
                             isTableMenuExpanded = !isTableMenuExpanded
                         },
                         modifier = Modifier.focusProperties { canFocus = false }
@@ -394,6 +391,22 @@ fun EditorToolbar(
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            // Insert Table
+                            IconButton(
+                                onClick = {
+                                    onInsertTable()
+                                    isTableMenuExpanded = false
+                                },
+                                modifier = Modifier.focusProperties { canFocus = false }
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.table),
+                                    contentDescription = "Insert Table",
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+
+                            // Add Row
                             IconButton(
                                 onClick = { onAddRow() },
                                 modifier = Modifier.focusProperties { canFocus = false }
@@ -405,6 +418,7 @@ fun EditorToolbar(
                                 )
                             }
 
+                            // Delete Row
                             IconButton(
                                 onClick = { onDeleteRow() },
                                 modifier = Modifier.focusProperties { canFocus = false }
@@ -416,6 +430,7 @@ fun EditorToolbar(
                                 )
                             }
 
+                            // Add Column
                             IconButton(
                                 onClick = { onAddColumn() },
                                 modifier = Modifier.focusProperties { canFocus = false }
@@ -427,6 +442,7 @@ fun EditorToolbar(
                                 )
                             }
 
+                            // Delete Column
                             IconButton(
                                 onClick = { onDeleteColumn() },
                                 modifier = Modifier.focusProperties { canFocus = false }
@@ -438,6 +454,7 @@ fun EditorToolbar(
                                 )
                             }
 
+                            // Delete Table
                             IconButton(
                                 onClick = {
                                     onDeleteTable()
@@ -498,6 +515,7 @@ fun NoteEditor(
     modifier: Modifier = Modifier
 ) {
     var focusedBlockId by remember { mutableStateOf<String?>(null) }
+    var lastFocusedTableBlockId by remember { mutableStateOf<String?>(null) }
     var blockToFocus by remember { mutableStateOf<String?>(null) }
     
     val focusRequesters = remember { mutableStateMapOf<String, FocusRequester>() }
@@ -543,7 +561,9 @@ fun NoteEditor(
         val isNumberedListFocused = focusedBlockId?.let { id ->
             blocks.any { it.id == id && it is Block.NumberedList }
         } ?: false
-        val focusedTableBlockId = focusedBlockId?.takeIf { id ->
+        val targetTableBlockId = focusedBlockId?.takeIf { id ->
+            blocks.any { it.id == id && it is Block.Table }
+        } ?: lastFocusedTableBlockId?.takeIf { id ->
             blocks.any { it.id == id && it is Block.Table }
         } ?: blocks.firstOrNull { it is Block.Table }?.id
         val isTableFocused = focusedBlockId?.let { id ->
@@ -598,10 +618,11 @@ fun NoteEditor(
                 newBlocks.add(idx + 1, newTable)
                 newBlocks.add(idx + 2, Block.RichText())
                 focusedBlockId = newTable.id
+                lastFocusedTableBlockId = newTable.id
                 onBlocksChange(newBlocks)
             },
             onAddRow = {
-                val targetId = focusedTableBlockId
+                val targetId = targetTableBlockId
                 if (targetId != null) {
                     onStructuralChange(blocks)
                     val newBlocks = blocks.toMutableList()
@@ -620,11 +641,12 @@ fun NoteEditor(
                     newBlocks.add(newTable)
                     newBlocks.add(Block.RichText())
                     focusedBlockId = newTable.id
+                    lastFocusedTableBlockId = newTable.id
                     onBlocksChange(newBlocks)
                 }
             },
             onDeleteRow = {
-                focusedTableBlockId?.let { id ->
+                targetTableBlockId?.let { id ->
                     onStructuralChange(blocks)
                     val newBlocks = blocks.toMutableList()
                     val idx = newBlocks.indexOfFirst { it.id == id }
@@ -639,7 +661,7 @@ fun NoteEditor(
                 }
             },
             onAddColumn = {
-                val targetId = focusedTableBlockId
+                val targetId = targetTableBlockId
                 if (targetId != null) {
                     onStructuralChange(blocks)
                     val newBlocks = blocks.toMutableList()
@@ -661,11 +683,12 @@ fun NoteEditor(
                     newBlocks.add(newTable)
                     newBlocks.add(Block.RichText())
                     focusedBlockId = newTable.id
+                    lastFocusedTableBlockId = newTable.id
                     onBlocksChange(newBlocks)
                 }
             },
             onDeleteColumn = {
-                focusedTableBlockId?.let { id ->
+                targetTableBlockId?.let { id ->
                     onStructuralChange(blocks)
                     val newBlocks = blocks.toMutableList()
                     val idx = newBlocks.indexOfFirst { it.id == id }
@@ -682,13 +705,14 @@ fun NoteEditor(
                 }
             },
             onDeleteTable = {
-                focusedTableBlockId?.let { id ->
+                targetTableBlockId?.let { id ->
                     onStructuralChange(blocks)
                     val newBlocks = blocks.toMutableList()
                     val idx = newBlocks.indexOfFirst { it.id == id }
                     if (idx != -1) {
                         newBlocks.removeAt(idx)
-                        focusedBlockId = null
+                        if (focusedBlockId == id) focusedBlockId = null
+                        if (lastFocusedTableBlockId == id) lastFocusedTableBlockId = null
                         onBlocksChange(newBlocks)
                     }
                 }
@@ -904,7 +928,15 @@ fun NoteEditor(
                                 onStructuralChange(blocks)
                                 val newBlocks = blocks.toMutableList()
                                 newBlocks.removeAt(index)
+                                if (focusedBlockId == block.id) focusedBlockId = null
+                                if (lastFocusedTableBlockId == block.id) lastFocusedTableBlockId = null
                                 onBlocksChange(newBlocks)
+                            },
+                            onFocusChanged = { isFocused ->
+                                if (isFocused) {
+                                    focusedBlockId = block.id
+                                    lastFocusedTableBlockId = block.id
+                                }
                             },
                             fontSize = 16f,
                             readOnly = false
