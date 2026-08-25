@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.automirrored.filled.FormatAlignLeft
 import androidx.compose.material.icons.filled.FormatAlignCenter
@@ -54,12 +55,19 @@ fun EditorToolbar(
     currentRichTextState: RichTextState?,
     isCheckboxFocused: Boolean,
     isNumberedListFocused: Boolean,
+    isTableFocused: Boolean,
     onInsertCheckbox: () -> Unit,
     onInsertNumberedList: () -> Unit,
-    onInsertTable: () -> Unit
+    onInsertTable: () -> Unit,
+    onAddRow: () -> Unit = {},
+    onDeleteRow: () -> Unit = {},
+    onAddColumn: () -> Unit = {},
+    onDeleteColumn: () -> Unit = {},
+    onDeleteTable: () -> Unit = {}
 ) {
     var fontMenuExpanded by remember { mutableStateOf(false) }
     var isAlignmentMenuExpanded by remember { mutableStateOf(false) }
+    var isTableMenuExpanded by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
     Column(
@@ -94,6 +102,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isTableMenuExpanded = false
                         currentRichTextState?.toggleSpanStyle(
                             androidx.compose.ui.text.SpanStyle(
                                 fontWeight = FontWeight.Bold
@@ -114,6 +123,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isTableMenuExpanded = false
                         currentRichTextState?.toggleSpanStyle(
                             androidx.compose.ui.text.SpanStyle(
                                 fontStyle = FontStyle.Italic
@@ -135,6 +145,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isTableMenuExpanded = false
                         currentRichTextState?.toggleSpanStyle(
                             androidx.compose.ui.text.SpanStyle(
                                 textDecoration = TextDecoration.LineThrough
@@ -156,6 +167,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isTableMenuExpanded = false
                         currentRichTextState?.toggleSpanStyle(
                             androidx.compose.ui.text.SpanStyle(
                                 textDecoration = TextDecoration.Underline
@@ -184,6 +196,7 @@ fun EditorToolbar(
                 Box(modifier = Modifier.focusProperties { canFocus = false }) {
                     IconButton(
                         onClick = {
+                            isTableMenuExpanded = false
                             isAlignmentMenuExpanded = !isAlignmentMenuExpanded
                         },
                         enabled = currentRichTextState != null,
@@ -288,6 +301,7 @@ fun EditorToolbar(
                     IconButton(
                         onClick = {
                             isAlignmentMenuExpanded = false
+                            isTableMenuExpanded = false
                             fontMenuExpanded = true
                         },
                         modifier = Modifier.focusProperties { canFocus = false }
@@ -324,6 +338,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isTableMenuExpanded = false
                         onInsertCheckbox()
                     },
                     modifier = Modifier.focusProperties { canFocus = false }
@@ -337,6 +352,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isTableMenuExpanded = false
                         onInsertNumberedList()
                     },
                     modifier = Modifier.focusProperties { canFocus = false }
@@ -347,18 +363,96 @@ fun EditorToolbar(
                         tint = if (isNumberedListFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                     )
                 }
-                IconButton(
-                    onClick = {
-                        isAlignmentMenuExpanded = false
-                        onInsertTable()
-                    },
-                    modifier = Modifier.focusProperties { canFocus = false }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.table),
-                        contentDescription = "Insert table",
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
+
+                // Primary Table Button on Main Toolbar with Anchored Floating Container
+                Box(modifier = Modifier.focusProperties { canFocus = false }) {
+                    IconButton(
+                        onClick = {
+                            isAlignmentMenuExpanded = false
+                            fontMenuExpanded = false
+                            if (!isTableFocused && !isTableMenuExpanded) {
+                                onInsertTable()
+                            }
+                            isTableMenuExpanded = !isTableMenuExpanded
+                        },
+                        modifier = Modifier.focusProperties { canFocus = false }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.table),
+                            contentDescription = "Table options",
+                            tint = if (isTableFocused || isTableMenuExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = isTableMenuExpanded,
+                        onDismissRequest = { isTableMenuExpanded = false },
+                        modifier = Modifier.focusProperties { canFocus = false }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(
+                                onClick = { onAddRow() },
+                                modifier = Modifier.focusProperties { canFocus = false }
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.table_add_row),
+                                    contentDescription = "Add Row",
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+
+                            IconButton(
+                                onClick = { onDeleteRow() },
+                                modifier = Modifier.focusProperties { canFocus = false }
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.table_delete_row),
+                                    contentDescription = "Delete Row",
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+
+                            IconButton(
+                                onClick = { onAddColumn() },
+                                modifier = Modifier.focusProperties { canFocus = false }
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.table_add_column),
+                                    contentDescription = "Add Column",
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+
+                            IconButton(
+                                onClick = { onDeleteColumn() },
+                                modifier = Modifier.focusProperties { canFocus = false }
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.table_delete_column),
+                                    contentDescription = "Delete Column",
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+
+                            IconButton(
+                                onClick = {
+                                    onDeleteTable()
+                                    isTableMenuExpanded = false
+                                },
+                                modifier = Modifier.focusProperties { canFocus = false }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Delete Table",
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        }
+                    }
                 }
             }
             // Horizontal Scrollbar Indicator
@@ -394,7 +488,6 @@ fun EditorToolbar(
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -450,12 +543,19 @@ fun NoteEditor(
         val isNumberedListFocused = focusedBlockId?.let { id ->
             blocks.any { it.id == id && it is Block.NumberedList }
         } ?: false
+        val focusedTableBlockId = focusedBlockId?.takeIf { id ->
+            blocks.any { it.id == id && it is Block.Table }
+        } ?: blocks.firstOrNull { it is Block.Table }?.id
+        val isTableFocused = focusedBlockId?.let { id ->
+            blocks.any { it.id == id && it is Block.Table }
+        } ?: false
         val prefixes = remember(blocks) { calculateNumberedListPrefixes(blocks) }
 
         EditorToolbar(
             currentRichTextState = focusedRichTextState,
             isCheckboxFocused = isCheckboxFocused,
             isNumberedListFocused = isNumberedListFocused,
+            isTableFocused = isTableFocused,
             onInsertCheckbox = {
                 onStructuralChange(blocks)
                 val newBlocks = blocks.toMutableList()
@@ -494,9 +594,104 @@ fun NoteEditor(
                 onStructuralChange(blocks)
                 val newBlocks = blocks.toMutableList()
                 val idx = newBlocks.indexOfFirst { it.id == focusedBlockId }.takeIf { it != -1 } ?: newBlocks.lastIndex
-                newBlocks.add(idx + 1, Block.Table())
+                val newTable = Block.Table()
+                newBlocks.add(idx + 1, newTable)
                 newBlocks.add(idx + 2, Block.RichText())
+                focusedBlockId = newTable.id
                 onBlocksChange(newBlocks)
+            },
+            onAddRow = {
+                val targetId = focusedTableBlockId
+                if (targetId != null) {
+                    onStructuralChange(blocks)
+                    val newBlocks = blocks.toMutableList()
+                    val idx = newBlocks.indexOfFirst { it.id == targetId }
+                    if (idx != -1 && newBlocks[idx] is Block.Table) {
+                        val table = newBlocks[idx] as Block.Table
+                        val newCells = table.cells.map { it.toMutableList() }.toMutableList()
+                        newCells.add(MutableList(table.cols) { "" })
+                        newBlocks[idx] = table.copy(rows = table.rows + 1, cells = newCells)
+                        onBlocksChange(newBlocks)
+                    }
+                } else {
+                    onStructuralChange(blocks)
+                    val newBlocks = blocks.toMutableList()
+                    val newTable = Block.Table()
+                    newBlocks.add(newTable)
+                    newBlocks.add(Block.RichText())
+                    focusedBlockId = newTable.id
+                    onBlocksChange(newBlocks)
+                }
+            },
+            onDeleteRow = {
+                focusedTableBlockId?.let { id ->
+                    onStructuralChange(blocks)
+                    val newBlocks = blocks.toMutableList()
+                    val idx = newBlocks.indexOfFirst { it.id == id }
+                    if (idx != -1 && newBlocks[idx] is Block.Table) {
+                        val table = newBlocks[idx] as Block.Table
+                        if (table.rows > 1) {
+                            val newCells = table.cells.dropLast(1).map { it.toMutableList() }.toMutableList()
+                            newBlocks[idx] = table.copy(rows = table.rows - 1, cells = newCells)
+                            onBlocksChange(newBlocks)
+                        }
+                    }
+                }
+            },
+            onAddColumn = {
+                val targetId = focusedTableBlockId
+                if (targetId != null) {
+                    onStructuralChange(blocks)
+                    val newBlocks = blocks.toMutableList()
+                    val idx = newBlocks.indexOfFirst { it.id == targetId }
+                    if (idx != -1 && newBlocks[idx] is Block.Table) {
+                        val table = newBlocks[idx] as Block.Table
+                        val newCells = table.cells.map { row ->
+                            val newRow = row.toMutableList()
+                            newRow.add("")
+                            newRow
+                        }.toMutableList()
+                        newBlocks[idx] = table.copy(cols = table.cols + 1, cells = newCells)
+                        onBlocksChange(newBlocks)
+                    }
+                } else {
+                    onStructuralChange(blocks)
+                    val newBlocks = blocks.toMutableList()
+                    val newTable = Block.Table()
+                    newBlocks.add(newTable)
+                    newBlocks.add(Block.RichText())
+                    focusedBlockId = newTable.id
+                    onBlocksChange(newBlocks)
+                }
+            },
+            onDeleteColumn = {
+                focusedTableBlockId?.let { id ->
+                    onStructuralChange(blocks)
+                    val newBlocks = blocks.toMutableList()
+                    val idx = newBlocks.indexOfFirst { it.id == id }
+                    if (idx != -1 && newBlocks[idx] is Block.Table) {
+                        val table = newBlocks[idx] as Block.Table
+                        if (table.cols > 1) {
+                            val newCells = table.cells.map { row ->
+                                row.dropLast(1).toMutableList()
+                            }.toMutableList()
+                            newBlocks[idx] = table.copy(cols = table.cols - 1, cells = newCells)
+                            onBlocksChange(newBlocks)
+                        }
+                    }
+                }
+            },
+            onDeleteTable = {
+                focusedTableBlockId?.let { id ->
+                    onStructuralChange(blocks)
+                    val newBlocks = blocks.toMutableList()
+                    val idx = newBlocks.indexOfFirst { it.id == id }
+                    if (idx != -1) {
+                        newBlocks.removeAt(idx)
+                        focusedBlockId = null
+                        onBlocksChange(newBlocks)
+                    }
+                }
             }
         )
 
