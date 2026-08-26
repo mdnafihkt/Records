@@ -33,8 +33,10 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -55,9 +57,11 @@ fun EditorToolbar(
     currentRichTextState: RichTextState?,
     isCheckboxFocused: Boolean,
     isNumberedListFocused: Boolean,
+    isBulletListFocused: Boolean,
     isTableFocused: Boolean,
     onInsertCheckbox: () -> Unit,
     onInsertNumberedList: () -> Unit,
+    onInsertBulletList: (style: String) -> Unit,
     onInsertTable: () -> Unit,
     onAddRow: () -> Unit = {},
     onDeleteRow: () -> Unit = {},
@@ -67,6 +71,7 @@ fun EditorToolbar(
 ) {
     var fontMenuExpanded by remember { mutableStateOf(false) }
     var isAlignmentMenuExpanded by remember { mutableStateOf(false) }
+    var isBulletMenuExpanded by remember { mutableStateOf(false) }
     var isTableMenuExpanded by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
@@ -102,6 +107,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isBulletMenuExpanded = false
                         isTableMenuExpanded = false
                         currentRichTextState?.toggleSpanStyle(
                             androidx.compose.ui.text.SpanStyle(
@@ -123,6 +129,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isBulletMenuExpanded = false
                         isTableMenuExpanded = false
                         currentRichTextState?.toggleSpanStyle(
                             androidx.compose.ui.text.SpanStyle(
@@ -145,6 +152,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isBulletMenuExpanded = false
                         isTableMenuExpanded = false
                         currentRichTextState?.toggleSpanStyle(
                             androidx.compose.ui.text.SpanStyle(
@@ -167,6 +175,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isBulletMenuExpanded = false
                         isTableMenuExpanded = false
                         currentRichTextState?.toggleSpanStyle(
                             androidx.compose.ui.text.SpanStyle(
@@ -196,6 +205,7 @@ fun EditorToolbar(
                 Box(modifier = Modifier.focusProperties { canFocus = false }) {
                     IconButton(
                         onClick = {
+                            isBulletMenuExpanded = false
                             isTableMenuExpanded = false
                             isAlignmentMenuExpanded = !isAlignmentMenuExpanded
                         },
@@ -301,6 +311,7 @@ fun EditorToolbar(
                     IconButton(
                         onClick = {
                             isAlignmentMenuExpanded = false
+                            isBulletMenuExpanded = false
                             isTableMenuExpanded = false
                             fontMenuExpanded = true
                         },
@@ -338,6 +349,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isBulletMenuExpanded = false
                         isTableMenuExpanded = false
                         onInsertCheckbox()
                     },
@@ -352,6 +364,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isBulletMenuExpanded = false
                         isTableMenuExpanded = false
                         onInsertNumberedList()
                     },
@@ -362,6 +375,94 @@ fun EditorToolbar(
                         contentDescription = "Insert numbered list",
                         tint = if (isNumberedListFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                     )
+                }
+
+                // Primary Bullet List Button on Main Toolbar with Anchored Floating Container
+                Box(modifier = Modifier.focusProperties { canFocus = false }) {
+                    IconButton(
+                        onClick = {
+                            isAlignmentMenuExpanded = false
+                            fontMenuExpanded = false
+                            isTableMenuExpanded = false
+                            isBulletMenuExpanded = !isBulletMenuExpanded
+                        },
+                        modifier = Modifier.focusProperties { canFocus = false }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.format_list_bulleted),
+                            contentDescription = "Bullet List options",
+                            tint = if (isBulletListFocused || isBulletMenuExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = isBulletMenuExpanded,
+                        onDismissRequest = { isBulletMenuExpanded = false },
+                        modifier = Modifier.focusProperties { canFocus = false }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Dot Bullet
+                            IconButton(
+                                onClick = {
+                                    onInsertBulletList("dot")
+                                    isBulletMenuExpanded = false
+                                },
+                                modifier = Modifier.focusProperties { canFocus = false }
+                            ) {
+                                Text(
+                                    text = "•",
+                                    style = TextStyle(
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onBackground,
+                                        textAlign = TextAlign.Center
+                                    )
+                                )
+                            }
+
+                            // Square Bullet
+                            IconButton(
+                                onClick = {
+                                    onInsertBulletList("square")
+                                    isBulletMenuExpanded = false
+                                },
+                                modifier = Modifier.focusProperties { canFocus = false }
+                            ) {
+                                Text(
+                                    text = "▪",
+                                    style = TextStyle(
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onBackground,
+                                        textAlign = TextAlign.Center
+                                    )
+                                )
+                            }
+
+                            // Arrow Bullet
+                            IconButton(
+                                onClick = {
+                                    onInsertBulletList("arrow")
+                                    isBulletMenuExpanded = false
+                                },
+                                modifier = Modifier.focusProperties { canFocus = false }
+                            ) {
+                                Text(
+                                    text = "➔",
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onBackground,
+                                        textAlign = TextAlign.Center
+                                    )
+                                )
+                            }
+                        }
+                    }
                 }
 
                 // Primary Table Button on Main Toolbar with Anchored Floating Container
@@ -561,6 +662,9 @@ fun NoteEditor(
         val isNumberedListFocused = focusedBlockId?.let { id ->
             blocks.any { it.id == id && it is Block.NumberedList }
         } ?: false
+        val isBulletListFocused = focusedBlockId?.let { id ->
+            blocks.any { it.id == id && it is Block.BulletList }
+        } ?: false
         val targetTableBlockId = focusedBlockId?.takeIf { id ->
             blocks.any { it.id == id && it is Block.Table }
         } ?: lastFocusedTableBlockId?.takeIf { id ->
@@ -575,6 +679,7 @@ fun NoteEditor(
             currentRichTextState = focusedRichTextState,
             isCheckboxFocused = isCheckboxFocused,
             isNumberedListFocused = isNumberedListFocused,
+            isBulletListFocused = isBulletListFocused,
             isTableFocused = isTableFocused,
             onInsertCheckbox = {
                 onStructuralChange(blocks)
@@ -607,6 +712,23 @@ fun NoteEditor(
                     newBlocks.add(idx + 1, newNumberedList)
                     newBlocks.add(idx + 2, newText)
                     blockToFocus = newNumberedList.id
+                }
+                onBlocksChange(newBlocks)
+            },
+            onInsertBulletList = { style ->
+                onStructuralChange(blocks)
+                val newBlocks = blocks.toMutableList()
+                val idx = newBlocks.indexOfFirst { it.id == focusedBlockId }.takeIf { it != -1 } ?: newBlocks.lastIndex
+                if (idx != -1 && newBlocks[idx] is Block.BulletList) {
+                    val currentBullet = newBlocks[idx] as Block.BulletList
+                    newBlocks[idx] = currentBullet.copy(bulletStyle = style)
+                    blockToFocus = currentBullet.id
+                } else {
+                    val newBulletList = Block.BulletList(bulletStyle = style)
+                    val newText = Block.RichText()
+                    newBlocks.add(idx + 1, newBulletList)
+                    newBlocks.add(idx + 2, newText)
+                    blockToFocus = newBulletList.id
                 }
                 onBlocksChange(newBlocks)
             },
@@ -891,6 +1013,77 @@ fun NoteEditor(
                                     )
                                     newBlocks.add(index + 1, newNumberedList)
                                     blockToFocus = newNumberedList.id
+                                }
+                                onBlocksChange(newBlocks)
+                            },
+                            onTabPressed = {
+                                onStructuralChange(blocks)
+                                val newBlocks = blocks.toMutableList()
+                                newBlocks[index] = block.copy(indentLevel = block.indentLevel + 1)
+                                onBlocksChange(newBlocks)
+                            },
+                            onShiftTabPressed = {
+                                onStructuralChange(blocks)
+                                val newBlocks = blocks.toMutableList()
+                                if (block.indentLevel > 0) {
+                                    newBlocks[index] = block.copy(indentLevel = block.indentLevel - 1)
+                                } else {
+                                    newBlocks[index] = Block.RichText(id = block.id, htmlContent = block.text)
+                                    blockToFocus = block.id
+                                }
+                                onBlocksChange(newBlocks)
+                            },
+                            fontSize = 16f,
+                            readOnly = false
+                        )
+                    }
+                    is Block.BulletList -> {
+                        LaunchedEffect(blockToFocus) {
+                            if (blockToFocus == block.id) {
+                                focusRequester.requestFocus()
+                                blockToFocus = null
+                            }
+                        }
+
+                        BulletListBlockComponent(
+                            block = block,
+                            onBlockChange = { newBlock ->
+                                onStructuralChange(blocks)
+                                val newBlocks = blocks.toMutableList()
+                                newBlocks[index] = newBlock
+                                onBlocksChange(newBlocks)
+                            },
+                            focusRequester = focusRequester,
+                            onFocusChanged = { isFocused ->
+                                if (isFocused) {
+                                    focusedBlockId = block.id
+                                }
+                            },
+                            onBackspacePressed = {
+                                onStructuralChange(blocks)
+                                val newBlocks = blocks.toMutableList()
+                                if (block.indentLevel > 0) {
+                                    newBlocks[index] = block.copy(indentLevel = block.indentLevel - 1)
+                                } else {
+                                    newBlocks[index] = Block.RichText(id = block.id, htmlContent = "")
+                                    blockToFocus = block.id
+                                }
+                                onBlocksChange(newBlocks)
+                            },
+                            onEnterPressed = { remainingText ->
+                                onStructuralChange(blocks)
+                                val newBlocks = blocks.toMutableList()
+                                if (block.text.isEmpty()) {
+                                    newBlocks[index] = Block.RichText(id = block.id, htmlContent = "")
+                                    blockToFocus = block.id
+                                } else {
+                                    val newBulletList = Block.BulletList(
+                                        text = remainingText,
+                                        bulletStyle = block.bulletStyle,
+                                        indentLevel = block.indentLevel
+                                    )
+                                    newBlocks.add(index + 1, newBulletList)
+                                    blockToFocus = newBulletList.id
                                 }
                                 onBlocksChange(newBlocks)
                             },

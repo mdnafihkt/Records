@@ -28,6 +28,13 @@ sealed class Block {
         var text: String = "",
         var indentLevel: Int = 0
     ) : Block()
+
+    data class BulletList(
+        override val id: String = UUID.randomUUID().toString(),
+        var text: String = "",
+        var bulletStyle: String = "dot",
+        var indentLevel: Int = 0
+    ) : Block()
 }
 
 // Wrapper for Gson serialization to keep track of type
@@ -40,7 +47,8 @@ data class BlockData(
     val rows: Int? = null,
     val cols: Int? = null,
     val cells: List<List<String>>? = null,
-    val indentLevel: Int? = null
+    val indentLevel: Int? = null,
+    val bulletStyle: String? = null
 ) {
     fun toBlock(): Block {
         return when (type) {
@@ -52,6 +60,7 @@ data class BlockData(
                 Block.Table(id, rows ?: 2, cols ?: 2, mutableCells)
             }
             "NumberedList" -> Block.NumberedList(id, text ?: "", indentLevel ?: 0)
+            "BulletList" -> Block.BulletList(id, text ?: "", bulletStyle ?: "dot", indentLevel ?: 0)
             else -> Block.RichText(id, "")
         }
     }
@@ -83,6 +92,13 @@ fun Block.toBlockData(): BlockData {
             text = text,
             indentLevel = indentLevel
         )
+        is Block.BulletList -> BlockData(
+            type = "BulletList",
+            id = id,
+            text = text,
+            bulletStyle = bulletStyle,
+            indentLevel = indentLevel
+        )
     }
 }
 
@@ -112,6 +128,14 @@ fun List<Block>.toPlainText(): String {
             is Block.Checkbox -> "[${if (block.checked) "x" else " "}] ${block.text}"
             is Block.Table -> "Table (${block.rows}x${block.cols})"
             is Block.NumberedList -> block.text
+            is Block.BulletList -> {
+                val symbol = when (block.bulletStyle) {
+                    "square" -> "▪"
+                    "arrow" -> "➔"
+                    else -> "•"
+                }
+                "$symbol ${block.text}"
+            }
         }
     }
 }

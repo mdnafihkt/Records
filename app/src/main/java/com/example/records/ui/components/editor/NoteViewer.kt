@@ -60,6 +60,15 @@ fun NoteViewer(
                         fontSize = 16f
                     )
                 }
+                is Block.BulletList -> {
+                    BulletListBlockComponent(
+                        block = block,
+                        onBlockChange = {},
+                        focusRequester = remember { FocusRequester() },
+                        readOnly = true,
+                        fontSize = 16f
+                    )
+                }
                 is Block.Table -> {
                     TableBlockComponent(
                         block = block,
