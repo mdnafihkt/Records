@@ -15,8 +15,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FormatSize
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.material.icons.automirrored.filled.FormatAlignLeft
 import androidx.compose.material.icons.filled.FormatAlignCenter
 import androidx.compose.material.icons.automirrored.filled.FormatAlignRight
@@ -74,6 +80,7 @@ fun EditorToolbar(
     onDeleteTable: () -> Unit = {}
 ) {
     var fontMenuExpanded by remember { mutableStateOf(false) }
+    var customFontSizeText by remember { mutableStateOf("16") }
     var isAlignmentMenuExpanded by remember { mutableStateOf(false) }
     var isIndentMenuExpanded by remember { mutableStateOf(false) }
     var isBulletMenuExpanded by remember { mutableStateOf(false) }
@@ -316,7 +323,7 @@ fun EditorToolbar(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                // Font Size Dropdown
+                // Font Size Dropdown (Horizontal Floating Secondary Container)
                 Box(modifier = Modifier.focusProperties { canFocus = false }) {
                     IconButton(
                         onClick = {
@@ -324,14 +331,18 @@ fun EditorToolbar(
                             isIndentMenuExpanded = false
                             isBulletMenuExpanded = false
                             isTableMenuExpanded = false
-                            fontMenuExpanded = true
+                            val currentSp = currentRichTextState?.currentSpanStyle?.fontSize?.value
+                            if (currentSp != null && currentSp > 0) {
+                                customFontSizeText = currentSp.toInt().toString()
+                            }
+                            fontMenuExpanded = !fontMenuExpanded
                         },
                         modifier = Modifier.focusProperties { canFocus = false }
                     ) {
                         Icon(
                             Icons.Default.FormatSize,
                             contentDescription = "Font Size",
-                            tint = MaterialTheme.colorScheme.onBackground
+                            tint = if (fontMenuExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                         )
                     }
                     DropdownMenu(
@@ -339,19 +350,129 @@ fun EditorToolbar(
                         onDismissRequest = { fontMenuExpanded = false },
                         modifier = Modifier.focusProperties { canFocus = false }
                     ) {
-                        listOf(12f, 14f, 16f, 18f, 20f, 24f).forEach { size ->
-                            DropdownMenuItem(
-                                text = { Text("${size.toInt()} pt") },
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Decrease Font Size (-)
+                            IconButton(
                                 onClick = {
-                                    currentRichTextState?.toggleSpanStyle(
-                                        androidx.compose.ui.text.SpanStyle(
-                                            fontSize = size.sp
+                                    val current = customFontSizeText.toIntOrNull() ?: 16
+                                    if (current > 6) {
+                                        val newSize = current - 1
+                                        customFontSizeText = newSize.toString()
+                                        currentRichTextState?.toggleSpanStyle(
+                                            androidx.compose.ui.text.SpanStyle(fontSize = newSize.sp)
+                                        )
+                                    }
+                                },
+                                enabled = currentRichTextState != null,
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .focusProperties { canFocus = false }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Remove,
+                                    contentDescription = "Decrease Font Size",
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+
+                            // Custom Numeric Input Field
+                            BasicTextField(
+                                value = customFontSizeText,
+                                onValueChange = { input ->
+                                    val digitsOnly = input.filter { it.isDigit() }.take(3)
+                                    customFontSizeText = digitsOnly
+                                    val sizeVal = digitsOnly.toFloatOrNull()
+                                    if (sizeVal != null && sizeVal in 6f..120f) {
+                                        currentRichTextState?.toggleSpanStyle(
+                                            androidx.compose.ui.text.SpanStyle(fontSize = sizeVal.sp)
+                                        )
+                                    }
+                                },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                singleLine = true,
+                                textStyle = TextStyle(
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    textAlign = TextAlign.Center
+                                ),
+                                modifier = Modifier
+                                    .width(42.dp)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                        shape = RoundedCornerShape(6.dp)
+                                    )
+                                    .padding(vertical = 6.dp, horizontal = 4.dp)
+                            )
+
+                            Text(
+                                text = "pt",
+                                style = TextStyle(
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                                )
+                            )
+
+                            // Increase Font Size (+)
+                            IconButton(
+                                onClick = {
+                                    val current = customFontSizeText.toIntOrNull() ?: 16
+                                    if (current < 120) {
+                                        val newSize = current + 1
+                                        customFontSizeText = newSize.toString()
+                                        currentRichTextState?.toggleSpanStyle(
+                                            androidx.compose.ui.text.SpanStyle(fontSize = newSize.sp)
+                                        )
+                                    }
+                                },
+                                enabled = currentRichTextState != null,
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .focusProperties { canFocus = false }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Increase Font Size",
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+
+                            Divider(
+                                modifier = Modifier
+                                    .height(24.dp)
+                                    .width(1.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant
+                            )
+
+                            // Quick Presets
+                            listOf(12, 14, 16, 18, 20, 24, 28).forEach { size ->
+                                Surface(
+                                    onClick = {
+                                        customFontSizeText = size.toString()
+                                        currentRichTextState?.toggleSpanStyle(
+                                            androidx.compose.ui.text.SpanStyle(fontSize = size.sp)
+                                        )
+                                    },
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = if (customFontSizeText == size.toString()) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                                    modifier = Modifier.padding(horizontal = 2.dp)
+                                ) {
+                                    Text(
+                                        text = "$size",
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),
+                                        style = TextStyle(
+                                            fontSize = 13.sp,
+                                            fontWeight = if (customFontSizeText == size.toString()) FontWeight.Bold else FontWeight.Normal,
+                                            color = if (customFontSizeText == size.toString()) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onBackground
                                         )
                                     )
-                                    fontMenuExpanded = false
-                                },
-                                modifier = Modifier.focusProperties { canFocus = false }
-                            )
+                                }
+                            }
                         }
                     }
                 }
