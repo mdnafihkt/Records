@@ -21,6 +21,8 @@ import androidx.compose.material.icons.automirrored.filled.FormatAlignLeft
 import androidx.compose.material.icons.filled.FormatAlignCenter
 import androidx.compose.material.icons.automirrored.filled.FormatAlignRight
 import androidx.compose.material.icons.filled.FormatAlignJustify
+import androidx.compose.material.icons.automirrored.filled.FormatIndentDecrease
+import androidx.compose.material.icons.automirrored.filled.FormatIndentIncrease
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -63,6 +65,8 @@ fun EditorToolbar(
     onInsertNumberedList: () -> Unit,
     onInsertBulletList: (style: String) -> Unit,
     onInsertTable: () -> Unit,
+    onIncreaseIndent: () -> Unit = {},
+    onDecreaseIndent: () -> Unit = {},
     onAddRow: () -> Unit = {},
     onDeleteRow: () -> Unit = {},
     onAddColumn: () -> Unit = {},
@@ -71,6 +75,7 @@ fun EditorToolbar(
 ) {
     var fontMenuExpanded by remember { mutableStateOf(false) }
     var isAlignmentMenuExpanded by remember { mutableStateOf(false) }
+    var isIndentMenuExpanded by remember { mutableStateOf(false) }
     var isBulletMenuExpanded by remember { mutableStateOf(false) }
     var isTableMenuExpanded by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
@@ -107,6 +112,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isIndentMenuExpanded = false
                         isBulletMenuExpanded = false
                         isTableMenuExpanded = false
                         currentRichTextState?.toggleSpanStyle(
@@ -129,6 +135,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isIndentMenuExpanded = false
                         isBulletMenuExpanded = false
                         isTableMenuExpanded = false
                         currentRichTextState?.toggleSpanStyle(
@@ -152,6 +159,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isIndentMenuExpanded = false
                         isBulletMenuExpanded = false
                         isTableMenuExpanded = false
                         currentRichTextState?.toggleSpanStyle(
@@ -175,6 +183,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isIndentMenuExpanded = false
                         isBulletMenuExpanded = false
                         isTableMenuExpanded = false
                         currentRichTextState?.toggleSpanStyle(
@@ -205,6 +214,7 @@ fun EditorToolbar(
                 Box(modifier = Modifier.focusProperties { canFocus = false }) {
                     IconButton(
                         onClick = {
+                            isIndentMenuExpanded = false
                             isBulletMenuExpanded = false
                             isTableMenuExpanded = false
                             isAlignmentMenuExpanded = !isAlignmentMenuExpanded
@@ -311,6 +321,7 @@ fun EditorToolbar(
                     IconButton(
                         onClick = {
                             isAlignmentMenuExpanded = false
+                            isIndentMenuExpanded = false
                             isBulletMenuExpanded = false
                             isTableMenuExpanded = false
                             fontMenuExpanded = true
@@ -349,6 +360,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isIndentMenuExpanded = false
                         isBulletMenuExpanded = false
                         isTableMenuExpanded = false
                         onInsertCheckbox()
@@ -364,6 +376,7 @@ fun EditorToolbar(
                 IconButton(
                     onClick = {
                         isAlignmentMenuExpanded = false
+                        isIndentMenuExpanded = false
                         isBulletMenuExpanded = false
                         isTableMenuExpanded = false
                         onInsertNumberedList()
@@ -383,6 +396,7 @@ fun EditorToolbar(
                         onClick = {
                             isAlignmentMenuExpanded = false
                             fontMenuExpanded = false
+                            isIndentMenuExpanded = false
                             isTableMenuExpanded = false
                             isBulletMenuExpanded = !isBulletMenuExpanded
                         },
@@ -465,11 +479,74 @@ fun EditorToolbar(
                     }
                 }
 
+                // Primary Indentation Tool Button on Main Toolbar with Anchored Floating Container
+                Box(modifier = Modifier.focusProperties { canFocus = false }) {
+                    IconButton(
+                        onClick = {
+                            isAlignmentMenuExpanded = false
+                            fontMenuExpanded = false
+                            isBulletMenuExpanded = false
+                            isTableMenuExpanded = false
+                            isIndentMenuExpanded = !isIndentMenuExpanded
+                        },
+                        modifier = Modifier.focusProperties { canFocus = false }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.FormatIndentIncrease,
+                            contentDescription = "Indentation options",
+                            tint = if (isIndentMenuExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = isIndentMenuExpanded,
+                        onDismissRequest = { isIndentMenuExpanded = false },
+                        modifier = Modifier.focusProperties { canFocus = false }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Decrease Indent / Outdent
+                            IconButton(
+                                onClick = {
+                                    onDecreaseIndent()
+                                    isIndentMenuExpanded = false
+                                },
+                                modifier = Modifier.focusProperties { canFocus = false }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.FormatIndentDecrease,
+                                    contentDescription = "Decrease Indent",
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+
+                            // Increase Indent / Indent
+                            IconButton(
+                                onClick = {
+                                    onIncreaseIndent()
+                                    isIndentMenuExpanded = false
+                                },
+                                modifier = Modifier.focusProperties { canFocus = false }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.FormatIndentIncrease,
+                                    contentDescription = "Increase Indent",
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+                        }
+                    }
+                }
+
                 // Primary Table Button on Main Toolbar with Anchored Floating Container
                 Box(modifier = Modifier.focusProperties { canFocus = false }) {
                     IconButton(
                         onClick = {
                             isAlignmentMenuExpanded = false
+                            isIndentMenuExpanded = false
                             fontMenuExpanded = false
                             isTableMenuExpanded = !isTableMenuExpanded
                         },
@@ -617,6 +694,7 @@ fun NoteEditor(
 ) {
     var focusedBlockId by remember { mutableStateOf<String?>(null) }
     var lastFocusedTableBlockId by remember { mutableStateOf<String?>(null) }
+    var lastFocusedListBlockId by remember { mutableStateOf<String?>(null) }
     var blockToFocus by remember { mutableStateOf<String?>(null) }
     
     val focusRequesters = remember { mutableStateMapOf<String, FocusRequester>() }
@@ -742,6 +820,62 @@ fun NoteEditor(
                 focusedBlockId = newTable.id
                 lastFocusedTableBlockId = newTable.id
                 onBlocksChange(newBlocks)
+            },
+            onIncreaseIndent = {
+                val targetId = focusedBlockId ?: lastFocusedListBlockId
+                if (targetId != null) {
+                    onStructuralChange(blocks)
+                    val newBlocks = blocks.toMutableList()
+                    val idx = newBlocks.indexOfFirst { it.id == targetId }
+                    if (idx != -1) {
+                        when (val block = newBlocks[idx]) {
+                            is Block.NumberedList -> {
+                                newBlocks[idx] = block.copy(indentLevel = block.indentLevel + 1)
+                                onBlocksChange(newBlocks)
+                            }
+                            is Block.BulletList -> {
+                                newBlocks[idx] = block.copy(indentLevel = block.indentLevel + 1)
+                                onBlocksChange(newBlocks)
+                            }
+                            is Block.Checkbox -> {
+                                newBlocks[idx] = block.copy(indentLevel = block.indentLevel + 1)
+                                onBlocksChange(newBlocks)
+                            }
+                            else -> {}
+                        }
+                    }
+                }
+            },
+            onDecreaseIndent = {
+                val targetId = focusedBlockId ?: lastFocusedListBlockId
+                if (targetId != null) {
+                    onStructuralChange(blocks)
+                    val newBlocks = blocks.toMutableList()
+                    val idx = newBlocks.indexOfFirst { it.id == targetId }
+                    if (idx != -1) {
+                        when (val block = newBlocks[idx]) {
+                            is Block.NumberedList -> {
+                                if (block.indentLevel > 0) {
+                                    newBlocks[idx] = block.copy(indentLevel = block.indentLevel - 1)
+                                    onBlocksChange(newBlocks)
+                                }
+                            }
+                            is Block.BulletList -> {
+                                if (block.indentLevel > 0) {
+                                    newBlocks[idx] = block.copy(indentLevel = block.indentLevel - 1)
+                                    onBlocksChange(newBlocks)
+                                }
+                            }
+                            is Block.Checkbox -> {
+                                if (block.indentLevel > 0) {
+                                    newBlocks[idx] = block.copy(indentLevel = block.indentLevel - 1)
+                                    onBlocksChange(newBlocks)
+                                }
+                            }
+                            else -> {}
+                        }
+                    }
+                }
             },
             onAddRow = {
                 val targetId = targetTableBlockId
@@ -944,22 +1078,44 @@ fun NoteEditor(
                             onFocusChanged = { isFocused ->
                                 if (isFocused) {
                                     focusedBlockId = block.id
+                                    lastFocusedListBlockId = block.id
                                 }
                             },
                             onBackspacePressed = {
                                 onStructuralChange(blocks)
                                 val newBlocks = blocks.toMutableList()
-                                newBlocks[index] = Block.RichText(id = block.id, htmlContent = "")
-                                blockToFocus = block.id
+                                if (block.indentLevel > 0) {
+                                    newBlocks[index] = block.copy(indentLevel = block.indentLevel - 1)
+                                } else {
+                                    newBlocks[index] = Block.RichText(id = block.id, htmlContent = "")
+                                    blockToFocus = block.id
+                                }
                                 onBlocksChange(newBlocks)
                             },
                             onEnterPressed = { remainingText ->
                                 onStructuralChange(blocks)
                                 val newBlocks = blocks.toMutableList()
-                                val newCheckbox = Block.Checkbox(text = remainingText)
+                                val newCheckbox = Block.Checkbox(
+                                    text = remainingText,
+                                    indentLevel = block.indentLevel
+                                )
                                 newBlocks.add(index + 1, newCheckbox)
                                 blockToFocus = newCheckbox.id
                                 onBlocksChange(newBlocks)
+                            },
+                            onTabPressed = {
+                                onStructuralChange(blocks)
+                                val newBlocks = blocks.toMutableList()
+                                newBlocks[index] = block.copy(indentLevel = block.indentLevel + 1)
+                                onBlocksChange(newBlocks)
+                            },
+                            onShiftTabPressed = {
+                                onStructuralChange(blocks)
+                                val newBlocks = blocks.toMutableList()
+                                if (block.indentLevel > 0) {
+                                    newBlocks[index] = block.copy(indentLevel = block.indentLevel - 1)
+                                    onBlocksChange(newBlocks)
+                                }
                             },
                             fontSize = 16f,
                             readOnly = false
@@ -987,6 +1143,7 @@ fun NoteEditor(
                             onFocusChanged = { isFocused ->
                                 if (isFocused) {
                                     focusedBlockId = block.id
+                                    lastFocusedListBlockId = block.id
                                 }
                             },
                             onBackspacePressed = {
@@ -1057,6 +1214,7 @@ fun NoteEditor(
                             onFocusChanged = { isFocused ->
                                 if (isFocused) {
                                     focusedBlockId = block.id
+                                    lastFocusedListBlockId = block.id
                                 }
                             },
                             onBackspacePressed = {

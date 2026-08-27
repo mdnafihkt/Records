@@ -28,13 +28,15 @@ fun CheckboxBlockComponent(
     onFocusChanged: (Boolean) -> Unit = {},
     onBackspacePressed: () -> Unit = {},
     onEnterPressed: (String) -> Unit = {},
+    onTabPressed: () -> Unit = {},
+    onShiftTabPressed: () -> Unit = {},
     readOnly: Boolean = false,
     fontSize: Float = 16f
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 1.dp),
+            .padding(start = (block.indentLevel * 20).dp, top = 1.dp, bottom = 1.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Checkbox(
@@ -98,17 +100,30 @@ fun CheckboxBlockComponent(
                 .focusRequester(focusRequester)
                 .onFocusChanged { onFocusChanged(it.isFocused) }
                 .onKeyEvent { keyEvent ->
-                    if (keyEvent.type == KeyEventType.KeyDown && 
-                        keyEvent.key == Key.Backspace && 
-                        block.text.isEmpty()
-                    ) {
-                        onBackspacePressed()
-                        true
-                    } else if (keyEvent.type == KeyEventType.KeyDown && 
-                        keyEvent.key == Key.Enter
-                    ) {
-                        onEnterPressed("")
-                        true
+                    if (keyEvent.type == KeyEventType.KeyDown) {
+                        when (keyEvent.key) {
+                            Key.Tab -> {
+                                if (keyEvent.isShiftPressed) {
+                                    onShiftTabPressed()
+                                } else {
+                                    onTabPressed()
+                                }
+                                true
+                            }
+                            Key.Backspace -> {
+                                if (block.text.isEmpty()) {
+                                    onBackspacePressed()
+                                    true
+                                } else {
+                                    false
+                                }
+                            }
+                            Key.Enter -> {
+                                onEnterPressed("")
+                                true
+                            }
+                            else -> false
+                        }
                     } else {
                         false
                     }

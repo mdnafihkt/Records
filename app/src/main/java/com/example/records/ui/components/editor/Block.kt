@@ -13,7 +13,8 @@ sealed class Block {
     data class Checkbox(
         override val id: String = UUID.randomUUID().toString(),
         var checked: Boolean = false,
-        var text: String = ""
+        var text: String = "",
+        var indentLevel: Int = 0
     ) : Block()
 
     data class Table(
@@ -53,7 +54,7 @@ data class BlockData(
     fun toBlock(): Block {
         return when (type) {
             "RichText" -> Block.RichText(id, htmlContent ?: "")
-            "Checkbox" -> Block.Checkbox(id, checked ?: false, text ?: "")
+            "Checkbox" -> Block.Checkbox(id, checked ?: false, text ?: "", indentLevel ?: 0)
             "Table" -> {
                 val mutableCells = cells?.map { it.toMutableList() }?.toMutableList()
                     ?: MutableList(rows ?: 2) { MutableList(cols ?: 2) { "" } }
@@ -77,7 +78,8 @@ fun Block.toBlockData(): BlockData {
             type = "Checkbox",
             id = id,
             checked = checked,
-            text = text
+            text = text,
+            indentLevel = indentLevel
         )
         is Block.Table -> BlockData(
             type = "Table",
