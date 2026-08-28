@@ -65,4 +65,17 @@ class FolderViewModel(application: Application) : AndroidViewModel(application) 
             loadFolders()
         }
     }
+
+    fun moveNotesToFolder(noteIds: List<Int>, targetFolderId: Int) {
+        viewModelScope.launch {
+            val noteRepository = com.example.records.repository.NoteRepository(db.noteDao(), db.folderNoteJoinDao(), db.folderDao())
+            noteRepository.moveNotesToFolder(noteIds, targetFolderId)
+            loadFolders()
+        }
+    }
+
+    suspend fun getAllNotes(): List<com.example.records.repository.DecryptedNote> {
+        val noteRepository = com.example.records.repository.NoteRepository(db.noteDao(), db.folderNoteJoinDao(), db.folderDao())
+        return noteRepository.getAllNotes()
+    }
 }

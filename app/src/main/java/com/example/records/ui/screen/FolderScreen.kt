@@ -73,12 +73,20 @@ import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.draw.shadow
+import androidx.compose.material3.Checkbox
+import androidx.compose.runtime.produceState
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.material.icons.filled.DriveFileMove
+import com.example.records.repository.DecryptedNote
+import com.example.records.ui.components.editor.toBlocks
+import com.example.records.ui.components.editor.toPlainText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FolderScreen(
     folderViewModel: FolderViewModel = viewModel(),
-    onFolderClick: (Int) -> Unit // returns folderId
+    onFolderClick: (Int) -> Unit, // returns folderId
+    onAddNoteToFolder: (Int) -> Unit = {}
 ) {
     val folders by folderViewModel.folders.collectAsState()
     val allNotesCount by folderViewModel.allNotesCount.collectAsState()
@@ -86,6 +94,7 @@ fun FolderScreen(
     var showAddFolderDialog by remember { mutableStateOf(false) }
     var showRenameFolderDialog by remember { mutableStateOf<Folder?>(null) }
     var showDeleteFolderDialog by remember { mutableStateOf<Folder?>(null) }
+    var showMoveNotesDialogForFolder by remember { mutableStateOf<Folder?>(null) }
 
     var selectedFolderForOptions by remember { mutableStateOf<Folder?>(null) }
     val sheetState = rememberModalBottomSheetState()
@@ -273,6 +282,18 @@ fun FolderScreen(
                 )
             }
 
+            showMoveNotesDialogForFolder?.let { folder ->
+                SelectNotesForFolderDialog(
+                    folder = folder,
+                    folderViewModel = folderViewModel,
+                    onConfirm = { noteIds ->
+                        folderViewModel.moveNotesToFolder(noteIds, folder.id)
+                        showMoveNotesDialogForFolder = null
+                    },
+                    onDismiss = { showMoveNotesDialogForFolder = null }
+                )
+            }
+
             // Bottom Sheet
             if (selectedFolderForOptions != null) {
                 ModalBottomSheet(
@@ -292,6 +313,46 @@ fun FolderScreen(
                             color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
+                        
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    val targetFolderId = selectedFolderForOptions?.id ?: 0
+                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                        if (!sheetState.isVisible) {
+                                            selectedFolderForOptions = null
+                                        }
+                                    }
+                                    onAddNoteToFolder(targetFolderId)
+                                }
+                                .padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
+                            Spacer(Modifier.width(16.dp))
+                            Text("New Note", color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp)
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    val folder = selectedFolderForOptions
+                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                        if (!sheetState.isVisible) {
+                                            selectedFolderForOptions = null
+                                        }
+                                    }
+                                    showMoveNotesDialogForFolder = folder
+                                }
+                                .padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.DriveFileMove, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
+                            Spacer(Modifier.width(16.dp))
+                            Text("Add Existing Notes", color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp)
+                        }
                         
                         Row(
                             modifier = Modifier
@@ -537,6 +598,98 @@ fun FolderDialog(
                 }
             ) {
                 Text("Save")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
+fun SelectNotesForFolderDialog(
+    folder: Folder,
+    folderViewModel: FolderViewModel,
+    onConfirm: (List<Int>) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val notesState = produceState<List<DecryptedNote>>(initialValue = emptyList()) {
+        value = folderViewModel.getAllNotes()
+    }
+    val allNotes = notesState.value
+    var selectedNoteIds by remember { mutableStateOf(setOf<Int>()) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add Notes to ${folder.name}") },
+        text = {
+            if (allNotes.isEmpty()) {
+                Text("No existing notes found.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(allNotes, key = { it.id }) { note ->
+                        val isSelected = selectedNoteIds.contains(note.id)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable {
+                                    selectedNoteIds = if (isSelected) {
+                                        selectedNoteIds - note.id
+                                    } else {
+                                        selectedNoteIds + note.id
+                                    }
+                                }
+                                .padding(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = isSelected,
+                                onCheckedChange = { checked ->
+                                    selectedNoteIds = if (checked) {
+                                        selectedNoteIds + note.id
+                                    } else {
+                                        selectedNoteIds - note.id
+                                    }
+                                }
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = note.title.ifEmpty { "Untitled Note" },
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 16.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(
+                                    text = note.content.toBlocks().toPlainText(),
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onConfirm(selectedNoteIds.toList())
+                },
+                enabled = selectedNoteIds.isNotEmpty()
+            ) {
+                Text("Add Selected")
             }
         },
         dismissButton = {

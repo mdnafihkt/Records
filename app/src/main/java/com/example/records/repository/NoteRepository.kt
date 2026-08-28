@@ -148,6 +148,18 @@ class NoteRepository(
         return if (joins.isNotEmpty()) joins[0].folderId else 1
     }
 
+    suspend fun moveNoteToFolder(noteId: Int, folderId: Int) {
+        folderNoteJoinDao.deleteByNoteId(noteId)
+        folderNoteJoinDao.insert(FolderNoteJoin(folderId, noteId))
+    }
+
+    suspend fun moveNotesToFolder(noteIds: List<Int>, folderId: Int) {
+        noteIds.forEach { noteId ->
+            folderNoteJoinDao.deleteByNoteId(noteId)
+            folderNoteJoinDao.insert(FolderNoteJoin(folderId, noteId))
+        }
+    }
+
     // ── Encryption Helpers ────────────────────────────────────────
 
     private fun encryptNote(decryptedNote: DecryptedNote): Note {

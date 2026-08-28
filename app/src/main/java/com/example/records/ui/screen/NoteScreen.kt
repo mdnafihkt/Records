@@ -52,6 +52,7 @@ import com.example.records.ui.theme.GlassmorphicBackground
 @Composable
 fun NoteScreen(
     notes: List<DecryptedNote>,
+    folderName: String = "My Notes",
     onNoteClick: (Int) -> Unit,
     onAddNoteClick : () -> Unit
 ) {
@@ -72,7 +73,7 @@ fun NoteScreen(
                 Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
                     // Fixed Title
                     Text(
-                        text = "My Notes",
+                        text = folderName,
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onBackground

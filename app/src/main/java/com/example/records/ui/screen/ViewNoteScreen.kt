@@ -64,14 +64,16 @@ import com.example.records.ui.theme.GlassmorphicCard
 @Composable
 fun ViewNoteScreen(
     note: DecryptedNote?,
+    folders: List<com.example.records.database.Folder> = emptyList(),
     onBackClick: () -> Unit,
     onEditClick: () -> Unit,
-    onMoveClick: () -> Unit,
+    onMoveClick: (Int) -> Unit,
     onDeleteClick: () -> Unit,
     onPinClick: () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showMoveDialog by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var isSearchVisible by remember { mutableStateOf(false) }
 
@@ -154,7 +156,7 @@ fun ViewNoteScreen(
                                 text = { Text("Move folder") },
                                 onClick = {
                                     showMenu = false
-                                    onMoveClick()
+                                    showMoveDialog = true
                                 }
                             )
                             DropdownMenuItem(
@@ -231,6 +233,52 @@ fun ViewNoteScreen(
                 },
                 dismissButton = {
                     Button(onClick = { showDeleteDialog = false }) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
+
+        if (showMoveDialog) {
+            AlertDialog(
+                onDismissRequest = { showMoveDialog = false },
+                title = { Text("Move to Folder") },
+                text = {
+                    if (folders.isEmpty()) {
+                        Text("No folders available.")
+                    } else {
+                        Column {
+                            folders.forEach { folder ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            onMoveClick(folder.id)
+                                            showMoveDialog = false
+                                        }
+                                        .padding(vertical = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.folder_icon_2),
+                                        contentDescription = null,
+                                        tint = if (folder.color != 0) Color(folder.color) else MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(Modifier.width(12.dp))
+                                    Text(
+                                        text = folder.name,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                            }
+                        }
+                    }
+                },
+                confirmButton = {},
+                dismissButton = {
+                    Button(onClick = { showMoveDialog = false }) {
                         Text("Cancel")
                     }
                 }

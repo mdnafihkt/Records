@@ -122,6 +122,9 @@ fun AppNavHost() {
                             } else {
                                 navController.navigate(Screen.NoteList.createRoute(folderId))
                             }
+                        },
+                        onAddNoteToFolder = { folderId ->
+                            navController.navigate(Screen.AddEditNote.createRoute(folderId = folderId, isEdit = false))
                         }
                 )
             }
@@ -142,12 +145,22 @@ fun AppNavHost() {
                             }
                         }
 
+                val folderName by
+                        produceState<String>(initialValue = "My Notes", key1 = folderId) {
+                            value = if (folderId == 0) {
+                                "My Notes"
+                            } else {
+                                db.folderDao().getAllFolders().find { it.id == folderId }?.name ?: "Folder Notes"
+                            }
+                        }
+
                 NoteScreen(
                         notes = notes,
+                        folderName = folderName,
                         onNoteClick = { noteId ->
                             navController.navigate(Screen.ViewNote.createRoute(noteId))
                         },
-                        onAddNoteClick = { navController.navigate(Screen.AddEditNote.createRoute(folderId = 0 , isEdit = false)) }
+                        onAddNoteClick = { navController.navigate(Screen.AddEditNote.createRoute(folderId = folderId, isEdit = false)) }
                 )
             }
 
@@ -163,8 +176,14 @@ fun AppNavHost() {
                             value = noteRepository.getNoteById(noteId)
                         }
 
+                val foldersState =
+                        produceState<List<com.example.records.database.Folder>>(initialValue = emptyList()) {
+                            value = db.folderDao().getAllFolders()
+                        }
+
                 ViewNoteScreen(
                         note = note,
+                        folders = foldersState.value,
                         onBackClick = { navController.popBackStack() },
                         onEditClick = {
                             scope.launch {
@@ -174,8 +193,11 @@ fun AppNavHost() {
                                 )
                             }
                         },
-                        onMoveClick = {
-                            Toast.makeText(context, "Not yet implemented", Toast.LENGTH_LONG).show()
+                        onMoveClick = { targetFolderId ->
+                            scope.launch {
+                                noteRepository.moveNoteToFolder(noteId, targetFolderId)
+                                Toast.makeText(context, "Note moved", Toast.LENGTH_SHORT).show()
+                            }
                         },
                         onDeleteClick = {
                             scope.launch {
