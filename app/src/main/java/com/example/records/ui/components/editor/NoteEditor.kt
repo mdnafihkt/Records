@@ -601,66 +601,46 @@ fun EditorToolbar(
                 }
 
                 // Primary Indentation Tool Button on Main Toolbar with Anchored Floating Container
-                Box(modifier = Modifier.focusProperties { canFocus = false }) {
-                    IconButton(
-                        onClick = {
-                            isAlignmentMenuExpanded = false
-                            fontMenuExpanded = false
-                            isBulletMenuExpanded = false
-                            isTableMenuExpanded = false
-                            isIndentMenuExpanded = !isIndentMenuExpanded
-                        },
-                        modifier = Modifier.focusProperties { canFocus = false }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.FormatIndentIncrease,
-                            contentDescription = "Indentation options",
-                            tint = if (isIndentMenuExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-
-                    DropdownMenu(
-                        expanded = isIndentMenuExpanded,
-                        onDismissRequest = { isIndentMenuExpanded = false },
-                        modifier = Modifier.focusProperties { canFocus = false }
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            // Decrease Indent / Outdent
-                            IconButton(
-                                onClick = {
-                                    onDecreaseIndent()
-                                    isIndentMenuExpanded = false
-                                },
-                                modifier = Modifier.focusProperties { canFocus = false }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.FormatIndentDecrease,
-                                    contentDescription = "Decrease Indent",
-                                    tint = MaterialTheme.colorScheme.onBackground
-                                )
-                            }
-
-                            // Increase Indent / Indent
-                            IconButton(
-                                onClick = {
-                                    onIncreaseIndent()
-                                    isIndentMenuExpanded = false
-                                },
-                                modifier = Modifier.focusProperties { canFocus = false }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.FormatIndentIncrease,
-                                    contentDescription = "Increase Indent",
-                                    tint = MaterialTheme.colorScheme.onBackground
-                                )
-                            }
-                        }
-                    }
+                //Outdent
+            IconButton(
+                  onClick = {
+                        isAlignmentMenuExpanded = false
+                        fontMenuExpanded = false
+                        isBulletMenuExpanded = false
+                        isTableMenuExpanded = false
+                        isIndentMenuExpanded = !isIndentMenuExpanded
+                        onDecreaseIndent()
+                        isIndentMenuExpanded = false
+                    },
+                    modifier = Modifier.focusProperties { canFocus = false }
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.FormatIndentDecrease,
+                        contentDescription = "Decrease Indent",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
                 }
+
+                // Increase Indent / Indent
+                IconButton(
+                    onClick = {
+                        isAlignmentMenuExpanded = false
+                        fontMenuExpanded = false
+                        isBulletMenuExpanded = false
+                        isTableMenuExpanded = false
+                        isIndentMenuExpanded = !isIndentMenuExpanded
+                        onIncreaseIndent()
+                        isIndentMenuExpanded = false
+                    },
+                    modifier = Modifier.focusProperties { canFocus = false }
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.FormatIndentIncrease,
+                        contentDescription = "Increase Indent",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+
 
                 // Primary Table Button on Main Toolbar with Anchored Floating Container
                 Box(modifier = Modifier.focusProperties { canFocus = false }) {
