@@ -34,6 +34,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
@@ -79,6 +81,7 @@ fun EditorToolbar(
     onDeleteColumn: () -> Unit = {},
     onDeleteTable: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     var fontMenuExpanded by remember { mutableStateOf(false) }
     var customFontSizeText by remember { mutableStateOf("16") }
     var isAlignmentMenuExpanded by remember { mutableStateOf(false) }
@@ -333,7 +336,7 @@ fun EditorToolbar(
                             isTableMenuExpanded = false
                             val currentSp = currentRichTextState?.currentSpanStyle?.fontSize?.value
                             if (currentSp != null && currentSp > 0) {
-                                customFontSizeText = currentSp.toInt().toString()
+                                customFontSizeText = currentSp.coerceIn(12f, 42f).toInt().toString()
                             }
                             fontMenuExpanded = !fontMenuExpanded
                         },
@@ -360,7 +363,13 @@ fun EditorToolbar(
                             IconButton(
                                 onClick = {
                                     val current = customFontSizeText.toIntOrNull() ?: 16
-                                    if (current > 6) {
+                                    if (current <= 12) {
+                                        customFontSizeText = "12"
+                                        currentRichTextState?.toggleSpanStyle(
+                                            androidx.compose.ui.text.SpanStyle(fontSize = 12.sp)
+                                        )
+                                        Toast.makeText(context, "12 is minimum limit", Toast.LENGTH_SHORT).show()
+                                    } else {
                                         val newSize = current - 1
                                         customFontSizeText = newSize.toString()
                                         currentRichTextState?.toggleSpanStyle(
@@ -385,12 +394,30 @@ fun EditorToolbar(
                                 value = customFontSizeText,
                                 onValueChange = { input ->
                                     val digitsOnly = input.filter { it.isDigit() }.take(3)
-                                    customFontSizeText = digitsOnly
                                     val sizeVal = digitsOnly.toFloatOrNull()
-                                    if (sizeVal != null && sizeVal in 6f..120f) {
-                                        currentRichTextState?.toggleSpanStyle(
-                                            androidx.compose.ui.text.SpanStyle(fontSize = sizeVal.sp)
-                                        )
+                                    if (sizeVal != null) {
+                                        if (sizeVal > 42f) {
+                                            customFontSizeText = "42"
+                                            currentRichTextState?.toggleSpanStyle(
+                                                androidx.compose.ui.text.SpanStyle(fontSize = 42.sp)
+                                            )
+                                            Toast.makeText(context, "Maximum font size is 42", Toast.LENGTH_SHORT).show()
+                                        } else if (digitsOnly.length >= 2 && sizeVal < 12f) {
+                                            customFontSizeText = "12"
+                                            currentRichTextState?.toggleSpanStyle(
+                                                androidx.compose.ui.text.SpanStyle(fontSize = 12.sp)
+                                            )
+                                            Toast.makeText(context, "12 is minimum limit", Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            customFontSizeText = digitsOnly
+                                            if (sizeVal in 12f..42f) {
+                                                currentRichTextState?.toggleSpanStyle(
+                                                    androidx.compose.ui.text.SpanStyle(fontSize = sizeVal.sp)
+                                                )
+                                            }
+                                        }
+                                    } else {
+                                        customFontSizeText = digitsOnly
                                     }
                                 },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -422,7 +449,13 @@ fun EditorToolbar(
                             IconButton(
                                 onClick = {
                                     val current = customFontSizeText.toIntOrNull() ?: 16
-                                    if (current < 120) {
+                                    if (current >= 42) {
+                                        customFontSizeText = "42"
+                                        currentRichTextState?.toggleSpanStyle(
+                                            androidx.compose.ui.text.SpanStyle(fontSize = 42.sp)
+                                        )
+                                        Toast.makeText(context, "Maximum font size is 42", Toast.LENGTH_SHORT).show()
+                                    } else {
                                         val newSize = current + 1
                                         customFontSizeText = newSize.toString()
                                         currentRichTextState?.toggleSpanStyle(
@@ -450,7 +483,7 @@ fun EditorToolbar(
                             )
 
                             // Quick Presets
-                            listOf(12, 14, 16, 18, 20, 24, 28).forEach { size ->
+                            listOf(12, 16, 42).forEach { size ->
                                 Surface(
                                     onClick = {
                                         customFontSizeText = size.toString()
